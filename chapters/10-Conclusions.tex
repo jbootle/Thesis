@@ -1,0 +1,48 @@
+% !TEX root = ..\Main.tex
+\chapter{Conclusion}
+\label{chapterlabel:Conclusions}
+%
+% This just dumps some pseudolatin in so you can see some text in place.
+%\blindtext
+%
+%    A failure to overview the whole project, perhaps just focusing on one aspect (e.g., something the author has just explored in the section above, or their %favourite aspect/part of the project).
+%
+%    A collection of motherhood statements disconnected from the literature, `soap box' announcements or imperatives for action that don't necessarily flow %from the evidence presented. For example, I recently reviewed a research paper where the author seemed to consider the final section as his/her chance for %chest beating on issues not at all substantiated by the research presented: 'Thus teachers should blah blah blah...'
+%
+%    A lazy reiteration (even duplication) of statements from the abstract or the introduction or abstract.
+%
+%    A bland re-summarising of the research and/or listing of findings.
+%
+%    A failure to highlight the 'take-home message' - be that the key argument, key finding(s) or implications. This 'high pass' claim or observation is what makes %a conclusion great.
+%
+%    remind the reader of the research problem and purpose and how they were addressed
+%    briefly summarise what has been covered in the paper
+%    make some kind of holistic assessment/judgement/ claim that pertains to the whole project (i.e., more than a descriptive summary)
+%    assess the value/relevance/ implications of the key findings in light of existing studies and literature
+%    'speak' to the Introduction
+%    outline implications of the study (for theory, practice, further research)
+%    comment on the findings that failed to support or only partially support the hypothesis or research questions directing the study
+%    refer to the limitations of the studies that may affect the validity or the generalisability of results
+%    make recommendations for further research
+%    make claims for new knowledge/ contribution to knowledge.
+%
+    %An introductory restatement of research problem, aims and/or research question
+    %A summary of findings and limitations
+  %  Practical applications/implications
+  %  Recommendations for further research
+%
+%In this thesis, we introduced the \ILC\ model. We aimed to demonstrate the usefulness and power of the \ILC\ model by constructing zero-knowledge protocols for a wide-variety of applications. We wanted to give zero-knowledge protocols with better efficiency than ever seen before. We wanted to distill the ideas underlying a long seqence of works on interactive zero-knowledge proofs, so that the techniques used to design and analyse them could be viewed through a common lens, and in doing so, make it easier to design these protocols.
+
+In this thesis, we introduced the \ILC\ model, modified it to bring it closer to real protocols, and gave compilations from \ILC\ protocols to real zero-knowledge protocols based on hash functions and error-correcting codes. The compilations separate the cryptographic and non-cryptographic parts of the design process and simplify the protocol design process. In particular, designing our \ILC\ protocols and proving them secure was a matter of applying linear algebra and simple lemmata about polynomial identity testing. Proving that the \ILC\ protocols could be securely compiled into real arguments was more complicated, but was done once and for all, and the compilations can be reused for many \ILC\ protocols in the future. We presented protocols with state-of-the-art communication complexity and round complexity, and showed that the \ILC\ model is powerful enough to reason about both general NP-Complete statements like arithmetic circuit satisfiability. We also gave \ILC\ protocols for simpler statements such as polynomial evaluation or range proofs, in a manner that leads to highly efficient protocols. This included the framing of general relations to capture a class of zero-knowledge protocols characterised by low-degree polynomials, formalising the techniques used in such protocols, and providing a generic protocol for reasoning about such relations, which can be used to give batch-proofs for many statements at the same time.
+
+We found techniques used in interactive zero-knowledge protocols in the discrete logarithm setting, and rewrote many of those protocols in the \ILC\ model. Thus, this work shows that a great many discrete logarithm arguments follow the same basic design paradigms. Surprisingly, the same style of protocol and design techniques extend beyond the discrete logarithm setting to another commitment scheme which is not homomorphic! This shows that the \ILC\ model addresses our goals of providing a good abstraction for discrete-logarithm-based protocols, which is also useful outside its original setting.
+
+Using only this methodology, we were able to present some protocols with state-of-the-art communication complexity. Examples include a discrete-logarithm based polynomial evaluation argument, with a better asymptotic communication complexity than observed prevously, and a discrete-logarithm based membership argument, whose asymptotic communication complexity has improved constants over previous work, and which has highly tuneable parameters. These are of practical significance as they can be used as part of membership and non-membership arguments both in the designs of other primitives, like group and ring signatures, and in applications such as preventing double-spending in cryptocurrencies. Since \ILC\ protocols can also be compiled based on hash functions and error-correcting codes, we also obtain some completely new arguments for polynomial evaluation and membership based on the existence of collision resistant hash functions. This shows that our goals of designing efficient protocols for a wide variety of different applications was also addressed.
+
+%\red{Rewrite to match intro hypotheses}
+%\red{Relation part and extra POK part}
+We also presented some extra techniques which fall outside the \ILC\ model, namely, a recursive argument to show that committed values have a particular scalar product, and a field extension technique which boosts the soundness of \ILC\ protocols over small fields. This is at once a strength and a weakness of using idealised communication models. Protocols inside such models are highly constrained, which makes them easier to design and reason about, but may also limit their performance and utility. The fact that the most efficient protocol in this thesis, the logarithmic-communication argument for arithmetic circuit satisfiability, does not lie within the main model of communication, is a limitation. However, once a suitable model has been identified, one can also try to design useful protocols by attempting to create protocols outside the model.
+
+There are other zero-knowledge protocols \cite{BaumBCPGL18}, some based on lattices, and some based on the Strong RSA assumption, which seem to work on the same basis as \ILC\ protocols. That is, the prover commits to certain vectors, and the verifier picks a random challenge, and uses structured linear combinations of the committed vectors in a number of verification equations. Unlike in the \ILC\ model, in which all elements belong to a field and the notion of size is not important, these settings require careful consideration of the size of committed elements to ensure zero-knowledge, and often for soundness too. The model falls short of capturing these protocols. Improving the model to take this into account, in particular for lattice-based protocols which may enjoy post-quantum security guarantees, is an attractive target for future research.
+
+Another avenue that was not investigated is restricting the verifier's \ILC\ queries. In all of the \ILC\ protocols presented in this thesis, the coefficients of the verifier's linear queries are given by a linearly-independent set of polynomials evaluated at uniformly random challenges chosen by the verifier. The queries have a carefully chosen algebraic structure. For every protocol that we give, the query matrix appears to be a form of strongly universal hash function. The compilation from \ILC\ protocols to discrete-logarithm based protocols requires restrictions on the rank and dimension of the matrix, and that a related system of linear equations can be solved. These conditions are treated in an ad-hoc manner outside of the proofs that the protocols are secure in the idealised model. There is still a gap between the model and the compiled protocols, and the communication model can be refined further. One could hope that such strong algebraic restrictions lead to interesting results, such as lower bounds on the communication complexity of \ILC\ protocols, as linear algebra is an old discipline with many results that one could hope to apply to the structure of the query matrices.

@@ -1,0 +1,99 @@
+% !TEX root = ..\Main.tex
+\chapter{Cryptographic Assumptions and Concrete Commitment Schemes}
+\label{chapterlabel:Cryptographic-Assumptions}
+
+Zero-knowledge protocols are often built based on cryptographic assumptions stating that various mathematical problems cannot be solved efficiently. In this thesis, we show that efficient zero-knowledge proofs and arguments can be built easily based on two different cryptographic assumptions: the discrete logarithm assumption, and the existence of collision resistant hash functions. Here, we formally define both of these assumptions.
+
+We define cryptographic assumptions relative to instance generators $\instancegen$.
+
+\section{The Discrete Logarithm Assumption}
+
+The discrete logarithm assumption is a computational hardness assumption in any group $\G$. Given two group elements $g$ and $h$ in $\G$, the discrete logarithm problem is to compute an integer $k$ such that $g^k = h$ in $\G$.
+
+The discrete logarithm problem has been extensively studied. It forms the basis for cryptosystems and commitments, such as the ElGamal encryption scheme and the Pedersen commitment scheme. Researchers have also devised algorithms to solve the discrete logarithm problem, some of which work for any group, and some of which work for particular choices of group.
+
+\paragraph{Formal Definition}
+
+Let $\instancegen$ be a probabilistic, polynomial time algorithm that on input $1^\sep$ returns a description $\instance = (\G,\DLOGprime,g)$ of a group $\G$ of prime order $\DLOGprime$, with a generator $g$. Assume that the group has associated polynomial time algorithms for computing group operations and deciding membership.
+
+We say that the discrete logarithm assumption holds relative to $\instancegen$ if for all probabilistic polynomial time adversaries $\adversary$ and all $\sep \in \N$,
+$$ \Pr \left[ \instance = (\G,\DLOGprime,g) \gets \instancegen(1^\sep); x \gets \Z_\DLOGprime; h := g^x : \adversary(\instance,h)=x \right] \approx 0 $$
+
+\paragraph{Commitment Scheme} The Pedersen commitment scheme \cite{Pedersen91} is a well-known commitment scheme based on the discrete logarithm assumption. The original commitment scheme allows a committer to commit to a single element, but is easily generalised to a commitment scheme for multiple elements, shown in Figure \ref{alg:com:pedersen}. Here, the message space is $\Z_p^n$ and the randomness space is $\Z_p$. Commitments lie in $\Gr$. The binding property comes from the discrete logarithm assumption, and the hiding property from the fact that $r$ is chosen uniformly at random, so that commitments are distributed as random group elements.
+
+Perhaps suprisingly, a Pedersen commitment on a message of length $n$ can be computed using $O(n / \log n)$ group operations rather than the $O(n)$ operations that one might expect, using Pippenger's algorithm. A special case of the algorithm- which is sufficient to obtain our results- is explained in Appendix \ref{appendix:multiexp}.
+
+Pedersen commitments are an attractive choice because they are both succinct, and simple and easy to compute using exponentiation operations on group elements. Our \ILC\ protocols use only arithmetic operations over fields. When instantiated using Pedersen commitments, although the protocols are more complicated, the types of operations required to compute the resulting zero-knowledge proofs are fundamentally the same as those required to compute DSA or ECDSA signatures, with the addition of well-known Fast Fourier transform algorithms to perform some polynomial operations. This should make it extremely easy to produce efficient implementations of our \ILC\ protocols when they are compiled into the discrete logarithm setting.
+
+\begin{figure}[t]
+  \caption{Pedersen Commitments}
+\label{alg:com:pedersen}
+\fbox{\centerline{\small\begin{minipage}[b]{\textwidth}
+    \begin{algorithmic}[1]
+	\State $\ckgen{1^\sep}{\mlen}$:
+	\State $\instance = (\G,\DLOGprime,g) \gets \instancegen(1^\sep)$
+	\State Select $\vec{g} \gets \G^{\mlen+1}$
+	\State \Return $(\instance,\vec{g})$
+    \end{algorithmic}\end{minipage}}}
+\fbox{\centerline{\small\begin{minipage}[b]{\textwidth}
+    \begin{algorithmic}[1]
+	\State $\commit{\vec{m}}{r}$:
+	\State Parse $(m_1,\ldots,m_n) = \vec{m}$
+	\State Parse $((\G,\DLOGprime,g),(g_1,\ldots,g_n,h)) = \ck$
+	\State \Return $h^r \prod_{i=1}^n g_i^{m_i}$
+    \end{algorithmic}\end{minipage}}}
+\end{figure}
+
+\paragraph{Parameter Choices} The discrete logarithm problem is believed to be difficult when $\G$ is chosen to be a subgroup of the multiplicative group of a prime field, or the group of points of an elliptic curve over a finite field, with large prime order. In order to achieve \sep\ bits of security, different sizes of group are required in each case. Over prime fields, the best known algorithms are based on the general number field sieve \cite{schiro}, and in light of these algorithms, a prime of roughly $\bigo(\sep^3)$ bits is required for $\sep$ bits of security. For most elliptic curves, except those from a few special families, the best algorithms are generic algorithms such as Pollard's rho algorithm, and the order of $\G$ should be approximately $2\sep$ bits.
+
+The binding property of the Pedersen commitment scheme is equivalent to the discrete logarithm assumption, and there is no change in the security of the scheme as $\mlen$ is increased.
+
+The discrete logarithm assumption is well-known, well-examined, and widely used in cryptography. Our protocols rely on the discrete logarithm assumption in groups with prime order $p$. The assumption is believed to hold in suitable subgroups of elliptic-curve groups. The best algorithms for finding discrete logarithms in such elliptic curve groups are still generic algorithms with complexity $\Omega (\sqrt{p})$. For these groups we therefore enjoy lower parameter sizes than protocols based on RSA groups that are subject to sub-exponential attacks.
+
+The discrete logarithm assumption is also believed to hold in well-chosen multiplicative sub-groups of finite fields. Finite fields of prime order should have moduli of $\frac{\lambda^3}{\mathrm{polylog}\lambda}$ bits in order to achieve $\lambda$ bits of security against the best known attacks. This makes protocols communicating large numbers of group elements highly impractical in this setting. Some of our protocols can be tuned so that they only require a constant number of group elements, resulting in much better efficiency when instantiated in finite fields of prime order, since the $\frac{\lambda^3}{\mathrm{polylog}\lambda}$ communication cost can then appear as a constant additive factor rather than a multiplicative one.
+
+\section{The Collision Problem for Hash Functions}
+
+Hash functions are functions which produce a short digest, or hash, of fixed length when applied to an input of arbitrary size. When using hash functions for cryptographic security guarantees, a common requirement is collision resistance. The computational problem here is to generate two different inputs which give the same hash value.
+
+Like Pedersen commitments, hash-based commitments can be extremely simple and efficient to compute. But Pedersen commitments are based on the hardness of the discrete logarithm assumption, and so we expect that a quantum computer running Shor's algorithm would be able to break the binding property of Pedersen commitments, and thus the soundness property of our \ILC\ protocols when compiled in the discrete logarithm setting. However, there is currently no efficient quantum algorithm for breaking the collision-resistance of hash-functions much faster than classical algorithms.
+
+Recent works, most notably \cite{Unruh17}, argue that when made into non-interactive zero-knowledge proofs, certain zero-knowledge proofs are secure in strong threat models against quantum adversaries who are able to perform quantum interactions with the prover or the verifier. Making such arguments about our own protocols is beyond the scope of this thesis, but as they are based on a cryptographic assumption which still resists cryptanalytic attempts by quantum algorithms, it is possible that they could be proved secure against quantum adversaries in the future, or inspire other protocols with quantum security proofs.
+
+\paragraph{Formal Definition.} Collision resistance is properly defined for a family of functions. Let $\HashInLen, \HashOutLen : \N \to \N$ be increasing functions such that $\HashInLen (\sep) > \HashOutLen(\sep)$ for all $\sep \in \N$. Let $\instancegen$ be a probabilistic, polynomial time algorithm that on input $1^{\sep}$ returns a key $s$. Then suppose that there exists a DPT algorithm $\HashFunction$ such that for every $n$ and every $s$, $\HashFunction$ defines a function $\HashFunction : \{0,1\}^{\HashInLen(\sep)} \to \{0,1\}^{\HashOutLen(\sep)}$. Then $(\instancegen,\HashFunction)$ is a fixed-length hash function.
+
+We say that $(\instancegen,\HashFunction)$ is a collision resistant hash function if for all probabilistic polynomial time adversaries $\adversary$ and all $\sep \in \N$,
+$$ \Pr \left[ s \gets \instancegen(1^\sep) : \adversary(s) = (x,x'), \ x,x'\in \{0,1\}^{\HashInLen(\sep)}, \HashFunction^s(x) = \HashFunction^s(x') \right] \approx 0 $$
+
+\paragraph{Commitment Scheme.} Halevi and Micali~\cite{HalMic96} show that a collision-resistant hash function gives rise to an efficient and compact statistically hiding commitment scheme. In the following, we tacitly assume that $\HashInLen(\sep)$ is large enough to create a functional commitment scheme. If this is not the case, one can use the Merkle-Damgaard construction or alternatives \cite{Lucks04,NandiP10} used to extend the hash function to a larger input length.
+
+Let $T_{m,n}$ be the space of $m \times n$ Toeplitz matrices over $\Z_2$. This is the collection of matrices such that for each top-left to bottom-right diagonal, every element in the diagonal is equal. Note that $A$ can be described using $m+n-1$ bits.
+
+Figure \label{alg:com:hash} gives a commitment scheme with message space $\{0,1\}^\HashInLen$, randomness space $\{0,1\}^{O(\HashOutLen)}$ and commitment space $\{0,1\}^{O(\HashOutLen)}$.
+
+\begin{figure}[t]
+  \caption{Hash-Based Commitment}
+\label{alg:com:hash}
+\fbox{\centerline{\small\begin{minipage}[b]{\textwidth}
+    \begin{algorithmic}[1]
+	\State $\ckgen{1^\sep}{\mlen}$:
+	\State Set $L = 6\sep+4$.
+	\State $s \gets \crsgen(1^\lambda)$.
+	\State \Return $(\HashFunction,s,L)$
+    \end{algorithmic}\end{minipage}}}
+\fbox{\centerline{\small\begin{minipage}[b]{\textwidth}
+    \begin{algorithmic}[1]
+	\State $\commit{\vec{m}}{r}$:
+	\State Parse $\vec{m}$ as a bitstring.
+	\State Parse $\vec{r} \in \{0,1\}^L$.
+	\State Compute $\vec{m}' = \HashFunction^s(\vec{m})$.
+	\State Select $A \gets T_n$.
+	\State Compute $\vec{b} = \vec{m}'-A\vec{r}$.
+	\State Compute $y = \HashFunction^s(\vec{r})$.
+	\State \Return $(A,\vec{b},y)$
+    \end{algorithmic}\end{minipage}}}
+\end{figure}
+
+\paragraph{Parameter Choices}
+
+The best known generic attack on collision resistant hash functions is the birthday attack, which shows that a collision can be found in $O(2^{\HashOutLen / 2})$ operations. This is a square-root of the cost of the simplest possible attack, which simply hashes every possible message until a collision is found, and uses $O(2^\HashOutLen)$ operations in the worst case.

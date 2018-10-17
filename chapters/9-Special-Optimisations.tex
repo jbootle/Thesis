@@ -1,0 +1,287 @@
+% !TEX root = ..\Main.tex
+\chapter{Optimisations outside the ILC Model}
+\label{chapterlabel:Special-Optimisations}
+
+\section{Recursive Argument for Inner Product Evaluation}\label{se:innerproduct}
+
+Using Pedersen commitments as our commitment scheme, we will now give an inner product argument of knowledge of two vectors $\vec{a},\vec{b}\in \Z_p^n$ such that $A=\ComCommit_{ck}(\vec{a})$, $B=\ComCommit_{ck'}(\vec{b})$ and $\vec{a}\cdot \vec{b}=z$. Here, we assume that $z \in \Z_p$, commitments $A$, $B$ and commitment keys $ck,ck'$ are known to both the prover and the verifier. The argument will be used as a subroutine where zero-knowledge is not required, so the prover could in principle just reveal the witness $\vec{a},\vec{b}$ to the verifier. In the following we show how to use interaction to reduce the communication from linear to logarithmic in $n$, the length of the vectors.
+
+The basic step in our inner product argument is a 2-move reduction to a smaller statement using techniques similar to \cite{BG12}. It will suffice for the prover to reveal the witness for the smaller statement in order to convince the verifier about the validity of the original statement.
+In the full argument, prover and verifier recursively run the reduction to obtain increasingly smaller statements. The argument is then concluded with the prover revealing a %and at the end the prover simply reveals a 
+witness for a very small statement.
+The outcome of this is a $O(\log{n})$-move argument with an overall communication of $O(\log{n})$ group and field elements. The inner product argument will be used in the next section to build a logarithmic size argument for circuit satisfiability. 
+
+Due to the obvious relationship with Pedersen commitments, we will think of multi-exponentiations $\vec{g}^{\vec{a}}$ and $\vec{h}^{\vec{b}}$ as commitments with randomness set equal to zero, and to $\vec{a},\vec{b}$ as openings with respect to commitment keys $\vec{g},\vec{h}$.
+
+%\red{This argument could be easily turned into a zero-knowledge argument of knowledge for inner product of vectors with logarithmic communication. Since it goes beyond the main purpose of the paper, we address the reader to the appendix for a separate discussion.}
+
+\subsection{Main Idea}
+We now describe the basic step in our argument.
+Consider the common input for both prover and verifier to be of the form $(\Gr,\Z_p,ck,A,ck',B,z,m)$ where $m$ divides $n$, the length of the vectors. For arbitrary $n$ one can always reduce to the case where $m|n$ by appending at most $m-1$ extra commitment keys for single elements to $ck$ and $ck'$.
+
+We split the bases for the multi-exponentiations into $m$ sets $\vec{g}=(\vec{g}_1,\ldots,\vec{g}_m)$ and $\vec{h}=(\vec{h}_1,\ldots,\vec{h}_m)$, where each set has size $\frac{n}{m}$.
+%
+We want to prove knowledge of vectors $\vec{a}=(\vec{a}_1,\ldots,\vec{a}_m)$ and $\vec{b}=(\vec{b}_1,\ldots,\vec{b}_m)$ such that $$A=\vec{g}^{\vec{a}}=\prod_{i=1}^m\vec{g}_i^{\vec{a}_i}\qquad B=\vec{h}^{\vec{b}}=\prod_{i=1}^m\vec{h}_i^{\vec{b}_i} \qquad \vec{a}\cdot \vec{b}=\sum_{i=1}^m \vec{a}_i \cdot \vec{b}_i=z$$ 
+%All the vectors have size $m_{\mu}m_{\mu-1}\cdots m_1$ and we will give a recursive argument that reduces the problem size by a factor $m$ from $m_{\mu}m_{\mu-1}\cdots m_1$ to $m_{\mu-1}\cdots m_1$.
+%
+%
+The key idea is for the prover to replace  $A$ with  $A'$, a commitment to a shorter vector $\vec{a}'=\sum_{i=1}^m\vec{a}_ix^i$, given a random challenge $x\gets \Z_p^*$ provided by the verifier.
+%Say the prover has a commitment $A=\prod_{i=1}^m\vec{g}^{\vec{a}_i}$. 
+In the argument, the prover first computes and sends 
+$$A_k=\mkern-24mu\prod_{i=\max(1,1-k)}^{\min(m,m-k)}\mkern-24mu\vec{g}_i^{\vec{a}_{i+k}} \quad \text{  for   } k=1-m,\ldots, m-1$$ corresponding to the products over the diagonals of the following matrix
+
+\definecolor{lgray}{gray}{0.5}
+
+
+\newcommand\LGRAY{\color{lgray}}
+
+
+
+
+
+\newcommand*{\LongestText}{$A_{2-m}$}%
+\newlength{\LargestSize}%
+\settowidth{\LargestSize}{\LongestText}%
+\newcommand*{\MakeBox}[1]{\makebox[\LargestSize][c]{$#1$}}%
+\newcommand*{\MakeBoxText}[1]{\text{\MakeBox{#1}}}%
+%
+%$$\begin{array}{ccrl}
+%& \begin{array}{cccccc}  \MakeBox{\vec{a}_1} & \MakeBox{\vec{a}_2} && {\cdots} && \MakeBox{\vec{a}_m} \: \end{array} & \\
+%&&\\
+%\begin{array}{c} \vec{g}_{1} \\ \\ \vdots \\ \vec{g}_{m-1} \\  \vec{g}_{m} \end{array}& \left(\begin{array}{cccccc}
+%\MakeBox{ \vec{g}_{1}^{\vec{a}_1}} & \MakeBox{\vec{g}_{1}^{\vec{a}_2}} && \cdots & & \MakeBox{\vec{g}_{1}^{\vec{a}_m}} \\
+%\\
+% \vdots& \MakeBox{ \vec{g}_{2}^{\vec{a}_2}} &&  & & \MakeBox{\vec{g}_{2}^{\vec{a}_m}} \\
+%\MakeBox{\LGRAY\vec{g}_{m-1}^{\vec{a}_1}} &  &&  \ddots & & \vdots \\
+% \vec{g}_{m}^{\vec{a}_1} &\LGRAY \vec{g}_{m}^{\vec{a}_2} && \cdots & &  \vec{g}_{m}^{\vec{a}_m} \\
+%\end{array} \right) & \begin{array}{c} \\ \\ A_{m-1}\\ A_{m-2}  \\ \vdots  \end{array} \\
+%&&\\
+%& \begin{array}{cccccc} \MakeBox{ } &  A_{1-m} & &\LGRAY A_{2-m}&& \cdots   \end{array} &  A_0=&  A\\
+%
+%\end{array}$$
+
+$$
+\begin{array}{ccc}%{c@{}c@{}c}
+        
+          &
+  
+         \begin{array}{cccc} 
+          \MakeBox{\vec{a}_1} & \MakeBox{\vec{a}_2} & \MakeBox{\cdots} & \MakeBox{\vec{a}_m} 
+           \end{array} 
+     
+      & \\
+
+  &&\\
+                 \begin{array}{c} \vec{g}_{1} \\ \vdots \\ \vec{g}_{m-1} \\  \vec{g}_{m} \end{array}   & 
+                 
+                     \left(\begin{array}{cccc}
+                       \MakeBox{ \vec{g}_{1}^{\vec{a}_1}} &\LGRAY \MakeBox{\vec{g}_{1}^{\vec{a}_2}} & \cdots  & \MakeBox{\vec{g}_{1}^{\vec{a}_m}} \\ 
+                      \ddots& \MakeBox{ \vec{g}_{2}^{\vec{a}_2}} & \LGRAY\MakeBox{\ddots} & \vdots \\
+                       \MakeBox{\LGRAY\vec{g}_{m-1}^{\vec{a}_1}} & \ddots  & \ddots  & \MakeBox{\LGRAY\vec{g}_{m-1}^{\vec{a}_m}} \\
+                         \vec{g}_{m}^{\vec{a}_1} &\LGRAY \vec{g}_{m}^{\vec{a}_2} & \cdots &   \vec{g}_{m}^{\vec{a}_m} \\
+                      \end{array}\right) & \begin{array}{c} \\ \\  A_{m-1}\\  \vdots  \end{array}\\
+&&\LGRAY A_{m-2}\\
+ & \begin{array}{cccccc} \MakeBox{ } &  A_{1-m} & &\LGRAY A_{2-m}&&  \MakeBox{\cdots}   \end{array}  &   A_0=A 
+\end{array}
+$$
+
+Notice that $A_0=A$ is already known to the verifier since it is part of the statement. The verifier now sends a random challenge $x\gets \Z_p^*$. 
+
+At this point, both the prover and the verifier can compute $\vec{g}':=\prod_{i=1}^m\vec{g}_i^{x^{-i}}$ and $A':=\prod_{k=1-m}^{m-1}A_k^{x^k}$. 
+%
+If the prover is honest then we have $A'=(\vec{g}')^{\vec{a}'}$, namely $A'$ is a commitment to $\vec{a}'$ under the key $\vec{g}'$.
+Furthermore, even if the prover is dishonest, we can show that if the prover can open $A'$ with respect to the key $\vec{g}'$ for $2m-1$ different challenges, then we can extract opening $(\vec{a}_1,\ldots,\vec{a}_m)$ corresponding to $A=\prod_{i=1}^m\vec{g}_i^{\vec{a}_i}$. %and that the opening of $A'$ must be $\vec{a}'$.
+
+
+The same type of argument can be applied in parallel to $B$ with the inverse challenge $x^{-1}$ giving us a sum of the form $\vec{b}'=\sum_{i=1}^m\vec{b}_ix^{-i}$ and a new base $\vec{h}'=\prod_{i=1}^m\vec{h}_i^{x^{i}}$. %where $B=\prod_{i=1}^m\vec{h}_i^{\vec{b}_i}$. 
+
+All that remains is to demonstrate that $z$ is the constant term %coefficient of $x^{0}$ 
+in the product $\vec{a}'\cdot \vec{b}'=\sum_{i=1}^m\vec{a}_ix^i\cdot \sum_{j=1}^m\vec{b}_jx^{-j}$. Similarly to $A$ and $B$, the prover sends values 
+$$z_k=\mkern-24mu\sum_{i=\max(1,1-k)}^{\min(m,m-k)}\mkern-24mu\vec{a}_i\cdot \vec{b}_{i+k}  \quad \text{  for   } k=1-m,\ldots, m-1$$
+where $z_0=z=\sum_{i=1}^m \vec{a}_i\cdot\vec{b}_i$, and shows that $z':=\vec{a}' \cdot \vec{b}'=\sum_{k=1-m}^{m-1}z_kx^{-k}$.
+
+To summarise, after the challenge $x$ has been sent, both parties compute $\vec{g}',A',\vec{h}',B',z'$ and then run an argument for the knowledge of $\vec{a}', \vec{b}'$ of length $\frac{n}{m}$. Given $n=m_\mu  m_{\mu-1} \cdots m_1$, we recursively apply this reduction over the factors of $n$ to obtain, after $\mu-1$ iterations, vectors of length $m_1$. The prover concludes the argument by revealing a short witness associated with the last statement.
+
+\subsection{Formal description}
+
+We now give a formal description of the argument of knowledge introduced above.
+
+\begin{description}
+\item[Common input:] $(\Gr,p,\vec{g},A,\vec{h},B,z,m_{\mu}=m,m_{\mu-1}=m',\ldots,m_1)$ such that $\vec{g},\vec{h} \in \Gr^n$, $A,B \in \Gr$ and $n=\prod_{i=1}^{\mu} m_i  $. %m_\mu\cdots m_1$. 
+\item[Prover's witness:] $(\vec{a}_1,\ldots,\vec{a}_m,\vec{b}_1,\ldots,\vec{b}_m)$ satisfying $$A=\prod_{i=1}^m\vec{g}_i^{\vec{a}_i} \qquad \qquad B=\prod_{i=1}^m\vec{h}_i^{\vec{b}_i} \qquad \qquad \sum_{i=1}^m\vec{a}_i\cdot\vec{b}_i=z$$
+\item[Argument if $\mu=1$:]
+\item[\ P:] Send $(a_1,\ldots,a_m,b_1,,\ldots,b_m)$.
+\item[\ V:] Accept if and only if $$A=\prod_{i=1}^mg_i^{a_i} \qquad \qquad B=\prod_{i=1}^mh_i^{b_i} \qquad \qquad \sum_{i=1}^ma_ib_i=z$$
+\item[Reduction if $\mu\neq 1$:]
+\item[\ P:] Send $A_{1-m},B_{1-m},z_{1-m},\ldots,A_{m-1},B_{m-1},z_{m-1}$ where $$A_k=\mkern-24mu \prod_{i=\max(1,1-k)}^{\min(m,m-k)}\mkern-24mu\vec{g}_i^{\vec{a}_{i+k}} \qquad B_k=\mkern-24mu \prod_{i=\max(1,1-k)}^{\min(m,m-k)}\mkern-24mu\vec{h}_i^{\vec{b}_{i+k}} \qquad z_k=\mkern-24mu\sum_{i=\max(1,1-k)}^{\min(m,m-k)}\mkern-24mu\vec{a}_i\cdot \vec{b}_{i+k}$$ Observe $A_0=A, B_0=B, z_0=z$ so they can be omitted from the message.
+\item[\ V:] $x\gets \Z_p^*$.
+
+Both prover and verifier compute a reduced statement of the form $$(\Gr,p,\vec{g}',A',\vec{h}',B',z',m_{\mu-1},\ldots,m_1)$$ where
+\begin{align*}
+\vec{g}'=(\vec{g}_1',\ldots,\vec{g}_{m'}')=\prod_{i=1}^m\vec{g}_i^{x^{-i}} & \qquad A'=\mkern-12mu\prod_{k=1-m}^{m-1}\mkern-12muA_k^{x^{k}} & \\
+\vec{h}'=(\vec{h}_1',\ldots,\vec{h}_{m'}')=\prod_{i=1}^m\vec{h}_i^{x^{i}} & \qquad B'=\mkern-12mu\prod_{k=1-m}^{m-1}\mkern-12muB_k^{x^{-k}} & \qquad z'=\mkern-12mu\sum_{k=1-m}^{m-1}\mkern-12mu z_kx^{-k}
+\end{align*} 
+The prover computes a new witness as $(\vec{a}_1',\ldots,\vec{a}_{m'}')=\sum_{i=1}^m\vec{a}_ix^i$ and $(\vec{b}_1',\ldots,\vec{b}_{m'}')=\sum_{i=1}^m\vec{b}_ix^{-i}$.
+\end{description}
+
+\subsubsection{Security Analysis.}
+\begin{theorem}\label{th:log}
+The argument has perfect completeness and computational witness extended emulation for either extracting a non-trivial discrete logarithm relation or a valid witness.
+\end{theorem}
+\begin{proof}
+Perfect completeness can be verified directly. 
+To prove witness-extended emulation we start by giving an extractor that either extracts a witness for the original statement or a non-trivial discrete logarithm relation. 
+
+For $\mu=1$ we have (perfect) witness-extended emulation since the prover reveals a witness and the verifier checks it. 
+
+Before discussing extraction in the recursive step, note that if we get a non-trivial discrete logarithm relation for $\vec{g}_1',\ldots,\vec{g}_{m'}'$ then we also get a non-trivial discrete logarithm relation for $\vec{g}_1,\ldots,\vec{g}_m$, since $x\neq 0$. A similar argument applies to 
+%Similarly, a non-trivial discrete logarithm relation for
+ $\vec{h}_1',\ldots,\vec{h}_{m'}'$ %gives us a non-trivial discrete logarithm relation for
+ and  $\vec{h}_1,\ldots,\vec{h}_m$.
+
+Now, assume we get witness $\vec{a}',\vec{b}'$  such that
+%\begin{align*}
+$$A'=\mkern-12mu\prod_{k=1-m}^{m-1}\mkern-12mu A_k^{x^{k}}=\left(\prod_{i=1}^m\vec{g}_i^{x^{-i}}\right)^{\vec{a}'}\quad  B'=\mkern-12mu\prod_{k=1-m}^{m-1}\mkern-12mu{}B_k^{x^{-k}}\mkern-12mu=\left(\prod_{i=1}^m\vec{h}_i^{x^{i}}\right)^{\vec{b}'}%$$
+%$$ 
+\quad
+\vec{a}'\cdot \vec{b}'=\mkern-12mu\sum_{k=1-m}^{m-1}\mkern-12mu{}z_kx^{-k}$$
+%\end{align*}
+ for $2m-1$ different challenges $x\in \Z_p^*$. We will show that they yield either a witness for the original statement, or a non-trivial discrete logarithm relation for either $\vec{g}_1,\ldots,\vec{g}_m$ or $\vec{h}_1,\ldots,\vec{h}_m$.
+
+Take $2m-1$ different challenges $x\in \Z_p^*$. They form a shifted Vandermonde matrix with rows $(x^{1-m},x^{2-m},\ldots,x^{m-1})$. By taking appropriate linear combinations of the vectors we can obtain any unit vector $(0,\ldots,0,1,0,\ldots,0)$. Taking the same linear combinations of the $2m-1$ equations $$\prod_{k=1-m}^{m-1}\mkern-12muA_k^{x^{k}}=\left(\prod_{i=1}^m\vec{g}_i^{x^{-i}}\right)^{\vec{a}'} \mbox{\quad we get vectors }\vec{a}_{k,i}\mbox{ such that \quad}A_k=\prod_{i=1}^m\vec{g}_i^{\vec{a}_{k,i}}$$ 
+
+For each of the $2m-1$ challenges, we now have $\prod_{k=1-m}^{m-1}A_k^{x^{k}}=\left(\prod_{i=1}^m\vec{g}_i^{x^{-i}}\right)^{\vec{a}'}$, which means that \emph{for all} $i$ we have 
+%
+$$x^{-i}\vec{a}'=\mkern-12mu\sum_{k=1-m}^{m-1}\mkern-12mu\vec{a}_{k,i}x^{k}$$
+ %
+unless we encounter a non-trivial discrete logarithm relation for $\vec{g}_1,\ldots,\vec{g}_m$. This means that $\vec{a}'=\sum_{k=1-m}^{m-1}\vec{a}_{k,i}x^{k+i}$ for all $i$, and in particular $\sum_{k=1-m}^{m-1}\vec{a}_{k,i}x^{k+i}=\sum_{k=1-m}^{m-1}\vec{a}_{k,1}x^{k+1}=\sum_{k=1-m}^{m-1}\vec{a}_{k,m}x^{k+m}$. Matching terms of degree outside $\{1,\ldots,m\}$ reveals $\vec{a}_{k,i}=0$ for $k+i\notin \{1,\ldots,m\}$. Defining $\vec{a}_i=\vec{a}_{0,i}$, and matching terms of similar degree we get $$\vec{a}_{k,i}=\left\{ \begin{array}{ll} \vec{a}_{k+i} & \textnormal{ if } k+i\in \{1,\ldots,m\} \\ 0 & \textnormal{ otherwise }\end{array} \right .$$ 
+This means $$\vec{a}'=\mkern-12mu\sum_{k=1-m}^{m-1}\mkern-12mu\vec{a}_{k,1}x^{k+1}=\sum_{k=0}^{m-1}\vec{a}_{k+1}x^{k+1}=\sum_{i=1}^m\vec{a}_ix^i$$
+
+A similar analysis of $B_{1-m},\ldots,B_{m-1}$ and openings $\vec{b}'$ for $2m-1$ different challenges $x^{-1}\in \Z_p^*$ gives us either a non-trivial discrete logarithm relation for $\vec{h}_1,\ldots,\vec{h}_m$ or vectors $\vec{b}_i$ such that $\vec{b}'=\sum_{i=1}^m\vec{b}_ix^{-i}$ and $B=\prod_{i=1}^m\vec{h}_i^{\vec{b}_i}$. 
+
+Finally, with $\sum_{i=1}^m\vec{a}_ix^i\cdot \sum_{j=1}^m\vec{b}_jx^{-j}=\sum_{k=1-m}^{m-1}z_kx^{-k}$ for $2m-1$ different challenges we get $z=z_0=\sum_{i=1}^m\vec{a}_i\cdot \vec{b}_i$.
+
+We can now apply the forking lemma to a tree of size $(2m_\mu-1)(2m_{\mu-1}-1)\cdots(2m_2-1)\leq n^2$, which is polynomial in $\lambda$, to conclude that the argument has witness-extended emulation.
+\qed
+\end{proof}
+
+\subsection{Efficiency.}
+The recursive argument uses $2\mu-1$ moves. 
+The communication cost of all steps sums up to $4\sum_{i=2}^{\mu} (m_i-1)$ group elements and $2\sum_{i=2}^{\mu } (m_i-1)+2m_1$ field elements.
+
+At each iteration, the main cost for the prover is computing the $A_k$ and $B_k$ values, using less than $\frac{4(m_\mu^2 m_{\mu-1} \ldots m_1 )}{\log (m_\mu \ldots m_1)}$ group exponentiations via multi-exponentiation techniques, and the $z_k$ values using  $m_\mu^2 m_{\mu-1} \cdots m_1$ field multiplications. The cost of computing the reduced statements is dominated by $\frac{2(m_\mu m_{\mu-1}\ldots m_1 )}{\log m_\mu}$ group exponentiations for both the prover and the verifier. In the case where $m_\mu = \ldots = m_1 = m$, the verifier complexity is bounded above by $\frac{2 m^{\mu}}{\log m}\frac{m}{m-1}$ group exponentiations. The prover complexity is bounded above by $\frac{6 m^{\mu+1}}{\log m}\frac{m}{m-1}$ group exponentiations and $m^{\mu+1}\frac{m}{m-1}$ field multiplications.
+
+\subsection{How to use this Argument}
+
+At the end of the argument of Section \ref{subsec:5rndsqrt}, once compiled using Pedersen commitments, the verification equations verify exactly the statement of the recursive argument above. This means that rather than the prover sending the vector $\vec{r}$ to the verifier in that argument, along with some commitment randomness which appears in the compiled argument, the prover and verifier can conduct an inner product argument like the one above to prove that the prover knows values which satisfy the verification equations. To get a logarithmic communication complexity, one can use the original 5-move arithmetic circuit argument with extremely long vectors, of length $O(N)$, where $N$ is the number of multiplication gates in the arithmetic circuit. Then the prover and verifier run the recursive argument with $m_i = 2$ for all $i$.
+
+The argument is presented in stand-alone form in Appendix \ref{appendix:logprot}.
+%Then, in the verification equations of that protocol, the verifier checks that vectors sent by the prover correspond to certain Pedersen commitments, and that the vectors have a given scalar product.
+\subsection{Generalisations}
+
+Our original recursive argument applied to Pedersen commitments, which have the following form:
+
+$ck = (g_1,\ldots,g_n,h)$
+
+$ \ComCommit (a_1,\ldots,a_n;r) = h^r \prod_{i=1}^n g_i^{a_i}$
+
+We applied the argument to prove that committed values gave a particular scalar product:
+
+$z = \vec{a} \cdot \vec{b} = \sum_{i=1}^N a_i b_i$
+
+Taking a step back, consider $g^a$ and $ab$. Both of these functions are very simple bilinear maps. Scalar products and Pedersen Commitments (or multi-exponentiations) come from combining multiple instances of these simple bilinear maps.
+
+Thus, under the right conditions, we can replace these with other similar bilinear maps and recover a recursive argument. For example, we have the following commitment scheme for group elements:
+
+$ck = (g_1,\ldots,g_n,h)$
+
+$\ComCommit (a_1,\ldots,a_n;r) = e(h,r) \prod_{i=1}^n e(g_i,a_i)$
+
+We may wish to prove for example that a committed vector of group elements and a committed vector of field elements have a particular multi-exponentiation, or that two committed vectors of group elements have a particular pairing-product.
+
+\paragraph{Bilinear Commitment Scheme}
+
+Suppose that $f : G \times X \to \mathcal{A}$ is a non-degenerate bilinear map between abelian groups. For any $N$, we can create a homomorphic commitment scheme with key space $G^N$, message space $X^N$ and commitments in $\mathcal{A}$ as follows:
+
+$ck = (g_1,\ldots,g_N,g_R) \gets G^{N+1}$
+
+$F(g_1,\ldots,g_N,g_R;x_1,\ldots,x_N,x_R) = \ComCommit  (x_1,\ldots,x_N;x_R) = f(g_R,x_R) \prod_{i=1}^N f(g_i,x_i)$
+
+Since $f$ is bilinear, the commitment scheme is homomorphic in both messages and keys. Since $f$ is non-degenerate, if $x_R$ is chosen uniformly at random, then the commitment will be uniformly random too.
+
+Relevant instantiations do have the perfectly hiding property, but we are more interested in the binding property at present.
+
+\begin{lemma} [Linear Independence]
+Assume that given $(g_1,\ldots,g_N,g_R) \gets G^{N+1}$, it is difficult to efficiently find $x_1,\ldots,x_N,x_R$ such that $f(g_R,x_R) \prod_{i=1}^N f(g_i,x_i) = 1$. Then the commitment scheme is computationally binding.
+\end{lemma}
+
+This includes the homomorphic commitment scheme for group elements used in \cite{Groth11}, where $G = \Gr_1, X = \Gr_2, \mathcal{A} = \Gr_T$ and our bilinear map is the pairing $e : \Gr_1 \times \Gr_2 \to \Gr_T$, under the Double Pairing Assumption.
+
+It also includes the Pedersen commitment scheme where $G = \Gr, X = \Z_p, \mathcal{A} = \Gr$, and $f(g,x) = g^x$, under the Discrete Logarithm Assumption.
+
+When all of the groups involved are $\F$-modules, one can generalise the recursive scalar product argument for two Pedersen-committed values to a recursive bilinear product argument for two values committed using bilinear commitment schemes, with an extremely similar protocol and security proof. The argument also works with two different bilinear commitment schemes. It would be interesting to see whether an argument of this form using the pairing-based commitment scheme of \cite{Groth11} could be used in conjunction with the logarithmic communication protocol resulting from the scalar product argument above, to get an interactive argument with sub-logarithmic communication complexity.
+
+\section{Field Extension Techniques}\label{sec:fieldext}
+
+The basis for the techniques in this section was originally published in joint work \cite{BootleCCGP16} with Carsten Baum, Andrea Cerulli, Rafael del Pino, Jens Groth and Vadim Lyubashevsky as part of a post-quantum zero-knowledge protocol based on lattice cryptography. We do not explain the details of the protocol, here, as they are unnecessary and lattice cryptography is beyond the scope of this thesis. The inspiration for these techniques came from \cite{CramerDK14} and \cite{CramerDP12}.
+
+Suppose that we have an \ILC\ protocol which works over a small finite field $\F$. Since soundness of these protocols is proved using the Schwarz-Zippel lemma, the soundness error in such protocols is limited to $O(1 / \abs{\F})$. If the proof relates to an algebraic statement which is naturally phrased over a small field, one approach which yields protocols with low soundness error is to simulate the behaviour of the smaller field in the larger one, and produce a proof for an equivalent relation over a larger field. However, this usually leads to significant overhead costs. Following a na\"{i}ve approach, one can imagine, for example, embedding a boolean circuit into a large prime field. Then, running an \ILC\ protocol on large field elements is wasteful, when some large field elements actually only contain boolean values. Instead, we show how to embed many elements from one finite field into an extension field, and also to perform useful operations on base field elements using operations on extension field elements.
+
+This is a viable approach when working with several of the commitment schemes from chapter \ref{chapterlabel:Cryptographic-Assumptions}.
+
+Based on \cite{BaumBCPGL18}, we now show how to embed witness elements into field extensions. This will allow us to use the generic 3-move protocol from Chapter \ref{chapterlabel:Generic-Protocol} for arithmetic circuit satisfiability with $O(1/|\F|^{2\extdeg})$ soundness error, which gives protocols with negligible soundness error in a single run.
+
+For simplicity, we explain how our techniques work over $\Z_p$. However, they will also work over other finite fields.
+
+Let $GF(\ACprime^{2\extdeg}) \simeq \Z_\ACprime[\phi]/\langle f(\phi) \rangle$, where $f$ is a polynomial of degree $2\extdeg$ that is irreducible over $\Z_\ACprime$. Our goal is to embed $\extdeg$ elements of $\Z_\ACprime$ into the extension field in a way so that we can multiply two $GF(\ACprime^{2\extdeg})$ elements in a way that does not interfere with the products of the original $\Z_\ACprime$ elements. Let $e_1,\ldots,e_\extdeg$ be distinct interpolation points in $\Z_\ACprime$ (note that in particular, this forces $\ACprime>\extdeg$). Let $l_1(X),\ldots,l_\extdeg(X)$ be the Lagrange polynomials associated with the points $e_i$, which have degree $\extdeg-1$. Let $l_0(X) = \prod_{j=1}^\extdeg (X-e_i)$, which has degree $\extdeg$.
+
+Now, suppose that we have $a_1,\ldots,a_\extdeg$, $b_1,\ldots,b_\extdeg$ and $c_1,\ldots,c_\extdeg$ in $\Z_\ACprime$ such that $a_j \cdot b_j = c_j \mod \ACprime$ for each $j$. By evaluating the expression at each interpolation point, we see that the following statement about polynomials holds over $\Z_\ACprime$: $ \left( \sum_{j=1}^\extdeg a_j l_j(X) \right) \cdot \left( \sum_{j=1}^\extdeg b_j l_j(X) \right) \equiv \left( \sum_{j=1}^\extdeg c_j l_j(X) \right) \mod l_0(X)$.
+
+Therefore, there are $c'_0,\ldots,c'_{k-2}\in \Z_\ACprime$ such that $\left( \sum_{j=1}^\extdeg a_j l_j(X) \right) \cdot \left( \sum_{j=1}^\extdeg b_j l_j(X) \right) = \left( \sum_{j=1}^\extdeg c_j l_j(X) \right) + l_0(X) \sum_{j=0}^{\extdeg-2} c'_j X^j$.
+
+The degree of $f$ is $2\extdeg$, so if we choose the basis
+\[\mathcal{B} = \{ l_1(\phi),\ldots,l_\extdeg(\phi),l_0(\phi),\phi l_0(\phi),\ldots,\phi^{\extdeg-1} l_0(\phi)\]
+for $GF(\ACprime^{2\extdeg}) \}$ we can perform multiplications of extension field elements without any overflow modulo $f$ interfering with the individual product relations $a_i b_i = c_i$ in $\Z_\ACprime$. We can therefore port he above equality into $GF(\ACprime^{2\extdeg})$ as the equality $\left( \sum_{j=1}^\extdeg a_j l_j(\phi) \right) \cdot \left( \sum_{j=1}^\extdeg b_j l_j(\phi) \right) = \left( \sum_{j=1}^\extdeg c_j l_j(\phi) \right) + l_0(\phi) \sum_{j=0}^{\extdeg-2} c'_j \phi^j$.
+
+This allows one multiplication of committed values to be performed without any overflow modulo $f$. As we shall see in the next subsection, this is sufficient for verifying multiplication triples for arithmetic circuit satisfiability.
+
+We also need to be able to view single commitments to elements of $\Z_\ACprime$ as elements of the extension field in a way that helps to verify linear consistency relations between the elements.
+
+Now, suppose that we have $a_1,\ldots,a_\extdeg$, $b_1,\ldots,b_\extdeg$ and $c_1,\ldots,c_\extdeg$ in $\Z_\ACprime$, and coefficients $w_{a,1},\ldots,w_{a,\extdeg}$, $w_{b,1},\ldots,w_{b,\extdeg}$ and $w_{c,1},\ldots,w_{c,\extdeg}$ in $\Z_\ACprime$ such that $\sum_{j=1}^\extdeg a_j w_{a,j} + \sum_{j=1}^\extdeg b_j w_{b,j} + \sum_{j=1}^\extdeg c_j w_{c,j} = K\mod \ACprime$. By comparing coefficients, we see that the following statement about polynomials holds over $\Z_\ACprime$:
+$\left( \sum_{j=1}^\extdeg a_j X^{j-1} \right) \cdot \left( \sum_{j=1}^\extdeg w_{a,j} X^{\extdeg-j} \right) $ $
++ \left( \sum_{j=1}^\extdeg b_j X^{j-1} \right) \cdot \left( \sum_{j=1}^\extdeg w_{b,j} X^{\extdeg-j} \right) $ $
++ \left( \sum_{j=1}^\extdeg c_j X^{j-1} \right) \cdot \left( \sum_{j=1}^\extdeg w_{c,j} X^{\extdeg-j} \right) $ $
+= K X^{\extdeg-1} + \sum_{j=0,j\neq \extdeg-1}^{2\extdeg-2} K_jX^j
+$, where the $K_j$ are extra terms determined from the $a,b,c$ and $w$ values.
+
+If we choose the basis $\mathcal{B}' = 1,\phi,\phi^2,\ldots,\phi^{2\extdeg-1}$ for $GF(\ACprime^{2\extdeg})$, we can perform multiplications of extension field elements in a way that always yields a useful linear relation in the $\phi^{\extdeg-1}$ term without any overflow modulo $f$.
+
+By viewing multiplication in $GF(\ACprime^{2\extdeg})$ as a linear map over $\Z_\ACprime^{2\extdeg}$, we can simulate arithmetic in the extension field using arithmetic in $\Z_\ACprime^{2\extdeg}$.
+
+Let $A_1,\ldots,A_{2\extdeg} \in \mathcal{C}^{2\extdeg}$ be homomorphic commitments to single elements, $a_1,\ldots,a_\extdeg \in \Z_\ACprime$. We can consider the tuple $\vec{A} = (A_1,\ldots,A_\extdeg)$ to be a commitment to an element $\vec{a} = (a_1,\ldots,a_{2\extdeg})$ of $GF(\ACprime^{2\extdeg})$. Now, if we consider $\vec{x} \in \Z_\ACprime^{2\extdeg}$ as an element of $GF(\ACprime^{2\extdeg})$, then there is a matrix $M_{\vec{x}}$ which simulates multiplication by $\vec{x}$ in $\Z_\ACprime^{2\extdeg}$ when we multiply on the left by $M_{\vec{x}}$. Since the $A_i$ are homomorphic commitments, we can obtain a commitment to $\vec{x} * \vec{a}$ by computing $M_{\vec{x}} \vec{A}$, where $*$ represents multiplication in $GF(\ACprime^{2\extdeg})$.
+
+\subsection{Reduction of Circuit Satisfiability to a Hadamard Matrix Product and Linear Constraints over $GF(\ACprime^{2\extdeg})$.}
+Let $\ACnumgates=\ACnumvec \ACveclen \extdeg$ be the number of multiplication gates in the arithmetic circuit. 
+To reduce circuit satisfiability to constraints over $GF(\ACprime^{2\extdeg})$, we can consider the same polynomial equations as before, written over $GF(\ACprime^{2\extdeg})$ rather than $\Z_\ACprime$. We consider the rows of matrices $A$, $B$, and $C$ as before, but this time, we label the row vectors of the matrices $\vec{a}_{i,j},\vec{b}_{i,j}$ and $\vec{c}_{i,j} \in \Z_\ACprime^\ACveclen$, for $1 \leq i \leq \ACnumvec$ and $1 \leq j \leq \extdeg$. Now, we consider the row vectors $\vec{a}_{i,1},\ldots,\vec{a}_{i,\extdeg}$, which are elements of $\Z_\ACprime^\ACveclen$, as an element in $GF(\ACprime^{2\extdeg})^\ACveclen$.
+
+Let $a_i = \left( \vec{a}_{i,1} , \vec{a}_{i,2} , \dots , \vec{a}_{i,\extdeg} , \vec{0} , \dots , \vec{0}\right)^T$ represent this element in $GF(\ACprime^{2\extdeg})^\ACveclen$. Each column of the matrix represents a separate element of $GF(\ACprime^{2\extdeg})$.
+
+Satisfiability conditions over $\Z_\ACprime$ were embedded using scalar products, denoted by $\cdot$, and element-wise products, denoted by $\circ$. If $a$ and $b$ in $\Z_\ACprime^{2\extdeg \times \ACveclen}$ represent elements of $GF(\ACprime^{2\extdeg})^\ACveclen$, then each column represents an element of $GF(\ACprime^{2\extdeg})$, and the scalar products and element-wise products of $a$ and $b$ are computed using the columns. We denote the element-wise product by $a \bigcirc b$ and the scalar product by $a \bigodot b$ to avoid confusion with any other matrix products on $a$ and $b$.
+
+\begin{align*}
+a = \left(\begin{array}{cccc} \\ \vec{v}_1 & \vec{v}_2 & \ldots & \vec{v}_\ACveclen \\ \qquad \end{array}\right) &\quad b = \left(\begin{array}{cccc} \\ \vec{w}_1 & \vec{w}_2 & \ldots & \vec{w}_\ACveclen \\ \qquad \end{array}\right)\\ \\
+a \bigcirc b = \left(\begin{array}{cccc} \\ M_{\vec{v}_1} \vec{w}_1 & M_{\vec{v}_2}\vec{w}_2 & \ldots & M_{\vec{v}_\ACveclen}\vec{w}_\ACveclen \\ \qquad \end{array}\right) &\quad
+a \bigodot b = M_{\vec{v}_1} \vec{w}_1 + M_{\vec{v}_2}\vec{w}_2 + \ldots + M_{\vec{v}_\ACveclen}\vec{w}_\ACveclen
+\end{align*}
+
+Note that in the verification equations, although the verifier computes high powers of random challenges $\vec{x}$ and $\vec{y}$, the verifier only computes quadratic polynomials of values such as $a$ and $b$ which have been sent by the prover. This is important, because when we expand $a$ and $b$ in terms of their coefficients $a_i$ and $b_i$, we see that the verifier only computes expressions which have degree 2 in the prover's secret committed wire values, embedded as elements of $GF(\ACprime^{2\extdeg})$. Therefore, considering a field extension of degree $2\extdeg$ with the basis $\mathcal{B}$ is sufficient for our purposes: we only need to ensure that a single multiplication in $GF(\ACprime^{2\extdeg})$ preserves the individual product relations embedded in the $GF(\ACprime)$ elements.
+
+When embedding satisfiability conditions into a polynomial over $\Z_\ACprime$, using random challenges $x,y \in \Z_\ACprime$, the prover could send linear combinations of vectors $\vec{a}_i \in \Z_\ACprime^\ACveclen$ such as $ \vec{a}(x)=\vec{a}_0 + \sum_{i=1}^\ACnumvec \vec{a}_{i}y^i x^{i} $
+to the verifier.
+
+However, when embedding satisfiability conditions into a polynomial over $GF(\ACprime^{2\extdeg})$, using random challenges $\vec{x},\vec{y} \in GF(\ACprime^{2\extdeg})$, the prover sends linear combinations of vectors $a_i \in GF(\ACprime^{2\extdeg})^\ACveclen$ such as
+$ a(x)=a_0 + \sum_{i=1}^\ACnumvec (M_{\vec{y}})^i (M_{\vec{x}})^i a_{i} $.
+
+\subsection{How to Apply This Idea}
+
+Suppose that we wish to give an argument for arithmetic circuit satisfiability over a small field $\F$. The way to use this technique to apply the 3-move square-root protocol over an algebraic extension of $\F$, and use the above technique to embed the conditions for circuit satisfiability into extension field operations. This yields an arithmetic circuit satisfiability argument over $\F$ with negligible soundness error in a single run, and the argument over the extension field will have the same asymptotic communication costs as one over the base field, but with the negligible soundness error.

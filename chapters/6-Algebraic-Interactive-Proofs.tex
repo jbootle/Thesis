@@ -1,0 +1,175 @@
+% !TEX root = ..\Main.tex
+\chapter{Lemmata for Security Proofs}
+\label{chapterlabel:AlgIntProofs}
+
+\section{Variant of the Schwarz-Zippel Lemma}
+\begin{lemma}
+\label{lem:szvariant}
+Let $\F$ be a field. Let $P$ be a function of the following form, where $Q(X)$ is a Laurent polynomial of total degree at most $d$ and $R_j(X)$ are \emph{arbitrary functions} and not necessarily polynomials.
+\[
+P(X,Y) = Q(X) + \sum_{j=-d', j \neq 0}^{d'} R_{j}(X) \ Y^{j}
+\]
+Let $S$ be a finite subset of $\F^\times$. Let $x,$ and $y$ be selected at random independently and uniformly from $S$. Let $\eventsz$ be the event that either $Q(X)$ is not the zero polynomial or one of the values of $R_j(x)$ is not zero. Then
+\[
+\Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \right] \leq \frac{d+2d'+1)}{|S|}
+\]
+\end{lemma}
+\paragraph{Remark} This lemma can be extensively generalised to functions with more variables, and used to prove the security of \ILC~ protocols with a larger number of random challenges. See in particular \cite{BootleCGGHJ17}.
+
+\begin{proof}
+Assume that the result holds for $u-1$. We prove the lemma for $u$. Write
+\[
+P(X,Y) = Q(X) + \sum_{j=-d', j \neq 0}^{d'} R_{j}(X) \ Y^{j}
+\]
+For a fixed value $x$ of $X$, this is a Laurent polynomial of total degree $2d'+1$ in $Y$. Let $\eventszz$ be the event that $P$ is the zero polynomial in $Y$. Let $\eventsz'$ be the event that $Q$ is not the zero polynomial.
+\begin{align*}
+\Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \right] &= \Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \wedge \eventszz\right] \\
+& ~ + \Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \wedge \neg \eventszz\right] \\
+\end{align*}
+If $\eventszz$ holds, then $P$ is the zero polynomial in $Z_u$, so since $Q(x)$ is the constant term, then $Q(x)$ is necessarily zero. On the other hand, if $\eventszz$ and $\eventsz$ hold simultaneously, then each value $R_j(x)$ must be zero, so $Q$ must be a non-zero polynomial. Therefore, $\eventsz'$ holds. We use these facts to bound the first probability. We bound the second probability by simply removing the event $\eventsz$.
+\begin{align*}
+\Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \right] &\leq \Pr \left[ \lbrace Q(x) = 0 \rbrace \wedge \eventsz' \right] \\
+& ~ + \Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \neg \eventszz \right] \\
+\end{align*}
+The first probability is bounded by the fact that $Q(X)$ is a polynomial of degree $d$ and has at most $d$ roots. To bound the second probability, observe that for any value of $x$ such that $\neg \eventszz$ holds, $P$ is a non-zero Laurent polynomial of degree at most $2d'+1$ in $Y$, and has at most $2d'+1$ roots $y$. The result follows.
+\qed
+\end{proof}
+
+\section{A general forking lemma.}
+Suppose that we have a $(2\mu+1)$-move public-coin argument with $\mu$ challenges, $x_1,\ldots,x_\mu$ in sequence. Let $n_i\geq 1$ for $1\leq i \leq \mu$.  Consider $\prod_{i=1}^\mu n_i$ accepting transcripts with challenges in the following tree format. The tree has depth $\mu$ and $\prod_{i=1}^\mu n_i$ leaves. The root of the tree is labelled with the statement. Each node of depth $i<\mu$ has exactly $n_i$ children, each labelled with a distinct value for the $i$th challenge $x_i$. This can be referred to as an $(n_1,\ldots,n_\mu)$-tree of accepting transcripts. 
+
+\begin{definition}[$(n_1,\ldots,n_\mu)$-tree special soundness]
+Let $(\crsgen,\prover,\verifier)$ be an interactive argument. Let $n_1(\sep),\ldots,n_\mu(\sep) \in \N$ such that $\prod_{i=1}^\mu n_i$ is bounded above by a polynomial in the security parameter $\sep$. Suppose that there exists a DPT algorithm $\chi$ such that given $\viewV$ for each transcript of an $(n_1,\ldots,n_\mu)$-tree of accepting transcripts as input, $\chi$ outputs a valid witness $w$ for the statement at the root of the tree. Then we say that $(\crsgen,\prover,\verifier)$ has $(n_1,\ldots,n_\mu)$-tree special soundness.
+\end{definition}
+
+All of our arguments allow a witness to be extracted efficiently from an appropriate tree of accepting transcripts. This is a natural generalisation of special-soundness for Sigma-protocols, where $\mu=1$ and $n=2$.  For simplicity in the following lemma, we assume that the challenges are chosen uniformly from a field $\F$ where $\left| \F \right| = 2^\sep$, but any sufficiently large challenge space would suffice.
+
+\begin{lemma}[Forking Lemma]\label{lem:fork}
+Let $(\mathcal{P},\mathcal{V})$ be a $(2\mu+1)$-move, public coin interactive protocol with $(n_1,\ldots,n_\mu)$-tree soundness. Then $(\mathcal{P},\mathcal{V})$ has witness-extended emulation. 
+\end{lemma}
+For simplicity in the following proof, we assume challenges are chosen uniformly from $\mathbb{Z}_p$ where $\left| p \right| = \lambda$, but any sufficiently large challenge space would suffice.
+
+We now provide a proof of the Forking Lemma we need for Theorems~\ref{th:log} and~\ref{th:mainAC}. 
+For simplicity in the following lemma, we assume that the challenges are chosen uniformly from $\mathbb{Z}_p$ where $\left| p \right| = \lambda$, but any sufficiently large challenge space would suffice.
+
+\begin{proof}\label{forkproof}
+Suppose that for deterministic polynomial time $\mathcal{P}^*$ there is a non-uniform polynomial time interactive adversary $\mathcal{A}$ in the sense of witness-extended emulation, such that
+$$ \Pr \Big{[}(u,s) \leftarrow\mathcal{A}(1^\sep); tr \leftarrow \langle \mathcal{P}^*(u,s), \mathcal{V}(u)\rangle: \mathcal{A}(tr)=1\Big{]} = \epsilon.$$
+Note that if $\epsilon$ is negligible, then we do not need to extract a witness, since the emulator can simply fail every time and trivially achieve witness-extended emulation. Therefore, from now on, we assume that $\epsilon$ is not negligible.
+
+We construct an expected polynomial time emulator $\mathcal{E}$, which has access to a rewindable transcript oracle $\langle \mathcal{P}^*, \mathcal{V}\rangle$ and produces a witness. This is done via recursive calls to tree-finders $\mathcal{T}$ that deal with the protocol after the first few challenges are already fixed. The $i$th tree-finder takes the previous challenges and partial transcript given to it as input, picks random values for $x_{i+1}$, runs the prover on these values and hands the result to the next tree-finder. Each tree-finder may fail on the first value of $x_{i+1}$, ensuring that the whole process runs in expected polynomial time. With overwhelming probability, the emulator obtains an $(n_1,\ldots,n_\mu)$-tree of transcripts and is then able to extract a witness, using the efficient algorithm $\chi$ that exists by assumption.
+
+\begin{description}
+\item $\mathcal{E}^{\langle \mathcal{P}^*, \mathcal{V}\rangle}(u)\to (tr,w)$:
+\begin{itemize}
+\item Run $\mathcal{T}^{\langle \mathcal{P}^*, \mathcal{V}\rangle}(1) \to (tr,\mathsf{tree})$
+\item If $\mathsf{tree}=\bot$ then return $(tr,\bot)$.
+\item If $\mathsf{tree}$ is not a valid $(n_1,\ldots,n_\mu)$-tree of transcripts (i.e. there are collisions in certain challenges) then return $(tr,\bot)$.
+\item Else run $w \gets \chi(u,\mathsf{tree})$.
+\item Return $(tr,w)$
+\end{itemize}
+\end{description}
+For $1 \leq i \leq \mu+1$:
+
+\begin{description}
+\item $\mathcal{T}^{\langle \mathcal{P}^*, \mathcal{V}\rangle}(i) \to (tr,\mathsf{tree})$:
+\begin{itemize}
+%case of the final tree-finder
+\item If $i = \mu+1$
+\item \qquad Obtain a complete protocol transcript from $tr \gets \langle \mathcal{P}^*, \mathcal{V}\rangle$
+\item \qquad Run $\mathcal{V}(tr) \to b$
+\item \qquad If $b=0$ then return $(tr,\bot)$.
+\item \qquad If $b=1$ then set $\mathsf{tree} = \{tr\}$ and return $(tr,\mathsf{tree})$.
+%tree-finder's first run of the next tree-finder. can fail on this run
+\item Run $\langle \mathcal{P}^*, \mathcal{V}\rangle$ up to and including move $2i+1$.
+\item Run $\mathcal{T}^{\langle \mathcal{P}^*, \mathcal{V}\rangle}(i+1) \to (tr,\mathsf{tree})$
+\item If $\mathsf{tree}=\bot$ then return $(tr,\bot)$.
+
+\item Set $\mathsf{counter}=1$
+%tree-finder's subsequent runs of the next tree-finder. cannot fail; just keeps running until success
+\item While $\mathsf{counter}< n_{i}$:
+\item \qquad Rewind $\langle \mathcal{P}^*, \mathcal{V}\rangle$ back until just before move $2i$.
+\item \qquad Run $\mathcal{T}^{\langle \mathcal{P}^*, \mathcal{V}\rangle}(i+1) \to (tr',\mathsf{tree}')$
+\item \qquad If $\mathsf{tree} \neq \bot$, then append the transcripts in $\mathsf{tree}'$ to $\mathsf{tree}$, and increment $\mathsf{counter}$.
+
+\item Return $(tr,\mathsf{tree})$
+
+\end{itemize}
+\end{description}
+
+Fix $1 \leq i \leq \mu$, and fix $x_1,\ldots,x_{i-1}$. We say that $\mathcal{T}(i)$ has failed if it returns $(tr,\bot)$.
+
+Let $\epsilon'$ be the probability that the $\mathcal{T}(i)$ fails for this choice of challenges, and let $\epsilon'(x_i)$ be the probability that $\mathcal{T}(i+1)$ fails for this choice of challenges continued with $x_i$. The $i$th tree-finder can fail only if the $(i+1)$th tree-finder fails the first time it is called. This implies that for uniformly random $x_i$, the probability that $\mathcal{T}(i+1)$ fails is $\epsilon' = \sum_{x_i \in \F} \Pr[X=x_i] \epsilon'(x_i)$.
+
+Therefore, the expected number of times that $\mathcal{T}(i)$ runs $\mathcal{T}(i+1)$ is $1+\epsilon' \frac{(n_i-1)}{\epsilon'} = n_i$. The final tree-finder $\mathcal{T}(k+1)$ merely checks whether the transcript is accepting or not. Hence, the total expected running time for $\mathcal{T}(1)$ to be $\prod_{i=1}^{\mu} n_i$ multiplied by the time taken to check whether a transcript is accepting. We conclude that the emulator $\mathcal{E}$ runs in expected polynomial time.
+
+The first tree-finder $\mathcal{T}(1)$ only outputs $(tr,\bot)$  if the very first set of challenges generated by all of the emulators fails to produce an accepting transcript. This is exactly the probability that $\mathcal{P}^*$ successfully produces an accepting transcript in one run.
+
+Given that we receive $\prod_{i=1}^\mu n_i$ accepting transcripts in $\mathsf{tree}$, we now consider the probability that they do not form an $(n_1,\ldots,n_\mu)$-tree. This occurs only when the $n_{i}$ values of challenge $x_{i}$ used by $\langle \mathcal{P}^*, \mathcal{V}\rangle$ while in the loop controlled by $\mathsf{counter}$ are not distinct, or in other words, there is a collision between these values, for some $i$.
+
+By Markov's inequality, an algorithm whose expected running time is $t$ will only run for longer than time $T>t$ with probability $\frac{t}{T}$. Let $t$ be the expected running time of $\mathcal{E}$, which is bounded above by a polynomial in the security parameter. For easier analysis, we limit the actual running time of $\mathcal{E}$ to $T$, whose value will be chosen later.
+
+When $\mathcal{E}$ runs in time at most $T$, then at most $T$ uniformly random public coin challenges were selected by $\mathcal{V}$ in $\langle \mathcal{P}^*, \mathcal{V}\rangle$. If there are no collisions between \emph{any} of the public coins chosen, then there are certainly no collisions of the type which would prevent $\mathsf{tree}$ from being a $(n_1,\ldots,n_\mu)$-tree of transcripts. The probability that there is a collision between $T$ values sampled uniformly from $\F$ is at most $\frac{T^2}{p}$.
+
+Now, we choose $T = \sqrt[3]{p}$. The probability that $\mathsf{tree}$ fails to be an $(n_1,\ldots,n_\mu)$-tree is at most $\frac{t}{T} + \frac{T^2}{p}$ which is now equal to $\frac{t}{\sqrt[3]{p}} + \frac{1}{\sqrt[3]{p}}$. This is negligible. Therefore, there is negligible probability of the tree-finding algorithms succeeding, yet $\mathcal{E}$ failing to extract a witness. This proves the argument has statistical witness-extended emulation. \qed
+\end{proof}
+
+\section{Extractable Algebraic Queries}
+
+\begin{lemma}\label{lem:matinv}
+Let $\vec{p} = (p_1(X),\ldots,p_k(X))$ be linearly independent (Laurent) polynomials over $\F[X]$ of degree at most $k-1$. Let $\vec{x} = (x_1,\ldots,x_k)$ be distinct points in $\F^*$. Then the following matrix is invertible.
+\begin{align*}
+M(\vec{p},\vec{x}) =
+\left(
+\begin{array}{lllll}
+p_1(x_1) & p_1(x_2) & \cdots & & p_1(x_k) \\
+p_2(x_1) & p_2(x_2) & \cdots & & p_2(x_k) \\
+\vdots & \vdots &  \ddots & & \vdots \\
+p_k(x_1) & p_k(x_2) & \cdots & & p_k(x_k)
+\end{array}
+\right)
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+The matrix $M(\vec{p},\vec{x})$ is square. In order to prove that the matrix is invertible, it suffices to prove that the rows are linearly independent. Suppose for contradiction that there was a linear relation between the rows of $M(\vec{p},\vec{x})$. Since all of the polynomials have degree at most $k-1$, the coefficients of each polynomial are completely determined by their evaluations at the points of $\vec{x}$, by applying a linear map. Therefore, any linear relation over the rows implies a linear relation over the polynomials, contradicting linear independence. \qed
+\end{proof}
+
+\begin{lemma}\label{lem:linextract}
+Consider an \ILC\ protocol with random verifier challenges $x$ and $y$. Consider \ILC\ queries of the following polynomial forms, where $\vec{p}_i$ are constant vectors, and $\vec{q}_j(y)$ are vectors which were committed after the prover saw $y$. We prove the result for each type of polynomial. Suppose that we have an $(n_1,n_2)$-tree of query results, written as a vector $\vec{q}$. There exist $n_1$ and $n_2$ such that given the result of the query for $n_1$ different values of $x$, and for each value of $x$, for $n_2$ different values of $y$, there exists a linear map $L$ such that $L \vec{q}$ is the concatenation of all of the $\vec{p}_i$ values, and the values of $\vec{q}_j(y)$ for each query $y$. In other words, \ILC\ protocols that use queries of this form have $(n_1,n_2)$-tree special soundness for some $n_1$ and $n_2$.
+\begin{enumerate}
+\item $\vec{v} = \sum_{i=-m}^m \vec{h}_i x^i$.
+\item $\vec{v} = \sum_{i=0}^m \vec{h}_i l_i(x)$, where $l_1(X),\ldots,l_m(X)$ is the set of Lagrange interpolation polynomials with distinct interpolation points $z_1,\ldots,z_m$ and $l_0(X) = \prod_{i=1}(X-z_i)$.
+\item $\vec{v} = \sum_{i=1}^m \vec{h}_i l_i(x) + l_0(x) \ \sum_{i=0}^{m-2} \vec{d}_i x^i$.
+\item $\vec{v} = \vec{v}_0 y + \sum_{i=0}^m \vec{h}_i l_i(x)$.
+\item $\vec{v} = \vec{f}_2 y^2 + \vec{f}_1 y + \sum_{i=1}^m \vec{h}_i l_i(x) + l_0(x) \ \sum_{i=0}^{m-2} \vec{d}_i x^i$.
+\item $\vec{v} = \vec{e} y + \sum_{i=-m}^m \vec{h}_i x^i$.
+\item $\vec{v} = \sum_{i=1}^m \vec{a}_{i}x^{i} y^i+\sum_{i=1}^m\vec{b}_{i} x^{-i}+x^m \sum_{i=1}^m\vec{c}_{i} x^{i}+\vec{d}x^{2m+1}$.
+\item $\vec{v} = \sum_{i=1}^m \vec{a}_i y^i + \sum_{k=-m,k\neq0}^m \vec{b}_k x^k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\begin{enumerate}
+\item Given queries for $2m+1$ different values of the challenge $x$, this follows from Lemma \ref{lem:matinv} with $\vec{p}$ a vector of powers of $X$, which are clearly linearly independent, and $\vec{x}$ a vectors of the different values of the challenge.
+\item Given queries for $m$ different values of the challenge $x$, this follows from Lemma \ref{lem:matinv} with $\vec{p}$ a vector containing all of the polynomials $l_i(X)$. The Lagrange interpolation polynomials on points $z_1,\ldots,z_m$ are clearly linearly independent, and $l_0(X)$ is independent from all of these Lagrange polynomials as it has degree $m$ while they have degree $m-1$.
+\item Given queries for $2m-1$ different values of the challenge $x$, this follows from Lemma \ref{lem:matinv} in a similar way to the previous two items.
+\item Fix $x$. Given query answers for two different values of $y$, we have a linear system in $\vec{v}_0$ and $\sum_{i=0}^m \vec{h}_i l_i(x)$. Applying Lemma \ref{lem:matinv} with $\vec{p} = (Y,1)$ and $\vec{Y}$ a vector containing the two different values of the challenge $y$, we can invert the linear system to recover $\vec{v}_0$ and $\sum_{i=0}^m \vec{h}_i l_i(x)$. Now, recovering the $\vec{h}_i$ values from $m$ values of $\sum_{i=0}^m \vec{h}_i l_i(x)$ for $m$ different values of $x$ reduces to an earlier case.
+\item Fixing a single value of $x$, given three query answers for three different values of $y$, we can eliminate $y$ in a similar way to the previous case. Then, recovering the $\vec{h}_i$ and $\vec{d}_i$ from many different values of $x$ is exactly the third case already covered.
+\item Fixing a single value of $x$, given two query answers for two different values of $y$, we can eliminate $y$ in a similar way to the previous case. Then, recovering the $\vec{h}_i$ from many different values of $x$ is exactly the first case already covered.
+\item For $4m+3$ different values of $x$, fix the value of $y$. Now ignore the powers of $y$ multiplying the $\vec{a}_i$ and apply the first case to recover $\vec{a}_i y^i$, $\vec{b}_i$, $\vec{c}_i$ and $\vec{d}$. If we assume that we have the query results for at least two distinct values of $y$ for each $x$, then at least one of the $y$ values from the pair must be non-zero. Then we can simply divide by $y$ to recover the $\vec{a}_i$.
+\item Fix $y$. Suppose that we have query answers for $2m+1$ distinct of $x$. Then apply the result of the first case in order to recover all $\vec{b}_k$ and the value of $\sum_{i=1}^m \vec{a}_i y^i$. Now, apply the first case again for many different values $\sum_{i=1}^m \vec{a}_i y^i$ for distinct values of $y$ to recover $\vec{a}_i$ for each $i$.
+\end{enumerate}
+\qed
+\end{proof}
+%
+%\section{Properties of \ILC\ Protocols}
+%\red{Have assumed that commitments are distributed uniformly at random in the commitment space, that commitment randomness is uniformly distributed over a field, and similar properties specific to Pedersen. Also that $Q$ has a) fewer rows (linear equations requested) than columns (commitments), but b) has full rank. a) is also necessary for ZK, otherwise verifier could solve linear equations to find values. b) is sort of clear; if it wasn't true the proof could be optimised by having the verifier request fewer linear combinations. Full rank, fewer rows than columns, random input implies random output by pulling back basis from range and applying steinitz exchange lemma}
+%
+%\begin{lemma}
+%Let $(\crsgen,\prover,\verifier)$ be an interactive algorithm over the \ILC\ channel. Suppose that the protocol is non-adaptive, so that the verifier makes all of their queries at the end of the protocol. Let $\Chal$ be the query matrix for the protocol. Assume that $\Chal$ does not have the maximum possible row-rank. Then, 
+%\end{lemma}
+%
+%\begin{lemma}
+%Let $(\crsgen,\prover,\verifier)$ be an interactive algorithm over the \ILC\ channel. Suppose that the protocol is non-adaptive, so that the verifier makes all of their queries at the end of the protocol. Let $\Chal$ be the query matrix for the protocol. Assume that $\Chal$ has the maximum possible row-rank. If $\Chal$ has at least as many rows as columns, then it is possible to compute some information about the prover's committed vectors. 
+%\end{lemma}

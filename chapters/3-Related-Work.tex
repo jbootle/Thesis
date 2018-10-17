@@ -1,0 +1,182 @@
+% !TEX root = ..\Main.tex
+\chapter{Background and Related Work}
+\label{chapterlabel:RelatedWork}
+
+Zero-knowledge proofs were invented by Goldwasser, Micali, and Rackoff~\cite{GoldwasserMR85}. In defining zero-knowledge proofs, the authors solved several important conceptual problems.
+
+Firstly, defining what is meant by interactive protocols between two parties required Interactive Turing Machines to put the concept on a rigourous theoretical footing. This lead to the new computational complexity classes \textsf{IP} and \textsf{ZK} of languages which can be recognised by interactive proofs and zero-knowledge proofs, respectively. They gave a zero-knowledge proof for quadratic residuosity, the first zero-knowledge proof, showing that the class \textsf{ZK} was non-empty.
+
+Secondly, they solved the problem of what it means for some party to know something. The knowledge of a party, or computing device, was captured by whatever it is possible for that party to compute, given the information available to it, and its own computational constraints.
+
+Finally, the problem of what it means to gain no knowledge from an interaction was captured using a simulation-based definition. That is, if it is possible to efficiently simulate the contents of an interactive protocol without taking part in the protocol or knowing any secret information that the participants are privy to, then observing the interaction cannot confer any new knowledge. What can be computed from viewing the execution of the protocol is exactly the same as what can be computed without seeing it, and using a simulated execution instead.
+
+Goldreich et al.~\cite{GMWzk} later showed that all languages in \textsf{NP} have zero-knowledge proofs, so that \textsf{NP} is contained inside \textsf{ZK}. Informally, this means that for any problem for which one can check the solution efficiently, one can also convince somebody else that you hold the solution, without giving away any information about the solution. In fact, more is true. By taking several results together, we know that there are zero-knowledge proofs for every language in \textsf{IP} \cite{GoldreichMW86,ImpagliazzoY87,Shamir90}, assuming the existence of one-way functions.
+
+%\red{Put in section on strengthened properties?}
+Feige et al.~\cite{FeigeFS87} introduced zero-knowledge proofs-of-knowledge. These are different to the original proposal of zero-knowledge proofs. Let us consider the difference for \textsf{NP} languages $\LL$, with an instance $\stm$ and a witness $\wit$. The original zero-knowledge proofs could be referred to as `zero-knowledge proofs of membership' in this context. They prove that $\stm$ lies in $\LL$, without leaking any further information, such as $\witness$. So the verifier learns that some valid $\wit$ exists, but this does not guarantee that the prover actually knows a witness. In a proof of knowledge, the verifier learns that the prover knows a valid $\wit$, and nothing more. These are useful for identification schemes, for example, where the prover might authenticate themselves by proving that the know the secret key corresponding to a particular public key.
+
+We can classify zero-knowledge proofs according to the number of rounds of interaction that take place between the prover and the verifier. Non-interactive zero-knowledge proofs were introduced in \cite{BFM}. In these proofs, the proof consists of a single message sent from the prover to the verifier, who then accepts it or rejects it. Non-interactive zero-knowledge proofs require a common reference string as input to the protocol, to be used by both the prover and the verifier. Without a common reference string, it is only possible to construct non-interactive zero-knowledge proofs for languages in the complexity class \textsf{BPP}, which are seen as trivial, as the verifier can efficiently decide whether an instance is in a \textsf{BPP}-language without receiving any help from the prover.
+%\red{talk about small numbers of rounds}
+
+The soundness and zero-knowledge properties of zero-knowledge proofs usually come in three different flavours:
+\begin{itemize}
+\item Perfect; the property is always satisfied, even against computationally unbounded adversaries.
+\item Statistical; the property fails to be satisfied with at most negligible probability, even against computationally unbounded adversaries.
+\item Computational; the property fails to be satisfied with at most negligible probability, against computationally bounded adversaries.
+\end{itemize}
+So far, we have discussed zero-knowledge proofs, which have perfect or statistical soundness. However, these can only have computational zero-knowledge. Protocols with computational soundness and perfect or statistical zero-knowledge are called zero-knowledge \emph{arguments}. Brassard et al.~\cite{BCC} showed that all languages in NP have zero-knowledge arguments with perfect zero-knowledge. Micali \cite{Mic00} introduced the related notion of CS (computationally-sound) proofs, for which false proofs for true statements exist, but are computationally difficult to find.
+
+Gentry et al.~\cite{FHENIZK} used fully homomorphic encryption to construct zero-knowledge proofs where the communication complexity corresponds to the size of the witness. For circuit satisfiability, for example, the scheme works by encrypting the witness using a symmetric key encryption scheme, and using fully homomorphic encryption to decrypt the witness and evaluate the circuit homomorphically in the witness while still in encrypted form. This result gives somehow optimal communication complexity, as proofs cannot in general have communication that is smaller than the witness size unless surprising results about the complexity of solving SAT instances hold~\cite{Goldreich1998,Goldreich2002}.
+
+Kilian~\cite{Kilian1992a} showed that in contrast to zero-knowledge proofs, zero-knowledge arguments can have very low communication complexity. His construction relied on the PCP theorem. Probabilistically checkable proofs, or PCPs, are proofs consisting of strings of many elements, whose correctness can be checked by examining only a small number of elements, sampled at random. Kilian's scheme has an excellent polylogarithmic communication complexity, but does not yield a practical scheme due to the large computational overhead required to convert statements into PCPs. In his scheme, the prover converts the statement to be proved into a PCP consisting of bits, commits to each of the bits using a single commitment, and then hashes all of the commitments in a Merkle tree. The verifier chooses a few bits of the PCP to verify. The prover reveals those commitments from the Merkle tree, and uses a simple, auxiliary zero-knowledge proof system to prove that the committed bits will pass the verifier's checks.
+%\red{Groth Sahai proofs}
+
+Ishai et al. \cite{Ishai2007} introduce commitment schemes with linear decommitment. After the committer commits to several values, they can open a linear combination of the commitments, in a verifiable manner. This is a weakening of the property of homomorphic commitments, where one can use the homomorphic property to compute the correct linear combination of the commitments, and then open them.  These commitments are closely related to the \ILC\ model. One could view parts of our compilation of \ILC\ protocols into zero-knowledge protocols based on hash functions and error-correcting codes as a proof that one can construct a commitment scheme with linear decommitment from these ingredients; one with an interactive decommitment phase.
+
+If an interactive protocol is zero-knowledge, then for any verifier, even a malicious one, there exists an efficient simulator for the protocol. Honest verifier zero-knowledge \cite{BellareMO90a} is a weaker property, which only guarantees that there exists a simulator for the interaction between an honest prover and an honest verifier. On introducing the notion, \cite{BellareMO90a} show that any protocol with statistical honest-verifier zero-knowledge can be converted into a fully statistical zero-knowledge protocol under the discrete logarithm assumption. \cite{OstrovskyVY93} show the same result under general one-way permutations, and \cite{Okamoto00} improved the result to one-way functions.
+
+We say a proof system is \emph{public coin} if the verifier's messages are chosen randomly and correspond exactly to the verifier's randomness. Another result by Damgaard \cite{Damgard93} showed that public-coin honest verifier zero-knowledge protocols with a constant number of rounds can be transformed into a fully zero-knowledge protocol without any complexity assumptions. \cite{GoldreichSV98} show that statistical honest-verifier zero-knowledge proofs can be converted into statistical fully zero-knowledge proofs without any complexity assumptions.
+
+Assuming a common reference string and relying on trapdoor commitments, Damg{\aa}rd \cite{Damgard2000} gave a transformation yielding concurrently secure protocols for $\Sigma$-Protocols. The transformation can be optimized~\cite{dissertation} using the idea that for each public-coin challenge $x$, the prover first commits to a value $x'$, then the verifier sends a value $x''$, after which the prover opens the commitment and uses the challenge $x=x'+x''$. The coin-flipping can be interleaved with the rest of the proof, which means the transformation preserves the number of rounds and only incurs a very small efficiency cost to do the coin-flipping for the challenges. 
+
+If one does not wish to rely on a common reference string for security, one can use a private-coin transformation where the verifier
+does not reveal the random coins used to generate the challenges sent to the prover (hence the final protocol is no longer public coin).
+One example is the Micciancio and Petrank \cite{MP03} transformation (yielding concurrently secure protocols) while incurring a small overhead of $\omega(\log{\lambda})$ with respect to the number of rounds as well as the computational and communication cost in each round. % where $\lambda$ is the security parameter and $\omega(\log{\lambda})$ is independent of the complexity of the original protocol. 
+The transformation preserves the soundness and completeness errors of the original protocol; however, it does not preserve statistical zero-knowledge as the obtained protocol only has computational zero-knowledge. 
+
+There are other public-coin transformations to general zero-knowledge e.g.~Goldreich et al.~\cite{GoldreichSV98}. The transformation relies on a random-selection protocol between the prover and verifier to specify a set of messages and restricting the verifier to choose challenges from this set. This means to get negligible soundness error these transformations require $\omega(1)$ sequential repetitions so the round complexity goes up.
+
+The Fiat-Shamir transformation \cite{FiatShamir} is a method of converting public-coin interactive zero-knowledge arguments into non-interactive zero-knowledge proofs. The new non-interactive protocol include a hash function in the common reference string. The prover replaces the verifier's messages with a hash of the protocol transcript up to that point. The resulting arguments are highly efficient in practice and are provably secure in the random oracle model \cite{bellarerogaway}. In the random oracle model, even if the initial interactive proof only has honest verifier zero-knowledge, the resulting argument will have full zero-knowledge.
+
+However, it has been shown \cite{Canetti2000,Goldwasser2003} that there are interactive protocols which are sound in the random oracle model, but which are insecure for any choice of hash function. Despite this theoretical problem, the Fiat-Shamir heuristic is still used to produce arguments for practical applications, where the hope is that it does give sound arguments for ``natural'' protocols.
+%\begin{figure}[]
+%\begin{center}
+%\resizebox{0.8\textwidth}{!}{
+%\framebox{
+%\begin{minipage}{0.9\textwidth}
+%\flushleft
+%
+%\begin{tabular}{lcl}
+%$\Prove(\sigma, u,w) $ & $\qquad \qquad \qquad \qquad \qquad$ & $\Vrfy(\sigma,u)$ \\
+%&&\\
+%
+%$a_1 \gets \Prove(\sigma,u,w)$ & $a_1$ & \\
+%& \begin{picture}(0,0) \put(-45,5){\vector(1,0){90}} \end{picture} &  \\
+%& $e_1$ & $e_1 \gets \mathcal{C}$\\
+%
+%& \begin{picture}(0,0) \put(45,5){\vector(-1,0){90}} \end{picture} &  \\
+%
+%$a_2 \gets \Prove(\sigma,u,w,e_1)$ & $a_2$ & \\
+%& \begin{picture}(0,0) \put(-45,5){\vector(1,0){90}} \end{picture} &  \\
+%
+%& $e_2$ & $e_2 \gets \mathcal{C}$\\
+%
+%& \begin{picture}(0,0) \put(45,5){\vector(-1,0){90}} \end{picture} &  \\
+%
+%& & \\
+%$\vdots$ & $\vdots$ & $\vdots$ \\
+%& & \\
+%
+%$a_n \gets \Prove(\sigma,u,w,e_1,e_2,e_{n-1})$ & $a_n$ & $b\gets \Vrfy(\sigma,u,a_1,e_1,\ldots,a_n)$ \\
+%
+%& \begin{picture}(0,0) \put(-45,5){\vector(1,0){90}} \end{picture} & $b \in \lbrace 0,1 \rbrace$ \\
+% 
+%\end{tabular}
+%\end{minipage}
+%}}\\
+%
+%$$\xdownarrow{1cm}F\text{-}S$$
+%
+%
+%\resizebox{0.8\textwidth}{!}{
+%\framebox{
+%\begin{minipage}{0.9\textwidth}
+%\flushleft
+%
+%\begin{tabular}{lcl}
+%$\Prove(\sigma, u,w,H) $  & $\qquad \qquad \qquad \qquad \qquad$ & $\Vrfy(\sigma,u,H)$ \\
+%&&\\
+%$a_1 \gets \Prove(\sigma,u,w)$ && \\
+%&&\\
+%$e_1 = H(\sigma,u,a_1 )$&&\\
+%&&\\
+%$a_2 \gets \Prove(\sigma,u,w,e_1)$ &&\\
+%&&\\
+%$e_2 = H(\sigma,u,a_1,e_1,a_2 )$&&\\
+%&&\\
+%$\vdots$ &&\\
+%&&\\
+%$a_n \gets \Prove(\sigma,u,w,e_1,e_2,e_{n-1})$&&\\
+%&$(a_1,e_1,\ldots,a_n)$& $b\gets \Vrfy(\sigma,u,a_1,e_1,\ldots,a_n)$\\
+%&\begin{picture}(0,0) \put(-45,5){\vector(1,0){90}} \end{picture}& $b \in \lbrace 0,1 \rbrace$
+%\end{tabular}
+%\end{minipage}
+%}
+%}
+%
+%
+%\end{center}
+%\caption{The Fiat-Shamir Heuristic. The first box shows an interactive zero knowledge proof. The second box shows the non-interactive zero knowledge proof resulting from applying the Fiat-Shamir transformation.}
+%\label{FiatShamir}
+%\end{figure}
+
+Schnorr~\cite{Schnorr91} and Guillou and Quisquater~\cite{GQ88} gave early examples of practical zero-knowledge arguments for concrete number theoretic problems. Schnorr's protocol proves knowledge of a discrete logarithm, and Guillou-Quisquater's protocol proves knowledge of the message corresponding to an RSA encryption. Extending Schnorr's protocols, there have been many constructions of zero-knowledge arguments based on the discrete logarithm assumption. Cramer and Damg{\aa}rd~\cite{Cramer1998a} gave a zero-knowledge argument for arithmetic circuit satisfiability, which has linear communication complexity. The argument uses homomorphic commitments to all wire values in the circuit, using the homomorphic property to verify that that the addition gates in the circuit are satisfied, and giving a protocol to verify multiplications which is used for each multiplication gate in the circuit.
+
+Before the logarithmic protocol presented in this thesis, the most efficient discrete logarithm based zero-knowledge arguments for arithmetic circuits were the ones by Groth~\cite{Groth2009b} and Seo~\cite{Seo2011a}, which are constant move arguments with a communication proportional to the square root of the circuit size. Both of these protocols fit into the Ideal Linear Commitment model. The square-root communication cost comes from the fact that all of the wire values in the arithmetic circuit are arranged into a matrix, and the prover sends the verifier a commitment to each row, and a linear combination of the rows. Balancing the number of rows and columns in the matrix gives a square-root communication cost in total. This thesis also gives two arguments for arithmetic circuit satisfiability based on the discrete logarithm assumption. One has fewer rounds of interaction than these previous works, and the other has lower concrete communication costs, and fewer verification equations.
+
+Using pairing-based cryptography instead of just relying on the discrete logarithm assumption, Groth~\cite{Groth11} extended these techniques to give a zero-knowledge argument with a cube-root communication complexity. In this argument, the prover arranges the wire-values into a cuboid. Each slice of the cuboid is a matrix, and the prover commits to each row of each matrix using a Pedersen commitment, which collapses the cuboid of wire-values into a matrix of Pedersen commitments. Then, the prover uses a pairing-based commitment scheme to collapse the matrix of Pedersen commitments into a vector of pairing-based commitments. The cube-root communication complexity comes from the fact that the prover has to send values to the verifier for each dimension of the cuboid, and balancing the dimensions gives the cube-root. The argument requires only a constant number of moves. It is the ability to use multiple related commitment schemes that allows the compression.
+
+Our logarithmic protocol for arithmetic circuit satisfiability employs a similar concept, but works in a slightly different way. Wire-values can be arranged in a hypercube. All elements are committed to using a Pedersen commitment. At each step in the argument, the prover receives a random challenge from the verifier, and takes a random linear combination of lower dimensional hypercubes to reduce the dimension of the hypercube by one. This operation is compatible with the Pedersen commitment scheme, up to some correction factors, and results in a Pedersen commitment to fewer elements. It is the sequential interaction over many rounds, and the special properties of the Pedersen commitment scheme, that allows the compression. This led to the protocol given in \cite{BootleCCGP16}, which shows that not only is the commitment scheme compatible with the compressing operation, but one can reduce a scalar-product check on the original elements to a check on the new compressed elements, leading to a highly efficient protocol for verifying the scalar product of committed vectors. 
+
+\cite{BunzBBPWM18} observes that the original protocol uses separate Pedersen commitments for each input vector to each scalar product, and optimises the argument by giving a new argument where are values are contained in a single commitment. Hyrax~\cite{WahbyTSTW18} uses the same scalar-product argument in a different way, combined with a multi-variate polynomial commitment scheme, to give efficient proofs for highly structured circuits, which achieve sub-linear proof size, linear prover time, and sub-linear verification time when giving proofs for a highly parallelisable circuit, or computing a batch proof for a large number of identical circuits. This approach performs best for circuits of low depth.
+
+\cite{BaumBCPGL18} adapts the square-root communication protocol of \cite{BootleCCGP16} to the post-quantum setting, using commitments based on the hardness of the shortest vector problem for lattices. This work can be seen as the compilation of a particular \ILC\ protocol into the new lattice-based setting. However, the commitment scheme used does not seem to admit the same special properties needed to replicate the argument with logarithmic communication complexity which is possible in the discrete logarithm setting. Like the compilation of \ILC\ protocols based on hash functions, the lattice-based protocol requires an check on all commitments, in the form of a proof-of-knowledge. The main difference between that protocol and our work is the adaptation of the same techniques to a new algebraic setting where the size of elements is important, and which is not a field, so that proof-techniques based on linear algebra become much more difficult to apply.
+
+An exciting line of research~\cite{Groth2010b,Lip12,Bitansky2012,Gennaro2013,Bitansky2013,PHGR13, C:BCGTV13,BCTV14} has developed many proposals for succinct non-interactive arguments (SNARGs) yielding pairing-based constructions where the arguments consist of a constant number of group elements. The arguments have a constant size, and a constant verification time, which allowed for effective recursive composition \cite{Bitansky2013} and exciting proof-carrying-data techniques. The disadvantage of these arguments is the super-linear computational complexity of the prover. The techniques have also been extended to give proofs with simulation-extractability \cite{GrothM17,BoweG18}.
+
+Like the \ILC\ model's relationship with many discrete-logarithm-based protocols, the pairing-based protocols above can all be captured using the model of Linear Interactive Proofs and Linear PCPs \cite{BitanskyCIPO13}. In linear interactive proofs, the prover and verifier send vectors of field elements to one another. The verifier makes linear queries on a proof vector created by the prover. However, the prover can only send linear (or affine) transformations of the verifier's previously sent vectors, which distinguishes these systems from \ILC\ protocols, in which the prover is allowed to perform more general computation. It is possible to convert \ILC\ protocols into linear interactive proofs, and vice-versa, but the resulting protocols are usually inefficient, reflecting the fact that the models were tailored to different use-cases. Furthermore, linear interactive proofs usually involve a verifier of algebraic degree two. The \ILC\ protocols presented in this work sometimes have a higher algebraic degree, so they could not be converted into linear interactive proofs and compiled using the same methods.
+
+The idealised linear interactive proofs are compiled into real arguments in pairing groups in works like \cite{BCTV14} by creating a common reference string with all of the verifier's queries embedded into the exponents of group elements. Since it is believed to be difficult to manipulate group elements in these groups except by using the group operations, the resulting protocols are secure. However, due to the nature of the verifier's queries in the idealised proofs, the common reference strings are highly structured and must either be generated by a trusted third party or an expensive multiparty computation protocol. Other works such as \cite{GrothKMMM18} attempt to mitigate the problem. They give a protocol which updates common reference strings, so that the updated common reference strings are trustworthy, even if the old ones were not. \cite{Ben-SassonC0TV15,BoweGG17} present secure multi-party computation protocols used to generate the common reference strings of pairing-based SNARKs.
+
+Furthermore, non-falsifiable knowledge extractor assumptions are used to guarantee security.  In contrast, the arguments we develop here are based solely on the discrete logarithm assumption, or collision resistant hash functions, and use a small common reference string which is independent of the circuit. This is because we choose to compile our idealised protocols under these alternative assumptions.
+
+Bootle et al~\cite{BootleCGGHJ17} used error-correcting codes and linear-time collision-resistant hash functions to give the first zero-knowledge proof and argument systems for arithmetic circuit satisfiability with constant computational overhead.  The prover uses a linear number of field multiplications, and verification is even more efficient, requiring only a linear number of additions. They proposed the \ILC\ model, which forms the basis of this work. Their methodology was also similar, designing an ideal protocol with the correct security properties and compiling it into a real proof. The result hinges on choices of particularly efficient linear-time-computable hash functions and codes. This work includes similar compilations, modified to account for changes in the \ILC\ model, optimisations specific to Reed-Solomon codes, and the discrete logarithm setting.
+
+STARKs~\cite{Ben-SassonBHR18} give an argument with logarithmic communication costs, and logarithmic verification costs. Computational complexity for the prover is quasilinear, but the large constants involved give this approach higher computational time for the prover than other cryptographic proof implementations such as \cite{BunzBBPWM18,WahbyTSTW18} for giving proofs about practical instances.
+
+An another effective way to construct efficient zero-knowledge proofs is to follow the so-called MPC-in-the-head paradigm of~\cite{IshaiKOS07}. This approach proved itself to give very efficient constructions both theoretically and practically. In this approach, when the prover wants to prove, for example, that a circuit is satisfiable, they simulate a secure multi-party computation protocol to evaluate the circuit on secret-shared inputs. They commit to the view of each party in the multi-party computation protocol. The verifier randomly selects some fraction of the views, and checks that they are consistent. ZKBoo~\cite{USENIX:GiaMadOrl16} and subsequent optimisation ZKB++~\cite{CCS:CDGORR17} use hash functions to construct zero-knowledge arguments for the satisfiability of boolean circuits. Their communication complexity is linear in the circuit size, but the use of symmetric primitives gives good performances in practice.
+
+Ligero~\cite{CCS:AHIV17} provides another implementation of the MPC-in-the-head paradigm and used techniques similar to ~\cite{BootleCGGHJ17} to construct sublinear arguments for arithmetic circuits. The approach used in Ligero is similar to the approach used in this work. One difference is that Ligero uses the multiplicative properties of Reed-Solomon codewords to help verify multiplications. This work does not require codewords to have any multiplicative properties.
+
+Jawurek et al.~\cite{JawurekKO13} gave a different approach to zero-knowledge proofs derived from multiparty computation protocols, using garbled circuits.
+
+All of the arguments mentioned above which rely on collision-resistant hash-functions for security only require a simple common reference string including a description of the hash-function. This makes them suitable for blockchain applications where a trusted-setup procedure is particularly undesirable.
+
+Other works give a composite approach. \cite{ChaseGM16} uses two approachs to interactive zero-knowledge. They use the garbled-circuit techniques of \cite{JawurekKO13} to prove non-algebraic statements, and algebraic protocols based on the discrete logarithm assumption and RSA assumption to prove algebraic statements. They leverage both techniques at the same time in order to construct efficient privacy-preserving credentials. \cite{AgrawalGM18} uses similar ideas to give non-interactive zero-knowledge proofs, this time by combining discrete-logarithm-based interactive zero-knowledge proofs made interactive through the Fiat-Shamir heuristic, and pairing-based SNARKs.
+
+Another model for protocols is that of interactive oracle proofs, introduced in \cite{Ben-SassonCS16}. Interactive oracle proofs are interactive proofs between a prover, and a verifier, in which the verifier only has query access to the prover's messages. They simultaneously generalise interactive proofs and PCPs. Intuitively, one way to view interactive oracle proofs is as PCPs where the interaction between the prover and the verifier means that the prover only has to compute a small part of the PCP for the verifier to check. In fact, Ideal Linear Commitment protocols can also be seen as interactive oracle proofs with some extra restrictions.
+
+%\paragraph{Low Depth Circuits and Special Applications}
+As well as general proof proof systems, various works give protocols with low communication complexity for specific languages. For example, in a membership argument~\cite{BS01,BDD07}, a prover demonstrates that a secret committed value $\lambda$ is an element of a list $\mathcal{L} = \{ \lambda_0,\ldots,\lambda_{N-1}\}$, without revealing any other information about $\lambda$. In a polynomial evaluation argument~\cite{FO97,BDD07}, a prover demonstrates that a secret committed value $v$ is the evaluation of a public polynomial $h(U)$ at another secret committed value $u$. In a range proof~\cite{Bou02,Lip03}, a prover demonstrates that a secret committed value $a$ is an element of the interval $[A;B]$.
+
+The goals of membership arguments are related to those of zero-knowledge sets \cite{Micali}. Membership arguments allow a prover to commit to a secret value and show that it lies in a public set, without leaking information on the value. On the other hand, zero-knowledge sets allow the prover to commit to a secret set, and handle membership and non-membership queries in a verifiable manner, without leaking information on the set.
+
+Herranz constructs attribute-based signatures \cite{Herranz} using what is essentially a set membership argument for multiple values. The argument relies only on the discrete logarithm assumption, but the communication complexity is much high; linear in the size of the set. Camenisch et al. \cite{Camenisch2008} also provide set membership proofs with logarithmic communication complexity, and Fauzi et al. \cite{Fauzi2014} construct constant size arguments for more complex relations between committed sets. The latter two works both rely on pairing-based assumptions.
+
+Groth and Kohlweiss~\cite{GrothK15}, and a follow-up work \cite{BootleCCGGP15} show that one can prove that one out of $N$ commitments contain $0$ with logarithmic communication complexity, based on the discrete logarithm assumption. For homomorphic commitments, it is easy to reduce the task of a membership argument to the task of checking that one commitment contains a zero, by dividing every commitment in the public set by the prover's own commitment. Both arguments work by arranging the values in the list into a tree, and having the prover commit to a sequence of bits which describe a path from the root of the tree to the leaf which is equal to the prover's own commitment. \cite{BootleCCGGP15} optimises the protocol given in \cite{GrothK15} by generalising to an n-ary tree rather than a binary one.
+
+Range arguments can be seen as a special case of membership arguments, where $\mathcal{L}$ is simply a list of consecutive integers. Many are based on the strong RSA assumption, and use Lagrange's Four-Square Theorem. Couteau et al. show that this assumption can be replaced by an RSA-variant which is much closer to the standard RSA assumption \cite{CouteauPP17}. Their techniques can be applied to existing works such as \cite{Groth05,Lip03}. Chaabouni et al.  \cite{Chaabouni2010} give an argument with sub-logarithmic communication complexity in the size of the list, which is comparable to the efficiency we achieve, and also relies on the hardness of the discrete logarithm problem, but uses pairings for verification.
+
+Membership arguments also generalise arguments that a committed value lies in a linear subspace such as \cite{Jutla2013,Jutla2014,Kiltz2015}, which all make use of pairings. Peng \cite{Peng2012} achieves a square-root complexity. Some existing protocols \cite{BayerG13}, \cite{GrothK15} even achieve logarithmic communication complexity. Our single-value membership proof is an extension of the latter works where we reduce the number of commitments from logarithmic to constant.
+
+Cryptographic accumulators \cite{Benaloh1994,Ngu05,Camenisch2009,Camenisch2002} can also be used to give membership proofs. The members of a set are absorbed into a constant-size accumulated value. Witnesses for set-membership can then be generated and verified using the accumulated value. Efficient instantiations of accumulators exist and often rely on the Strong RSA assumption or pairing-based assumptions. An RSA modulus has to be $\frac{\lambda^3}{\mathrm{polylog}\lambda}$ bits to provide security against factorisation using the General Number Field Sieve. Security of pairing-based schemes with constant embedding degree scale similarly due to sub-exponential algorithms for attacking the discrete logarithm problem in the target group. Furthermore, such schemes require a trusted setup. By contrast, when instantiating our proofs using Pedersen commitments or collision resistant hash functions, we only require commitments of size $O(\lambda)$ bits for security against discrete logarithm attacks in elliptic curve groups, or collision-finding attacks against the hash functions.
+
+Some of the schemes can be adapted to give zero-knowledge arguments for non-membership, from a variety of settings. For example, \cite{BayerG13,Peng2012} also give non-membership arguments in the discrete logarithm setting. Accumulators that support non-membership arguments have been constructed, based on both pairing assumptions (\cite{Damgard2008}) and the strong RSA assumption (\cite{Li2007}).
+
+Our polynomial commitment protocol is a key part of our zero-knowledge argument. Polynomial commitments were first introduced by Kate et al. \cite{KateZG10}, who give a construction using bilinear maps. The original construction has also been extended to the multivariate case \cite{PapamanthouST13,ZhangGKPP17}. Libert et al. \cite{LibertRY16} also gave a construction relying on much simpler pairing-based assumptions. Our polynomial commitment protocol builds on the polynomial commitment protocol presented in \cite{BootleCCGP16}, and gives a square-root communication complexity when instantiated with compact commitments. Later, Hyrax~\cite{WahbyTSTW18} gives a commitment scheme for multi-linear polynomials using the scalar-product argument of \cite{BootleCCGP16,BunzBBPWM18}, with a logarithmic communication complexity. The same idea can be incorporated into our batch protocol for low-degree polynomials, but does not improve asymptotic performance, so for ease of exposition, we do not discuss this.
+
+Some zero-knowledge proofs and arguments use the idea of embedding many statements into a single polynomial using Lagrange interpolation polynomials in a challenge $x$. The idea originates in the quadratic arithmetic programs of Gennaro et al.~\cite{Gennaro2013}. It was used in the context of interactive zero-knowledge arguments by Bayer~\cite{Bayer2014}. The technique was originally applied to construct a Hadamard product argument and batched polynomial evaluation argument. Earlier work by Gennaro et al.~\cite{Gennaro2004} batches Schnorr proofs using simple powers of $x$.
+
+Other batch arguments in the literature use methods from \cite{Bellare1998} and multiply different instances of the proof by small exponents before compressing the proofs together. This approach may be used to trade soundness for efficiency. The batch argument in this thesis proves and verifies the logical AND of many statements simultaneously. There are also batch proofs for OR statements \cite{eng2009}, and k-out-of-N batch proofs \cite{Henry2013}. Finally, Henry and Goldberg \cite{Henry2013} define a notion of conciseness to characterise batch proofs.
+
+Camenisch and Stadler~\cite{Camenisch1997} also propose a general framework of relations for zero-knowledge proofs based on the discrete logarithm assumption. Their notation is useful for describing large and complex statements. We take some inspiration from their notation, but use different notation since the \ILC\ model describes general relations over fields, and values committed using a generic commitment scheme.

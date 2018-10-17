@@ -1,0 +1,550 @@
+% -------- Packages --------
+
+% This package just gives you a quick way to dump in some sample text.
+% You can remove it -- it's just here for the examples.
+\usepackage{blindtext}
+
+% This package means empty pages (pages with no text) won't get stuff
+%  like chapter names at the top of the page. It's mostly cosmetic.
+\usepackage{emptypage}
+
+% The graphicx package adds the \includegraphics command,
+%  which is your basic command for adding a picture.
+\usepackage{graphicx}
+% Use this command to keep your images in a separate
+%  'images' folder.
+\graphicspath{ {images/} }
+
+% The float package improves LaTeX's handling of floats,
+%  and also adds the option to *force* LaTeX to put the float
+%  HERE, with the [H] option to the float environment.
+\usepackage{float}
+
+% The amsmath package enhances the various ways of including
+%  maths, including adding the align environment for aligned
+%  equations.
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+% Use these two packages together -- they define symbols
+%  for e.g. units that you can use in both text and math mode.
+\usepackage{gensymb}
+\usepackage{textcomp}
+% You may also want the units package for making little
+%  fractions for unit specifications.
+%\usepackage{units}
+
+
+% The setspace package lets you use 1.5-sized or double line spacing.
+\usepackage{setspace}
+\setstretch{1.5}
+
+% That just does body text -- if you want to expand *everything*,
+%  including footnotes and tables, use this instead:
+%\renewcommand{\baselinestretch}{1.5}
+
+
+% PGFPlots is either a really clunky or really good way to add graphs
+%  into your document, depending on your point of view.
+% There's waaaaay too much information on using this to cover here,
+%  so, you might want to start here:
+%   http://pgfplots.sourceforge.net/
+%  or here:
+%   http://pgfplots.sourceforge.net/pgfplots.pdf
+%\usepackage{pgfplots}
+%\pgfplotsset{compat=1.3} % <- this fixed axis labels in the version I was using
+
+% PGFPlotsTable can help you make tables a little more easily than
+%  usual in LaTeX.
+% If you're going to have to paste data in a lot, I'd suggest using it.
+%  You might want to start with the manual, here:
+%  http://pgfplots.sourceforge.net/pgfplotstable.pdf
+%\usepackage{pgfplotstable}
+
+% These settings are also recommended for using with pgfplotstable.
+%\pgfplotstableset{
+%	% these columns/<colname>/.style={<options>} things define a style
+%	% which applies to <colname> only.
+%	empty cells with={--}, % replace empty cells with '--'
+%	every head row/.style={before row=\toprule,after row=\midrule},
+%	every last row/.style={after row=\bottomrule}
+%}
+
+\usepackage{pdflscape}
+\usepackage{afterpage}
+\usepackage{capt-of}
+
+% The mhchem package provides chemistry formula typesetting commands
+%  e.g. \ce{H2O}
+%\usepackage[version=3]{mhchem}
+
+% And the chemfig package gives a weird command for adding Lewis 
+%  diagrams, for e.g. organic molecules
+%\usepackage{chemfig}
+
+% The linenumbers command from the lineno package adds line numbers
+%  alongside your text that can be useful for discussing edits 
+%  in drafts.
+% Remove or comment out the command for proper versions.
+%\usepackage[modulo]{lineno}
+% \linenumbers 
+
+
+% Alternatively, you can use the ifdraft package to let you add
+%  commands that will only be used in draft versions
+%\usepackage{ifdraft}
+
+% For example, the following adds a watermark if the draft mode is on.
+%\ifdraft{
+%  \usepackage{draftwatermark}
+%  \SetWatermarkText{\shortstack{\textsc{Draft Mode}\\ \strut \\ \strut \\ \strut}}
+%  \SetWatermarkScale{0.5}
+%  \SetWatermarkAngle{90}
+%}
+
+
+% The multirow package adds the option to make cells span 
+%  rows in tables.
+\usepackage{multirow}
+
+
+% Subfig allows you to create figures within figures, to, for example,
+%  make a single figure with 4 individually labeled and referenceable
+%  sub-figures.
+% It's quite fiddly to use, so check the documentation.
+%\usepackage{subfig}
+
+% The natbib package allows book-type citations commonly used in
+%  longer works, and less commonly in science articles (IME).
+% e.g. (Saucer et al., 1993) rather than [1]
+% More details are here: http://merkel.zoneo.net/Latex/natbib.php
+%\usepackage{natbib}
+
+% The bibentry package (along with the \nobibliography* command)
+%  allows putting full reference lines inline.
+%  See: 
+%   http://tex.stackexchange.com/questions/2905/how-can-i-list-references-from-bibtex-file-in-line-with-commentary
+\usepackage{bibentry} 
+
+% The isorot package allows you to put things sideways 
+%  (or indeed, at any angle) on a page.
+% This can be useful for wide graphs or other figures.
+%\usepackage{isorot}
+
+% The caption package adds more options for caption formatting.
+% This set-up makes hanging labels, makes the caption text smaller
+%  than the body text, and makes the label bold.
+% Highly recommended.
+\usepackage[format=hang,font=small,labelfont=bf]{caption}
+
+% If you're getting into defining your own commands, you might want
+%  to check out the etoolbox package -- it defines a few commands
+%  that can make it easier to make commands robust.
+\usepackage{etoolbox}
+
+\usepackage{algorithm,algorithmicx}
+
+\usepackage{amssymb}
+
+\usepackage{tikz}
+
+\usepackage{amsxtra}
+\usepackage{bm}
+\usepackage{mathrsfs} 
+
+\usepackage{paralist}
+\usepackage{graphicx}
+\usepackage{url} 
+%\usepackage[usenames,dvipsnames]{xcolor}
+\usetikzlibrary{positioning}
+\usepackage{multirow}
+\usepackage{breakcites}
+\usepackage{microtype}
+\usepackage{color}
+%\usepackage{hyperref}
+\usepackage{epstopdf}
+
+\newtheorem{defn}{Definition}
+\newtheorem{definition}{Definition}
+\newtheorem{thm}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{claim}{Claim}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lemma}[thm]{Lemma}
+\newtheorem{prp}{Proposition}
+
+%==========================Commands===========================
+
+%===Editorial========
+
+\newcommand{\red}[1]{{\textcolor{red}{#1}}}
+
+%===Computational Complexity========
+
+\newcommand{\sep}{\ensuremath{\lambda}}
+\newcommand{\bigo}{\ensuremath{\mathcal{O}}}
+\newcommand{\instancegen}{\ensuremath{\mathcal{G}}}
+\newcommand{\instance}{\ensuremath{\mathsf{gk}}}
+
+%===Relations and Languages========
+
+\newcommand{\relation}{\ensuremath{\mathsf{R}}}
+\newcommand{\lang}{\ensuremath{\mathsf{L}}}
+\newcommand{\statement}{\ensuremath{\mathsf{u}}}
+\newcommand{\witness}{\ensuremath{\mathsf{w}}}
+
+%===Pseudocode========
+\newcommand{\Function}[2]{\textbf{#1}({#2})}
+\newcommand{\If}{\textbf{If }}
+\newcommand{\Else}{\textbf{Else }}
+\newcommand{\While}{\textbf{While }}
+\newcommand{\Return}{\textbf{Return }}
+
+%===Zero-Knowledge========
+
+%=Algorithms
+
+\newcommand{\crsgen}{\ensuremath{\mathcal{G}}}
+\newcommand{\prover}{\ensuremath{\mathcal{P}}}
+\newcommand{\verifier}{\ensuremath{\mathcal{V}}}
+\newcommand{\extractor}{\ensuremath{\mathcal{X}}}
+\newcommand{\simulator}{\ensuremath{\mathcal{S}}}
+\newcommand{\adversary}{\ensuremath{\mathcal{A}}}
+
+%=Objects
+\newcommand{\crs}{\ensuremath{\mathsf{\sigma}}}
+\newcommand{\Proof}{\ensuremath{\mathsf{\pi}}}
+\newcommand{\transcript}{\ensuremath{\mathsf{tr}}}
+\newcommand{\provstate}{\ensuremath{\mathsf{s}}}
+\newcommand{\verifstate}{\ensuremath{\mathsf{t}}}
+
+%===Commitment Schemes========
+\newcommand{\ck}{\ensuremath{\mathsf{ck}}}
+\newcommand{\mlen}{\ensuremath{n}}
+\newcommand{\ckgen}[2]{\textbf{KeyGen} \left( #1 , #2 \right)}
+\newcommand{\commit}[2]{\textbf{Commit}_\ck \left( #1 ; #2 \right)}
+\newcommand{\decommit}[2]{\textbf{Decommit}_\ck \left( #1 ; #2 \right)}
+\newcommand{\verify}[2]{\textbf{Verify}_\ck \left( #1 ; #2 \right)}
+
+%===Maths========
+
+\newcommand{\N}{\ensuremath{\mathbb{N}}}
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+\newcommand{\F}{\ensuremath{\mathbb{F}}}
+\newcommand{\G}{\ensuremath{\mathbb{G}}}
+\newcommand{\R}{\ensuremath{\mathcal{R}}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand\norm[2]{\ensuremath{\left\lVert#2\right\rVert_{#1}}}
+\newcommand\abs[1]{|#1|}
+\newcommand*{\qed}{\hfill\ensuremath{\blacksquare}}%
+\newcommand*{\qeda}{\hfill\ensuremath{\square}}%
+
+%=DLOG Parameters
+
+\newcommand{\DLOGprime}{\ensuremath{p}}
+
+%=Lattice Cryptography
+
+\newcommand{\SISmodulus}{\ensuremath{q}}
+\newcommand{\SISnrows}{\ensuremath{n}}
+\newcommand{\SISncols}{\ensuremath{m}}
+\newcommand{\SISnormbound}{\ensuremath{\beta}}
+
+%=SRSA Parameters
+
+\newcommand{\RSAmodulus}{\ensuremath{N}}
+\newcommand{\RSAexponent}{\ensuremath{e}}
+\newcommand{\RSAp}{\ensuremath{p}}
+\newcommand{\RSAq}{\ensuremath{q}}
+\newcommand{\RSAC}{\ensuremath{C}}
+\newcommand{\RSAM}{\ensuremath{M}}
+
+%=CRHF Parameters
+
+\newcommand{\HashFunction}{\ensuremath{h}}
+\newcommand{\HashInLen}{\ensuremath{m}}
+\newcommand{\HashOutLen}{\ensuremath{l}}
+
+%===ILC Model========
+
+\newcommand{\ilc}{\ensuremath{\overset{\mathsf{ILC}}{\longleftrightarrow}}}
+\newcommand{\ILC}{\ensuremath{\mathsf{ILC}}}
+\newcommand{\ILCcommit}{\texttt{commit}}
+\newcommand{\ILCsend}{\texttt{send}}
+\newcommand{\ILCopen}{\texttt{open}}
+\newcommand{\ILCcheck}{\texttt{check}}
+\newcommand{\ILCveclen}{n}
+
+%===Arithmetic Circuits========
+\newcommand{\ACnumgates}{N}
+\newcommand{\ACveclen}{n}
+\newcommand{\ACnumvec}{m}
+\newcommand{\ACprime}{p}
+
+%===Non-ILC Optimisations========
+\newcommand{\extdeg}{k}
+
+%========================Miscellaneous Commands to Sort========================
+\newcommand{\Gr}{\G}
+\newcommand{\Grp}{\mathbb{G}}
+\newcommand{\order}{\mathbb{p}}
+\newcommand{\negl}{\nu}
+\newcommand{\prim}[2]{#1.#2}    
+
+\newcommand{\zo}{\ensuremath{\{0,1\}}}
+
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\COMMENT}[1]{}
+
+
+%\makeatletter
+%\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+%\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+\let\CapLet\MakeUppercase
+\let\LowLet\MakeLowercase
+
+% Prover, Verifier, Statements 
+\newcommand{\Po}{\ensuremath{\mathcal{P}}}
+\newcommand{\prov}{\Po}
+\newcommand{\V}{\ensuremath{\mathcal{V}}}
+\newcommand{\ver}{\V}
+\newcommand{\LL}{\ensuremath{\mathcal{L}}}
+\newcommand{\Rac}{\ensuremath{\mathcal{R}_{\mathsf{AC}}}}
+\newcommand{\KK}{\ensuremath{\mathcal{K}}}
+\newcommand{\KKIOP}{\ensuremath{\mathcal{K}_{\IOP}}}
+\newcommand{\KKILC}{\ensuremath{\mathcal{K}_{\ILC}}}
+\newcommand{\C}{\ensuremath{\mathcal{C}}}
+\newcommand{\E}{\ensuremath{\mathcal{E}}}
+\newcommand{\Si}{\ensuremath{\mathcal{S}}}
+\newcommand{\iop}{\ensuremath{\overset{\mathsf{IOP}}{\longleftrightarrow}}}
+\newcommand{\schan}{\std}%merging two notations
+\newcommand{\std}{\ensuremath{\longleftrightarrow}}
+\newcommand{\IOP}{\ensuremath{\mathsf{IOP}}}
+
+\newcommand{\vereq}{\overset{?}{=}}
+
+
+
+\newcommand{\Ex}{\ensuremath{\mathcal{E}}}
+\newcommand{\ExILC}{\ensuremath{\mathcal{E}_{\ILC}}}
+\newcommand{\ExIOP}{\ensuremath{\mathcal{E}_{\IOP}}}
+\newcommand{\Sim}{\ensuremath{\mathcal{S}}}
+\newcommand{\stm}{u}
+\newcommand{\wit}{w}
+
+
+\newcommand{\PoMal}{\Po^*}
+\newcommand{\PoILC}{\ensuremath{\mathcal{P}_{\ILC}}}
+\newcommand{\PoILCMal}{\PoILC^*}
+\newcommand{\PoIOP}{\ensuremath{\mathcal{P}_{\IOP}}}
+\newcommand{\PoIOPMal}{\PoIOP^*}
+% \newcommand{\PoACMal}{\Po^*_{AC}}
+\newcommand{\PoShiftMal}{\Po^*_{\textnormal{shift}}}
+\newcommand{\PoProdMal}{\Po^*_{\textnormal{prod}}}
+\newcommand{\VMal}{\V^*}
+\newcommand{\VILC}{\ensuremath{\mathcal{V}_{\ILC}}}
+\newcommand{\VIOP}{\ensuremath{\mathcal{V}_{\IOP}}}
+\newcommand{\SimILC}{\ensuremath{\mathcal{S}_{\ILC}}}
+\newcommand{\SimIOP}{\ensuremath{\mathcal{S}_{\IOP}}}
+
+
+\newcommand{\Emal}{E^*}
+\newcommand{\rownr}{\tau}
+\newcommand{\numcolt}{\numcol}% I use these commands to merge two notations I think are the same, but not confident enough to do replace all on
+\newcommand{\EC}{E_C}
+\newcommand{\witsim}{\widetilde{\wit}}
+\newcommand{\Extrans}{\ensuremath{\mathcal{T}}}
+\newcommand{\viewpilc}{\mathsf{trans}_{\PoILC}}
+\newcommand{\viewp}{\mathsf{trans}_{\Po}}
+\newcommand{\viewpilcsim}{\widetilde{\viewpilc}}
+
+
+
+\newcommand{\ComSetup}{\mathsf{Setup}}
+\newcommand{\ComCommit}{\mathsf{Commit}}
+\newcommand{\ComOpen}{\mathsf{Open}}
+\newcommand{\ComVerify}{\mathsf{Verify}}
+
+\newcommand{\setI}{\mathcal{I}}
+\newcommand{\pp}{\mathsf{pp}} % public parameters
+\newcommand{\vecsize}{\ell} % row size
+\newcommand{\elmvecsize}{\rho} % column size
+\newcommand{\Co}{c}  %commitment%
+\newcommand{\aux}{\text{aux}} % auxilary info for commitment etc.
+\newcommand{\asn}{\leftarrow} % assignment  operator
+\newcommand{\A}{\mathcal{A}} % Adversary
+\newcommand{\AIOP}{\mathcal{A}_{\IOP}} % Adversary
+\newcommand{\AILC}{\mathcal{A}_{\ILC}} % Adversary
+%\newcommand{\Atrans}{\mathcal{A^{IOP\to ILC}}}
+%\newcommand{\Atranso}{\Atrans^{\AIOP}}
+\newcommand{\andc}{~\wedge~} % Can set to \wedge or \mbox{~and~}
+\newcommand{\bigO}{\mathcal{O}}
+
+
+\newcommand{\hamdist}{\ensuremath{\mathsf{hd}}} % hamming distance. Should it be in \mathrm to avoid italic?
+\newcommand{\minhamdist}{\ensuremath{\mathsf{hd}}_{\mathrm{min}}} % hamming distance. Should it be in \mathrm to avoid italic?
+\newcommand{\relham}{\mathsf{rhd}}
+\newcommand{\hamw}{\ensuremath{\mathsf{wt}}} %hamming weight
+\newcommand{\hamweight}{\hamw}
+
+\newcommand{\proof}{\emph{Proof}}
+
+\newcommand{\oc}{\mathrm{oc}}%opening complexity
+\newcommand{\qc}{\mathrm{qc}}%query complexity
+\newcommand{\qrc}{\mathrm{qrc}}%query round complexity (=1 in our paper)
+\newcommand{\vc}{\mathrm{vcm}}%verifier communication
+\newcommand{\vcm}{\vc}%alternative command for verifier communication
+\newcommand{\vcp}{\mathrm{vcp}}%verifier computation
+\newcommand{\pcm}{\mathrm{pcm}}%prover communication
+\newcommand{\pcp}{\mathrm{pcp}}%prover computation
+\newcommand{\viewV}{\mathsf{view}_{\V}}
+\newcommand{\poly}{\textrm{poly}}
+\newcommand{\numpack}{\mathrm{\#p}}
+\newcommand{\tqs}{\mathrm{tqs}}
+
+\newcommand{\DDelta}{d}
+
+\newcommand{\transp}{{^\intercal}}
+
+\newcommand{\polylog}{\ensuremath{\textrm{polylog}}}
+
+%variables used in definition of ILC, IOP and compilation ILC->IOP
+
+
+\newcommand{\numcol}{\nu}%number of columns used in a matrix in IOP section
+\newcommand{\numround}{\mu}%total number of rounds in a protocol
+\newcommand{\roundnum}{i}%refers to a specific round number
+\newcommand{\eccr}{\vec{e}}%notation for vectors that are codeword
+\newcommand{\eccmal}{\vec{e}^*}%notation for vectors the might be codewords but are committed to by a malicious prover
+\newcommand{\sizeecc}{2\sizeeccrand}%size of codewords
+\newcommand{\setsizeecc}{[\sizeecc]}%set corresponding to length of ecc. Set set from which challenge j are taken
+\newcommand{\ECC}{\tilde{\mathsf{E}}_\codeset}%ERE error correcting code
+\newcommand{\preECC}{\mathsf{E}_\codeset}% error correcting code used for the \ECC
+\newcommand{\sizevect}{k}%the length of the vectors committed to in the first layer
+%\newcommand{\sizevecr}{\sizevect}%only relevant if not all vectors have the same length
+\newcommand{\coefvec}[1]{\vec{\gamma}_{{#1}}}%the coefficient used when opening linear combinations of committed vectors
+
+%variables used in appendix
+\newcommand{\app}{Appendix}
+\newcommand{\totalnumgates}{N}%total number of gates in the arithmetic circuit
+\newcommand{\numgates}{m}%number of addition and multiplication gates
+\newcommand{\numcomp}{\mathfrak{m}}%number of vectors to be compressed using `binary-expansion' challenges
+\newcommand{\numsqrt}{\mathfrak{n}}%number of vectors that simple sqrt argument is applied to
+\newcommand{\lognumcomp}{\mu}%log of \numcomp
+
+\newcommand{\event}{Err}
+\newcommand{\eventsz}{F}
+\newcommand{\eventszz}{G}
+
+\newcommand{\vect}{{\vec{v}}}
+\newcommand{\vectmal}[1]{\vect_{(#1)}^*}
+\newcommand{\vecr}[1]{{\vect_{#1}}}
+\newcommand{\numvect}[1]{{t_{#1}}}%total number of vectors committed to by round #1.
+\newcommand{\totalnumvec}{\numvect{}}%total umber of vectors committed to
+\newcommand{\Transcript}[1]{\text{Tr}(#1)}
+%\newcommand{\View}[2]{\text{View}_{#1}(#2)}
+
+\newcommand{\eccrand}{\vec{r}}
+\newcommand{\eccrandmal}[1]{\eccrand_{(#1)}^*}
+\newcommand{\sizeeccrand}{n}
+
+\newcommand{\ecc}{\vec{e}}%notation for vectors that are codeword
+\newcommand{\chalJ}{J}%set of challenges
+\newcommand{\Chal}{Q}%challenge matrix in last round of ILC to IOP
+\newcommand{\chalj}{j}%challenge values
+\newcommand{\chals}{\sep}% number of challenges s
+\newcommand{\chalx}{{\vec{\gamma}}}% values for the extra linear challenge
+\newcommand{\chalxt}{\chalx}%Sune: think it is the same as \chalx, but not confident enough to do replace all.
+\newcommand{\chaloptx}{\chalxt^*}% worst values for linear challenge
+
+
+\newcommand{\claimr}{r}
+\newcommand{\codeword}{c}
+\newcommand{\restword}{v}
+
+\newcommand{\indupara}{\kappa}
+
+\newcommand{\codeset}{\mathcal{C}}
+\newcommand{\maxdist}{\frac{\minhamdist}{3}}
+\newcommand{\relmindist}{\mathsf{rhd}_{\mathrm{min}}}
+
+%%The following 3 newcommands are using in the appendix appclaim
+
+\newcommand{\xce}{{\eccmal_0}+\chalx E^*}
+\newcommand{\xcer}{\vec{e}^*_0+(\chalx+r\chalx^*) E^*}
+\newcommand{\xceo}{\eccmal_0+x^* E^*}
+
+
+% Vectors
+
+\newcommand{\HKSamp}{\mathsf{HK}} % Hash key sampling 
+\newcommand{\HH}{\mathsf{H}} % Hash function
+\newcommand{\HHFam}{\mathcal{H}}  % Hash family
+\newcommand{\KeySpace}{\mathcal{K}}   % General Key Space
+\newcommand{\DSpace}{\mathcal{D}}   % Domain
+\newcommand{\RSpace}{\mathcal{R}}   % Range
+\newcommand{\inpoly}{\alpha}   % input size polynomial
+\newcommand{\outpoly}{\beta}   % Output size polynomial
+\newcommand{\keypoly}{\kappa}   % Key size polynomial
+\newcommand{\blocklen}{\kappa} % committed blocksize
+
+
+%Compilation environment
+
+\newtheorem{compilation}{Compilation}
+
+
+
+
+%=-============================
+% Primitives 
+%\newcommand{\COM}{\mathcal{COM}} % Commitment Scheme
+
+\newcommand{\heading}[1]{\vspace{.1cm}\noindent{\sc{\textsc{#1}}}.}
+%title for subsubsections which reduce vertical space consumed
+ 
+%======================================
+% Packages
+
+
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{url}
+\usepackage{ifthen}
+%\usepackage{eufrak}
+\usepackage{setspace}
+\usepackage{threeparttable}
+\usepackage{enumerate}
+%\usepackage{arydshln}
+\usepackage{centernot}
+\usepackage{tabularx}
+\usepackage{hhline}
+\usepackage{booktabs} 
+\usepackage{footmisc}
+\usepackage{subfigure}
+\usepackage{setspace}
+\usepackage{stmaryrd}
+\usepackage[latin1]{inputenc}
+\usepackage{fancybox}
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{etextools}
+\usepackage{caption}
+
+%\usepackage[ruled,noend]{algorithm2e}
+\usepackage{algorithm}
+ %package for algorithms and pseudocode
+%\usepackage[noend]{algorithm2e} %package for algorithms and pseudocode
+
+%\usepackage[backend=bibtex,firstinits=true]{biblatex}
+
+\definecolor{almond}{rgb}{0.94, 0.87, 0.8} % The color used in the merkle tree
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}

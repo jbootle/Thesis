@@ -1,0 +1,396 @@
+% !TEX root = ..\Main.tex
+\addcontentsline{toc}{chapter}{Appendices}
+
+% The \appendix command resets the chapter counter, and changes the chapter numbering scheme to capital letters.
+%\chapter{Appendices}
+\appendix
+
+\chapter{Security Proofs for Optimised Hash and Error-Correcting-Code Compilation}
+\label{appendix:optproofs}
+
+    \begin{theorem}[Completeness]
+    If $(\KKILC,\PoILC,\VILC)$ is complete for relation $\R$ over $\ILC$, then the compiled $(\KK,\Po,\V)$ with optimisations from Subsection \ref{subsec:ipcpopt} is complete for relation $\R$.
+    \end{theorem}  
+   \begin{proof}
+All the commitment openings are correct, so they will be accepted by the verifier. In the execution of $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle$, the fact that $\preECC$ is linear and Reed-Solomon codes are linear implies that $\ECC$ is linear and hence all the linear checks will be true. If $(\crs,\stm,\wit)\in \R$ then $(\crs_{\ILC},\stm,\wit)\in \R$ and being complete $\langle \PoILC(\crs_{\ILC},\stm,\wit)\ilc\VILC(\crs_{\ILC},stm)\rangle =1$ so $\V$'s internal copy of $\VILC$ will accept. Thus, in this case, $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle=1$, which proves completeness.\qed
+    \end{proof}
+  
+  
+      \begin{theorem}[Knowledge Soundness]
+    If $(\KKILC,\PoILC,\VILC)$ is statistically knowledge sound with a straight-line extractor for relation $\R$ over $\ILC$ and $(\ComSetup,\ComCommit)$ is computationally (statistically) binding, then $(\KK,\Po,\V)$ with the optimisations from Subsection \ref{subsec:ipcpopt} is computationally (statistically) knowledge sound for relation $\R$.
+    \end{theorem}   
+    \begin{proof}
+
+Throughout the proof of Theorem \ref{thm:sound}, we used the fact that $\ECC$ is linear. This is still the case, due to the linearity of Reed-Solomon codes. The only part of the proof of Theorem \ref{thm:sound} that used the form of $\ECC$ as part of the proof was Lemma \ref{lem:malform}. We reprove this lemma.
+
+\begin{lemma}
+The probability that for some $\rownr$ there are no $\vec{v}_\rownr$ and $\vec{r}_\rownr$ such that $\ECC(\vec{v}_\rownr,\vec{r}_\rownr)$ agrees with $\vec{e}_\rownr$ on the opened $j\in \bigcup_{i=1}^{2n}J_i$ and $b=1$ is negligible. 
+
+In particular, the probability that $b=1$ but $\Extrans$ does not extract the transcript of $\PoILCMal$ is negligible. 
+\end{lemma}
+\begin{proof}
+Since we can ignore events that happen with negligible probability, and the expected number of rewindings is polynomial, we can assume that in all the rewindings, $\PoMal$ only makes openings to the most common openings. 
+We showed that the probability that $b=1$ but $\PoMal$ sends a $V_{(Q)}^*\neq QV$, or $\V$ computes a $V_{(Q)}^{'*}\neq Q'V$ is negligible and by the same argument the probability that $b=1$ but $\PoMal$ sends
+$\vec{v}^*_{(\vec{\gamma})}\neq \vec{v}_{(\vec{\gamma})}$ is negligible. Therefore, in the following, we will assume $\vec{v}^*_{(\vec{\gamma})}=\vec{v}_{(\vec{\gamma})}$.
+
+Now suppose that there is some $\vec{e}_{\rownr}$ such that the opened values are inconsistent with being $\ECC(\vec{v}_\rownr,\vec{r}_\rownr)$ for any $\vec{r}_{\rownr}$. That is, either there is some $j$ such that $j,n+j\in \bigcup_{i=1}^{2n}J_i$ and $(\vec{e}_{\rownr})_j-(\vec{e}_{\rownr})_{n+j}\neq \preECC(\vec{v})_j$, or there exists some set $J' \subset [n+1,2n]$ of size at least $2\lambda +1$ such that $(\vec{e}_{\rownr})_j$ are not consistent with a Reed-Solomon codeword. Note that if $n = 2\lambda$, then a suitable Reed-Solomon codeword always exists by interpolation, so we do not need to consider this value of $n$. The first case with $j$ and $n+j$ has already been covered by Lemma \ref{lem:malform}. Therefore, we prove the second case.
+%\paragraph{Remark.} This proof technique can be viewed in another way in terms of parity-check matrices.
+
+If we are in the second case, then there exist $\mu_j \in \F$ which give a parity check on $J'$ such that $\sum_{j \in J'} \mu_j (\vec{e}_{\rownr})_j \neq 0$. This can be seen as follows. If the values are not consistent with a Reed-Solomon codeword, then that means that there is no polynomial whose evaluations would be consistent with polynomial evaluations $(\vec{e}_{\rownr})_j$ for $j \in J'$. Therefore, there exist $2\lambda+1$ values $j \in J'$, and $j^* \in J'$ such that if we interpolate to compute the polynomial which evaluates to $(\vec{e}_{\rownr})_j$ at points $a_j$, and then evaluate at $a_{j^*}$, the result is not equal to $(\vec{e}_{\rownr})_{j^*}$. Interpolation from evaluations at the points $a_j$ and then evaluation at $a_{j^*}$ are both linear operations, and composing both linear maps yields the values $\mu_j$.
+
+Then,for uniformly chosen $\vec{\gamma}_\rownr\in \F$, we get that $\vec{\gamma}_\rownr(\sum_{j \in J'} \mu_j (\vec{e}_{\rownr})_j)$ is uniformly distributed in $\F$. Hence for a random $\vec{\gamma}\in\F^t$, we have that $\vec{\gamma} (\sum_{j \in J'} \mu_j (\vec{e})_j)$ is uniformly distributed. When $\V$ sends $\vec{\gamma}$, $\PoMal$ will respond with $\vec{v}^*_{(\vec{\gamma})}=\vec{v}_{(\vec{\gamma})}$ and some $\vec{r}^*_{(\vec{\gamma})}$. 
+$\V$ will only accept on a challenge $J$ if for all $j\in J$ we have $(\vec{e}_0+\vec{\gamma}\vec{e})_j=\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_j$. 
+Since $J' \subset \bigcup_{i=1}^{2n} J_i$ we have $(\vec{e}_0+\vec{\gamma}\vec{e})_j=\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_j$ for each $j \in J'$ so 
+\begin{align*}
+\left(\sum_{j \in J'} \mu_j (\vec{e}_0)_j\right) + \vec{\gamma} \left(\sum_{j \in J'} \mu_j (\vec{e})_j \right) = 
+%
+& \sum_{j \in J'} \mu_j \ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_j = 0
+\end{align*}
+that is, 
+\[\left(\sum_{j \in J'} \mu_j (\vec{e}_0)_j\right) = -\vec{\gamma} \left(\sum_{j \in J'} \mu_j (\vec{e})_j \right)\]
+For random $\vec{\gamma}$ the right-hand side is uniform and the left-hand side is fixed, hence equality only happens with negligible probability. That proves the lemma. \qed
+\end{proof}
+\end{proof}
+
+
+\begin{theorem}[SHVZK]
+If $(\KKILC,\PoILC,\VILC)$ is perfect SHVZK 
+and $(\ComSetup,\ComCommit)$ is computationally (statistically) hiding then $(\KK,\Po,\V)$ with the optimisations from Subsection \ref{subsec:ipcpopt} is computationally (statistically) SHVZK.
+\end{theorem}
+\begin{proof}
+To prove we have SHVZK we describe how the simulator $\Sim(\crs,\stm,\rho)$ should simulate the view of $\V$. Along the way, we will argue why, the variables output by $\Sim$ have the correct joint distribution. To keep the proof readable, instead of saying that ``the joint distribution of [random variable] and all previously defined random variables is identical to the distribution in the real view of $\V$ in $\langle \Po(\crs,\stm,\wit)\std \V(\crs,\stm)\rangle$'' we will simply say that ``[random variable] has the correct distribution''.
+
+Using the randomness $\rho$ the simulator learns the queries $\rho_{\ILC}=(x_1,\ldots,x_{\mu-1},Q)$ the internal $\VILC$ run by the honest $\V$ will send. $\Sim$ can therefore run $\Sim_{\ILC}(\crs_{\ILC},\stm,\rho_{\ILC})$ to simulate the view of the internal $\VILC$. This gives it $(t_1,\ldots,t_\mu,V_{(Q)})$. By the SHVZK property of $(\KKILC,\PoILC,\VILC)$ these random variables will all have the correct joint distribution. 
+
+Then $\Sim$ reads the rest of $\rho$ to learn also the challenges $\chalx$ and $J$ that $\V$ will send. The simulator picks uniformly at random $\vect_{(\vec{\gamma})}\gets \F^{\sizevect}$. Since in a real proof $\vect_0$ is chosen at random, we see that the simulated $\vect_{(\vec{\gamma})}$ has the correct distribution. Now $\Sim$ picks $E_{01}|_J,\ldots,E_{\mu}|_J$ uniformly at random. Recall that this time $\ECC(\vect;\vec{r})=(\preECC(\vect)+\vec{r},\vec{r})$ where $\vec{r}$ is the Reed-Solomon encoding of $\vec{r}' \in \F^{2\sep}$. By definition of $J$ being allowed, we have for all $j\in J$ that $j+n\notin J$. This means for any choice of $\vect_0\in \F^{\sizevect}$ and $V\in \F^{t\times \sizevect}$ that when we choose random $\vec{r}'_0\gets \F^{2\sep}$ and $R' \gets \F^{t\times 2\sep}$ we get uniformly random $\ECC(\vect_0;\vec{r}'_0)|_J$, and $\ECC(V;R')$ is uniformly random subject to the second half of each vector being a Reed-Solomon codeword. Consequently, $E_{01}|_J,\ldots,E_{\mu}|_J$ have the correct distribution.
+
+Next, the simulator picks $\vec{r}'_{(\vec{\gamma})}\in \F^{2\sep}$ and $R'_{(Q)}\in \F^{t\times 2\sep}$. %one entry and column at a time.
+To do this, for all $j$ such that $j\in J$ or $j+n\in J$, the simulator computes the unique $(\vec{r}_{(\vec{\gamma})})_j\in \F$, $R_j\in \F^t$ and $R'_j\in \F^t$ such that we get $\ECC(\vect_{(\vec{\gamma})};\vec{r}_{(\vec{\gamma})})=\ecc_0|_J+\chalx E|_J$ and $\ECC(V_{(Q)};R_{(Q)})=QE|_J$ and $\ECC(V'_{(Q)};R'_{(Q)})=Q'E|_J$. For all $j$ such that $j\notin J$ and $j+n\notin J$, the values of $(\vec{r}'_{(\vec{\gamma})})_j\in \F$, $R'_j\in \F^t$ and $R'_j\in \F^t$ are now completely determined, by interpolation.
+
+Finally, $\Sim$ defines $E_{01}|_{\bar{J}},\ldots,E_{\mu}|_{\bar{J}}$ to be $0$ matrices. It then picks $\vec{s}_1,\ldots,\vec{s}_\mu$ at random and makes the commitments $\vec{c}_1,\ldots,\vec{c}_\mu$ as in the protocol. For $j\in J$ we see that all the $\vec{c}_i|_j$ commitments are computed as in the real execution from values that have the same distribution as in a real proof. Hence, they will have the correct distribution. The $\vec{c}_i|_j$s for $j\notin J$ are commitments to different values than in a real proof. However, by the computational (statistical) hiding property of the commitment scheme, they have a distribution that is computationally (statistically) indistinguishable from the correct distribution. \qed
+\end{proof}
+
+\chapter{Stand-alone Argument for Arithmetic Circuit Satisfiability with Logarithm Communication Complexity}
+\label{appendix:logprot}
+
+We now give the formal description of a stand-alone argument of knowledge for the satisfiability of an arithmetic circuit, which combines the compiled version of the \ILC\ protocol from Section \ref{subsec:5rndsqrt}, and the recursive protocol for inner products from Section \ref{se:innerproduct}. Both prover and verifier take the move parameter $\mu$ as common input. For square root communication complexity, the inner product argument is not used and we set $\mu=0$. For $\mu > 0$, the common input includes the values $(m_\mu,\ldots,m_1)$ used in the inner product argument.
+
+\begin{description}
+\item[Common Input:] $(ck,C,N,m,n,m_1',m_2',n',m_\mu,\ldots, m_1, \mu)$ where $ck$ is a commitment key.The description of an arithmetic circuit $$\left( \{\vec{w}_{q,{a,i}},\vec{w}_{q,{b,i}},\vec{w}_{q,{c,i}}\}_{q \in [Q], i \in [m]},\{K_{q}\}_{q \in [Q]}\right)$$ with $N=mn$ multiplication gates. $\mu$ is the move parameter and $n=m_\mu \cdots m_1$. Parameters $(m_1',m_2',n')$ are set to  satisfy both 
+$3m \leq m_1' n'$ and $4m+2 \leq m_2' n'$.
+
+\item[Prover's Witness:] Satisfying assignments $\vec{a}_{i},\vec{b}_i$ and $\vec{c}_i$ to the wires of $C$.
+\item[Argument:]
+\item[\ P:]
+Pick randomness $\alpha_1,\beta_1,\gamma_1,\ldots,\alpha_m,\beta_m,\gamma_m,\delta\gets \Z_p$ and blinding vector $\vec{d} \gets \Z_p^n$. Compute for $i \in \{1,\ldots,m\}$
+\begin{align*}
+{A}_{i}=\ComCommit(\vec{a}_{i};\alpha_{i}) && {B}_{i}=\ComCommit(\vec{b}_{i};\beta_{i}) \\
+{C}_{i}=\ComCommit(\vec{c}_{i};\gamma_{i}) && {D}=\ComCommit(\vec{d};\delta)
+\end{align*}
+
+Send $A_{1},B_{1},C_{1},\ldots,A_{m},B_{m},C_{m},D$ to the verifier.
+
+\item[\ V:] $y\gets \Z_p^*$.
+
+As argued before, the circuit determines vectors of polynomials $\vec{w}_{a,i}(Y)$, $\vec{w}_{b,i}(Y)$, $\vec{w}_{c,i}(Y)$ and $K(Y)$ such that $C$ is satisfiable if and only if 
+%
+$$
+%
+\sum_{i=1}^m  \vec{a}_i  \cdot (\vec{b}_i^T \circ \vec{Y}') Y^i+\sum_{i=1}^m \vec{a}_i  \cdot \vec{w}_{a,i}(Y)
++
+\sum_{i=1}^m \vec{b}_i \cdot \vec{w}_{b,i}(Y)   +\sum_{i=1}^m \vec{c}_i \cdot \vec{w}_{c,i}(Y) =  K(Y)
+$$
+ where $\vec{Y}'=(Y^m,\ldots,Y^{mn})$. Given $y$, both the prover and verifier can compute $K=K(y)$, $\vec{w}_{a,i}=\vec{w}_{a,i}(y)$, $\vec{w}_{b,i}=\vec{w}_{b,i}(y)$ and $\vec{w}_{c,i}=\vec{w}_{c,i}(y)$. 
+
+\item[\ P:] Compute Laurent polynomials $\vec{r},\vec{s},\vec{r}'$, which have vector coefficients, and Laurent polynomial $t$, in the indeterminate $X$ 
+\begin{align*}
+\vec{r}(X)&=\sum_{i=1}^m\vec{a}_{i}y^i X^{i}+\sum_{i=1}^m\vec{b}_{i} X^{-i}+X^m \sum_{i=1}^m\vec{c}_{i} X^{i}+\vec{d}X^{2m+1}\\
+\vec{s}(X)&=\sum_{i=1}^m\vec{w}_{a,i}y^{-i} X^{-i}+\sum_{i=1}^m\vec{w}_{b,i}X^{i}+ X^{-m} \sum_{i=1}^m\vec{w}_{c,i}X^{-i}\\
+\vec{r}'(X)&= \vec{r}(X) \circ \vec{y}' + 2\vec{s}(X)\\
+ t(X)&=\vec{r}(X)\cdot \vec{r}'(X)-2K=\sum_{k=-3m}^{4m+2}t_kX^{k}
+\end{align*}
+When the wires $\vec{a}_{i},\vec{b}_i,\vec{c}_i$ correspond to a satisfying assignment, the Laurent polynomial $t(X)$ will have constant term $t_0=0$. 
+
+Commit to $t(X)$ by computing $T_k = \ComCommit(t_k;\tau_k)$ for each $k\neq 0$, and send all of these commitments to the verifier.
+
+\item[\ V:] $x\gets \Z_p^*$
+\item[\ P:] Compute $v = t(x)$, ${\tau} = \sum_{k=-3m, k\neq 0}^{4m+2} \tau_k x^k$, and 
+$$\vec{r} =\sum_{i=1}^m\vec{a}_{i}x^{i} y^i+\sum_{i=1}^m\vec{b}_{i} x^{-i}+x^m \sum_{i=1}^m\vec{c}_{i} x^{i}+\vec{d}x^{2m+1}$$
+$$\rho =\sum_{i=1}^m\alpha_{i}x^{i} y^i+\sum_{i=1}^m\beta_{i} x^{-i}+x^m \sum_{i=1}^m\gamma_{i} x^{i}+\delta x^{2m+1}$$ 
+\begin{itemize}
+\item [$\bullet$] \textbf{If} $\boldsymbol\mu\: \mathbf{=0:}$ the inner product argument is not used. 
+The prover sends $(v,\tau,\vec{r},\rho)$ to the verifier.
+
+\item  [$\bullet$] \textbf{If} $\boldsymbol\mu\: \mathbf{>0:}$ the inner product argument is used. The prover computes $\vec{r}' = \vec{r}'(x)$ and sends $(v,\tau,\rho)$ to the verifier.
+\end{itemize}
+\item[Verification:] The verifier checks whether $\ComCommit(v;\tau) \vereq \prod_{k=-3m, k\neq 0}^{4m+2} T_k^{x^k}$.
+\begin{itemize}
+\item [$\bullet$] \textbf{If} $\boldsymbol\mu\: \mathbf{=0:}$ the inner product argument is not used. The verifier computes $\vec{r}'=\vec{r}\circ \vec{y}' +2\vec{s}(x)$, and accepts only if
+$$
+\begin{array}{cl}
+\vec{r}\cdot \vec{r}'-2K &=v\\
+\ComCommit(\vec{r};\rho) & = \left[ \prod_{i=1}^m A_{i}^{x^i y^i} \right] \left[ \prod_{i=1}^m B_{i}^{x^{-i}}\right] \left[ \prod_{i=1}^mC_{i}^{x^{m+i}}\right]D^{x^{2m+1}}\\
+\end{array}$$
+
+\item  [$\bullet$] \textbf{If} $\boldsymbol\mu\: \mathbf{>0:}$
+prover and verifier run the inner product argument with common input
+$$ (\Gr,p,\vec{g},R,\vec{h},R',v+2K,m_\mu,m_{\mu-1},\ldots,m_1)\mbox{\qquad where}$$
+$$
+\begin{array}{lll}
+ ck&= (\Gr,p,g,\vec{g}) & \qquad \qquad n=m_\mu m_{\mu-1}\cdots m_1\\
+ \vec{g} &=(g_1,g_2,\ldots,g_n) &  \qquad\qquad   \vec{h} =(g_1^{y^{-m}},g_2^{y^{-2m}},\ldots,g_n^{y^{-mn}})\\
+ R &= \ComCommit(0;-\rho)\left[ \prod_{i=1}^m A_{i}^{x^i y^i} \right] &\left[ \prod_{i=1}^m B_{i}^{x^{-i}}\right] \left[ \prod_{i=1}^mC_{i}^{x^{m+i}}\right]D^{x^{2m+1}} = \vec{g}^{\vec{r}}
+\\
+R'&=R \cdot \vec{h}^{2\vec{s}(x)} = \vec{h}^{\vec{r}'}&\\
+\end{array} 
+$$
+and the prover's witness is $\vec{r}$ and $\vec{r'}$.
+
+The verifier accepts if the inner product argument is accepting.
+\end{itemize}
+\end{description}
+
+\subsection{Security Analysis.}
+\begin{theorem}
+\label{th:mainAC}
+The argument for satisfiability of an arithmetic circuit has perfect completeness, perfect special honest verifier zero-knowledge and statistical witness-extended emulation for extracting either a breach of the binding property of the commitment scheme or a witness for the satisfiability of the circuit.
+\end{theorem}
+
+\begin{proof}
+Perfect completeness follows by inspection and using the fact that the inner product argument also have perfect completeness.
+
+For perfect special honest verifier zero-knowledge we are given $y,x\in \Z_p^*$, which allows us to compute $\vec{w}_{a,i},\vec{w}_{b,i},\vec{w}_{c,i}$ and $K$ from the circuit. The simulator picks $\vec{r}\gets \Z_p^n$ and $\rho \gets \Z_p$ and random commitments $A_{i},B_i$ and $C_i$. It computes \begin{align*}D=\left[\prod_{i=1}^m A_{i}^{x^i y^i}B_{i}^{x^{-i}}C_{i}^{x^{m+i}}\ComCommit(-\vec{r};-\rho)\right]^{-x^{-2m-1}}&& v=\vec{r}\cdot \vec{r}'-2K\end{align*}
+The simulator picks random commitments $T_{-3m},\ldots,T_{4m+2}$ and computes $T_{4m+2}$ from the verification equation $\ComCommit(v;\tau) \vereq \prod_{k=-3m, k\neq 0}^{4m+2} T_k^{x^k}$.
+
+To see that the simulated components have the same distribution as a real argument observe that since the commitment scheme is perfectly hiding the commitments $A_{i},B_i$ and $C_i$ have the same distribution as in a real argument. Also, in both the simulation and a real argument $\vec{r}$ and $\rho$ are uniformly random. Given these values the commitment $D$ is uniquely defined, and similarly for the $T_k$.
+
+When $\mu>0$ we simply remove $\vec{r}$ from the transcript and execute a fresh run of the inner product argument, given our knowledge of $\vec{r}$.
+
+It remains to show that we have witness-extended emulation. We treat the cases $\mu=0$ and $\mu >0$ separately.
+
+\paragraph{Square Root Argument.} Assume that we have $N+Q$ different challenges $y\in \Z_p^*$ for the same initial message, and for each of these challenges a further $7m+3$ different challenges $x\in \Z_p^*$ for the same third message, all with valid answers. We begin by showing that from this information we either extract a satisfying assignment to the wires $\vec{a}_{i},\vec{b}_i,\vec{c}_i$ in the circuit, or encounter a breach of the binding property of the commitment scheme.
+
+Let us first consider a fixed initial transcript $(A_{1},\ldots,A_m,\ldots,C_{m},D,y,T_{-3m},\ldots,T_{4m+2})$ and suppose we have valid arguments with $3m+2$ different values of $x$. Then the vectors $(x^{-m},\ldots,x^{2m+1})$ form the rows of a shifted Vandermonde matrix and we can obtain any unit vector $(0,\ldots,1,\ldots,0)$ by taking an appropriate linear combination of these vectors. By taking the correct linear combinations of the $3m+2$ verification equations $D^{x^{2m+1}}\prod_{i=1}^m A_{i}^{x^i y^i}B_{i}^{x^{-i}}C_{i}^{x^{m+i}}=\ComCommit(\vec{r};\rho)$, we can then extract openings to each $A_{i},B_i$ and $C_i$, since $y\in \mathbb{Z}_P^*$.
+
+We have valid arguments for $7m+3$ different challenges $x \in \mathbb{Z}_p^*$. Similar arguments to the above show that we can extract a Laurent polynomial $t(X) = \sum_{k=-3m,k\neq 0}^{4m+2} t_k x^k$ that is consistent with respect to all $3m+2$ evaluations of $\vec{r}(X) \cdot \vec{r}'(X) - 2K$. This directly implies that Equation~\ref{eq4:poly} holds for $Y=y$.
+
+Finally, suppose that this holds for $N+Q$ different challenges $y\in \Z_p^*$. Then, we have equality of polynomials in Equation~\ref{eq4:poly}, since a non-zero polynomial of degree $N+Q-1$ cannot have $N+Q$ roots. This means that the circuit is satisfied.
+
+Now we can apply the forking lemma to get witness-extended emulation, as the tree formed by the transcripts has size $(N+Q)\cdot(7m+3)$ which is polynomial in \sep.
+
+\paragraph{Inner Product Variant} Assume that we have $(N+Q)\cdot(7m+3)\cdot(2m_{\mu}-1)\ldots(2m_2-1)$ accepting transcripts for the same statement arranged in a tree as follows:
+\begin{itemize}
+\item The root is labeled with the statement.
+\item Each of the $(N+Q)$ depth 1 nodes is labeled with a different challenge $y$ and has $7m+3$ children labeled $x$.
+\item The children are subtrees of size $(2m_{\mu}-1)\ldots(2m_2-1)$
+\item Each level has nodes labeled with the challenges $x_i$ used in the $i$-th move of the recursive argument, and of degree $2m_{\mu-i+1}-1$.
+\end{itemize}
+
+Given the above tree of transcripts, we are able to do a two-stage extraction: First, we invoke the witness-extended emulation of the recursive inner product argument. %Then after $\mu$ iterations for a given subtree defined by a given pair of circuit protocol challenges $y,x$, we either produce a satisfying $\vec{r}$, or a non-trivial discrete logarithm relation.
+At this point, we either have a a non-trivial discrete logarithm relation, in which case we are done, or we have an accepting $\vec{r}$ for each $y,x$ pair. In this case, we proceed with the second stage and repeat the extraction procedure for $\mu =0$ to obtain either a witness for the original statement or a breach of the binding property of the commitment scheme.
+
+We now point out that the size of the tree will be $O(N\cdot(2m)^{\mu})\approx O (N^{2+\log_m 2})$ which is polynomial in the security parameter $\sep$ and invoke the forking lemma to complete the proof. \qed
+\end{proof}
+
+\subsection{Efficiency} \paragraph{Square Root Communication.} When we set $\mu=0$, the argument above has a communication cost of $10m+1$ commitments and $n+3$ field elements. Setting $m \approx \sqrt{\frac{N}{10}}$, $n\approx \sqrt{10N}$, we get a total communication complexity where the total number of group and field elements sent is as low as possible and approximately $3.2\sqrt{N}$ each.
+%
+The main computational cost for the prover is computing the initial commitments, corresponding to $\frac{3mn}{\log{n}}$ group exponentiations. The prover can compute $t(X)$ using FFT-based techniques. Assuming that $p$ is of a suitable form for the Fast Fourier transform, the dominant number of multiplications for this process is $\frac{3}{2} mn\log{m}$.
+The main cost in the verification is computing $\vec{s}(X)$ given the description of the circuit which requires in the worst case $Qn$ multiplications in $\Z_p$, considering arbitrary fan-in addition gates. In case of $O(N)$-size circuits with fan-in 2 gates, computing  $\vec{s}(X)$ requires $O(N)$ multiplications. Evaluating $\vec{s}(x)$ requires $3N$ multiplications. The last verification equation costs roughly
+ $\frac{(n+3m)}{\log{n+3m}}$ group exponentiations to the verifier.
+
+\paragraph{$(\mu+1)$-Root Communication.} We can reduce communication by using $\mu=O(1)$ iterations of the inner product argument. Choosing $m=N^{\frac{1}{\mu+1}}$, $n=N^{\frac{\mu}{\mu+1}}$ and $m_i=({N \over m})^{\frac{1}{\mu}}$ will give us a communication complexity of $4\mu N^{\frac{1}{\mu+1}}$ group elements and $2\mu N^{\frac{1}{\mu+1}}$ field elements. The prover's complexity is dominated by $6\mu N \over \log{N}$ group exponentiations and fewer than $\frac{3N}{2\mu} \log N$ field multiplications. The verifier's cost is dominated by $2\mu N \over \log{N}$ group exponentiations and $O(N)$ field multiplications.
+
+
+\paragraph{Logarithmic Communication.} By increasing the number of iteration of the inner product argument we can further reduce the communication complexity.
+
+To minimize the communication, we set $\mu = \log N -1$, $n=\frac{N}{2}$, $m = m_i =2$ in the above argument gives us $2\log{N}+1$ moves.
+The total communication amounts to approximately $4\log{N}$ group elements and $2\log{N}$ field elements.
+The prover computational cost is dominated by $12N$ group exponentiations, and $O(N)$ multiplications in $\Z_p$.%$32N$ multiplications in $\Z_p$.
+The main verification cost is bounded by $4N$ group exponentiations and $O(N)$ multiplications in $\Z_p$.
+
+\chapter{Exposition of an Efficient Multi-Exponentiation Algorithm}
+\label{appendix:multiexp}
+
+This chapter explains a special case of Pippenger's algorithm \cite{Pippenger1980a} for efficient multi-exponentiation, which explains why the cost of computing a Pedersen commitment of length $N$ is $O(N / \log N)$ group operations rather than $O(N)$.
+
+\section{Goal}
+
+Let $\Gr$ be a group of prime order $p \approx 2^\sep$. Let $g_0,\ldots,g_{N-1}$ be elements of $\Gr$ and let $e_0,\ldots,e_{N-1}$ be elements of $\Z_p$. Assume that $\lambda \geq N$.
+
+Let $G = \prod_{i=0}^{N-1} g_i^{e_i}$.
+
+\paragraph{Problem}
+
+Given $g_0,\ldots,g_{N-1}$, and $e_0,\ldots,e_{N-1}$, compute $G$.
+
+\section{Reduction to Multi-Products}
+
+We call the case where $e_0,\ldots,e_{N-1} \in \{0,1\}$ a multi-product rather than a multi-exponentiation. The first step will be to reduce the computation of $G$ to the computation of many multi-products.
+
+Set $s \approx \sqrt{\frac{\sep}{N}}$ and $t \approx \sqrt{\sep N}$. Let $e_{i,l}$ be the binary digits of $e_i$.
+
+$$\begin{array}{ll}
+G &= \prod_{i=0}^{N-1} g_i^{e_i} \\ \\
+& = \prod_{i=0}^{N-1} \prod_{l=0}^{\sep-1} g_i^{e_{i,l}2^l} \\ \\
+& = \prod_{i=0}^{N-1} \prod_{j=0}^{s-1} \prod_{k=0}^{t-1} g_i^{e_{i,j+sk} 2^{j+sk}} \\ \\
+& = \prod_{k=0}^{t-1} \left( \prod_{i=0}^{N-1} \prod_{j=0}^{s-1} g_i^{e_{i,j+sk} 2^k} \right)^{2^{sk}}
+\end{array}$$
+
+Set $g'_{i,j} = g_i^{2^j}$ for $0 \leq j \leq s-1$.
+
+Set $e'_{i,j,k} = e_{i,j+sk}$.
+
+Set $G'_{k} = \prod_{i=0}^{N-1} \prod_{j=0}^{s-1} g_i^{e_{i,sk+j} 2^j}$ for $0 \leq k \leq t-1$.
+
+Then, we have
+
+$$\begin{array}{ll}
+G &= \prod_{k=0}^{t-1} {G'}_{k}^{2^{sk}} \\ \\
+G'_{k} &= \prod_{i=0}^{N-1} \prod_{j=0}^{s-1} {g'}_{i,j}^{e_{i,j+sk}}
+\end{array}$$
+
+We will now consider the new multi-product problem:
+
+\paragraph{New Problem} Given $\{g'_{i,j}\}$, $\{ e'_{i,j,k} \}$, compute $\{ G'_k \}$.
+
+The new problem has $Ns = t$ input group elements $g'_{i,j}$ and $t$ output group elements $G'_{k}$.
+
+\subsection{Visualisation}
+
+This approach to computing $G$ can be visualised by arranging the binary digits in a matrix.
+
+$$\begin{array}{lllll}
+\begin{array}{l} e_0 \\ \\ \\ \\ e_1 \\ \\ \\ \\ \\ \vdots \\ \\ e_{N-1} \\ \\ \\ \end{array}
+
+& \qquad &
+
+\left( \begin{array}{lllll}
+e_{0,0} & e_{0,s} & e_{0,2s} & \cdots & e_{0,(t-1)s} \\
+e_{0,1} & e_{0,s+1} & e_{0,2s+1} & \cdots & e_{0,(t-1)s+1} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+e_{0,s-1} & e_{0,2s-1} & e_{0,3s-1} & \cdots & e_{0,\sep-1} \\
+\hline
+e_{1,0} & e_{1,s} & e_{1,2s} & \cdots & e_{1,(t-1)s} \\
+e_{1,1} & e_{1,s+1} & e_{1,2s+1} & \cdots & e_{1,(t-1)s+1} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+e_{1,s-1} & e_{1,2s-1} & e_{1,3s-1} & \cdots & e_{1,\sep-1} \\
+\hline
+\\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+\\
+\hline
+e_{N-1,0} & e_{N-1,s} & e_{N-1,2s} & \cdots & e_{N-1,(t-1)s} \\
+e_{N-1,1} & e_{N-1,s+1} & e_{N-1,2s+1} & \cdots & e_{N-1,(t-1)s+1} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+e_{N-1,s-1} & e_{N-1,2s-1} & e_{N-1,3s-1} & \cdots & e_{N-1,\sep-1} \\
+\end{array} \right)
+
+& \qquad &
+
+\begin{array}{l} g_0 \\ g_0^2 \\ \vdots \\ g_0^{2^{s-1}} \\ g_1 \\ g_1^2 \\ \vdots \\ g_1^{2^{s-1}} \\ \\ \vdots \\ \\ g_{N-1} \\ g_{N-1}^2 \\ \vdots \\ g_{N-1}^{2^{s-1}} \end{array}
+
+\\
+
+\\
+
+&& 
+
+\begin{array}{lllll} \quad G'_{0} \quad \ \ & \quad G'_{1} \quad \ \ & \quad G'_{2} \quad \ \ & \quad \cdots \quad \ \ & \quad G'_{t-1} \quad \ \ \end{array}
+
+&
+
+\end{array}$$
+
+The input values for the new problem are shown to the right of the matrix in the same row as the binary digits that they correspond to. The output values are shown below the matrix in the same column as the binary digits that they correspond to.
+
+Computing the multi-exponentiation of the inputs with a column of the matrix gives the output below that column.
+
+\subsection{Efficiency}
+
+The simplest method of computing the new inputs ${g'}_{i,j}$ is using $s$ squarings of $g_i$, for each $0 \leq i \leq N-1$, which gives a cost of $\sqrt{\sep N}$ group operations.
+
+\section{Computing the Multi-Products}
+
+The new problem has the same number of inputs and outputs, so we relabel to simplify notation. Set $M = \sqrt{\sep N} = sN = t$.
+
+\paragraph{Problem} Given $\{g'_{i}\}_{i=0}^{M-1}$, $\{ e'_{i,j} \}_{i,j=0}^{M-1}$, compute $G'_j = \prod_{i=0}^{M-1} {g'}_i^{e'_{i,j}}$.
+
+Let $b$ be some parameter to be determined later. We partition the input group elements into sets $S_0,\ldots,S_{M/b-1}$, each consisting of at most $b$ elements. Then, for each set $S_i$, we compute the set $T_i$, containing all possible multi-products of elements in $S_i$. For example, if $S_0 = \{ g_0, g_1,g_2 \}$, then $T_0 = \{ g_0,g_1,g_2,g_0 g_1,g_0 g_2, g_1 g_2, g_0 g_1 g_2 \}$.
+
+Now, we use the elements of the $T_i$ to compute the $G'_j$. Note that in order to compute the $G'_i$, we only need to use one element from each $T_i$.
+
+\subsection{Visualisation}
+
+$$ \begin{array}{l}
+\begin{array}{llll | lll | lll | llll} 
+& S_0 & & & & S_1 & & \quad & \cdots & \quad & & S_{M/b-1} & & \\
+g'_0 & g'_1 & \cdots & g'_{b-1} & g'_{b} & \cdots & g'_{2b-1} & & \cdots & & g'_{M-b-1} & \cdots & g'_{M-1}
+
+\\ \\ \\
+
+& T_0 & & & & T_1 & & \quad & \cdots & \quad & & T_{M/b-1} & & \\
+g'_0 & g'_1 & \cdots & \prod_{i=0}^{b-1} g'_{i} & g'_{b} & \cdots & \prod_{i=b}^{2b-1} g'_{i} & & \cdots & & g'_{M-b-1} & \cdots & \prod_{i=M-b-1}^{M-1} g'_{i} \end{array}
+
+\\ \\ \\
+
+\quad G'_0 \qquad \qquad \qquad G'_1 \qquad \qquad \qquad \cdots \qquad \qquad \qquad G'_{M-1} \\
+
+\end{array}$$
+
+\subsection{Efficiency}
+
+Given $S_i$, which contains $b$ elements, we can compute all possible multi-products using $2^b$ group operations. There are $M/b$ sets $S_i$, so computing all of the $T_i$ costs at most $2^b M / b$ group operations.
+
+Given all of the $T_i$, each $G'_j$ uses at most one element from each, so it costs at most $M/b$ group operations. There are $M$ of the $G'_j$, so computing all of them costs at most $M^2 / b$ group operations.
+
+\section{Recombining Inputs}
+
+Given the outputs of the multi-product step, we can now compute the final output $G$. Recall that $G = \prod_{k=0}^{t-1} {G'}_{k}^{2^{sk}}$
+
+This can be done using $st = \sep$ squarings.
+
+\section{Efficiency Analysis}
+
+This approach can be used to compute $\prod_{i=0}^{N-1} g_i^{e_i}$ using $\sep + M + 2^b \frac{ M}{b} + \frac{M^2}{b}$, where $M = \sqrt{\sep N}$.
+
+Set $b = \log M - \log \log M$. This becomes $$\sep + M + \frac{M^2}{(\log M - \log \log M)(\log M)} + \frac{M^2}{\log M - \log \log M}$$ which is $$\sep + \frac{M^2}{\log M} + o\left(\frac{M^2}{\log M}\right)$$
+
+Since $M = \sqrt{\sep N}$, we arrive at a cost of
+
+$$\sep + \frac{ 2 \sep N}{ \log \sep N} +  o\left( \frac{ \sep N}{ \log \sep N} \right)$$
+
+\subsection{Generalisation}
+
+In general, one can obtain a multiexponentiation algorithm which uses 
+$$\sep + \frac{ 2 \sep MN}{ \log \sep MN} +  o\left( \frac{ \sep MN}{ \log \sep MN} \right)$$
+group operations to compute $M$ multiexponentiations from $N$ group elements.
+
+\chapter{Computing Sums from \cite{GrothK15} and \cite{BayerG13} for Low-Depth Circuit Protocols}
+\label{appendixlabel2}
+
+We give an explicit method for computing the sum in \ref{app:member}, used by the verifier, for a zero-knowledge proof that a committed value lies in a public list. The task is to compute $ \sum_{i=0}^{N-1} \lambda_i \prod_{j=0}^{m-1} f_{j,i_j} $, with $N = n^m$.
+
+First, rewrite the index $i$ in terms of its $n$-ary digits $i_0,\ldots,i_{m-1}$, where $i = \sum_{j=0}^{m-1} i_j n^j$.
+
+$$\sum_{i_0,\ldots,i_{m-1} = 0}^{n-1} \lambda_{i_0,\ldots,i_{m-1}} \prod_{j=0}^{m-1} f_{j,i_j} = \sum_{i_{m-1}=0}^{n-1} f_{m-1, i_{m-1}} \left[ \sum_{i_0,\ldots,i_{m-2}} \lambda_{i_0,\ldots,i_{m-1}} \prod_{j=0}^{m-2} f_{j i_j} \right]$$
+
+Observe, that in brackets on the right hand side, we have $n$ copies of the original sum, but with $m-1$ digits $i_j$ instead of $m$. This suggests a recursive method for computing the sum. The base case is
+
+$$ \sum_{i_0 = 0}^{n-1} \lambda_{i_0} f_{0 i_0} $$
+
+which costs $n$ multiplications to compute. Denoting by $M(m)$ the number of multiplications required with $m$ digits, we have $M(1) = n$ and $M(m) \leq n + n \ M(m-1)$. From this, it is easy to see that $M(m) \leq \frac{n}{n-1} N \leq 2N$.
+
+Now, to compute $ \sum_{i=0}^{N-1} \lambda_i \prod_{j=0}^{m-1} f_{j,i_j}(X) $, with $N = n^m$ used by the prover in the same protocol, note that since each $f_{j i_j}(X)$ is a linear polynomial, the result has degree $m$. This means that if we evaluate each $f_{j i_j}(X)$ at $m+1$ points, and compute the sum for each evaluation point, we can interpolate to get the resulting polynomial. When we choose the points to be roots of unity, the dominant cost for computing this polynomial is $O(mN)$ multiplications using fast Fourier transform techniques.
+
+The techniques used to compute expressions like the sums appearing in \ref{app:poly}, in arguments for polynomial evaluation using our low-depth circuit argument, are very similar.
+%
+%\chapter{Colophon}
+%\label{appendixlabel3}
+%\textit{This is a description of the tools you used to make your thesis. It helps people make future documents, reminds you, and looks good.}
+%
+%\textit{(example)} This document was set in the Times Roman typeface using \LaTeX\ and Bib\TeX , composed with a text editor. 
+ % description of document, e.g. type faces, TeX used, TeXmaker, packages and things used for figures. Like a computational details section.
+% e.g. http://tex.stackexchange.com/questions/63468/what-is-best-way-to-mention-that-a-document-has-been-typeset-with-tex#63503
+
+% Side note:
+%http://tex.stackexchange.com/questions/1319/showcase-of-beautiful-typography-done-in-tex-friends

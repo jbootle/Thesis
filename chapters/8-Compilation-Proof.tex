@@ -1,0 +1,648 @@
+% !TEX root = ..\Main.tex
+\chapter{Compiling Ideal Linear Commitment Protocols into Standard Zero-Knowledge Proofs}
+\label{chapterlabel:Compilation-Proof}
+
+\paragraph{Remark} When considering \ILC\ protocols with multiple fixed vector lengths, as explained earlier, one can either define a new \ILC\ channel consisting of many copies of \ILC\ channels of single lengths to handle the issue, or simply pad all vectors to the length of the maximum vector. In the first case, we obtain compilation proofs for the new channel simply by running the compilation on the \ILC\ protocol for each single-length \ILC\ channel that makes up the multiple length channel.
+%
+%\red{Discuss ligero approach and connections to MPC-in-the-head}
+
+\section{Compiling into Hash-Based Proofs}
+\label{sec:IPCPgencon}\label{sec:ILCtoIOP}
+In this section, we show how to compile a proof of knowledge with straight-line extraction for relation $\R$ over the communication channel $\ILC$ into a proof of knowledge without straight-line extraction for the same relation over the standard channel, based on the existence of collision-resistant hash functions.
+
+The idea behind the compilation of an \ILC\ proof is that instead of committing to vectors $\vect_\rownr$ using the channel \ILC, the prover encodes each vector $\vect_\rownr$ as $\preECC(\vect_\rownr)$ using a linear error-correcting code $\preECC$. In any given round, we can think of the codewords as rows $\preECC(\vect_\rownr)$ in a matrix $\preECC(V)$. However, instead of committing to the rows of the matrix, the prover commits to the columns of the matrix. When the verifier wants to make an \ILCopen\ query for a linear combination of the original vectors, he sends the coefficients $\vec{q}=(q_1,\ldots,q_t)$ of the linear combination to the prover, and the prover responds with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$. 
+Notice that we will use the notation $\vect_{(\vec{q})}$, and later on $\vect_{(\vec{\gamma})}$, to denote vectors that depend on $\vec{q}$ and $\vec{\gamma}$: the $\vec{q}$ and $\vec{\gamma}$ are not indices. 
+Now, to spot check that the prover is not giving a wrong $\vect_{(\vec{q})}$, the verifier may request the $j$th element of each committed codeword $\ecc_\rownr$. This corresponds to revealing the $j$th column of error-corrected matrix $\preECC(V)$. Since the code $\preECC$ is linear, the revealed elements should satisfy $\preECC(\vect_{(\vec{q})})_j=\sum_{\rownr=1}^tq_\rownr \preECC(\vec{v}_\rownr)_{j}=\vec{q} (\preECC(V)|_{j})$. The verifier will spot check on multiple columns, so that if the code has sufficiently large minimum distance and the prover gives a wrong $\vect_{(\vec{q})}$, then with overwhelming probability, the verifier will  open at least one column $j$ where the above equality does not hold.
+
+Revealing entries in a codeword may leak information about the encoded vector. To get SHVZK, instead of using $\preECC$, we use a randomized encoding $\ECC$ defined by $\ECC(\vect;\vec{r})=(\preECC(\vect)+\vec{r},\vec{r})$. This doubles the code-length to $2n$ but ensures that when you reveal entry $j$, but not entry $j+n$, then the verifier only learns a random field element. The spot checking technique using $\ECC$ is illustrated in Fig.~\ref{fig:spotcheck}. In the following, we use the notation $\ecc_\rownr=(\preECC(\vect_\rownr)+\vec{r}_\rownr,\vec{r}_\rownr)$ and $E=(\preECC(V)+R,R)$.
+
+The original compilation given in \cite{BootleCGGHJ17} handled an earlier version of the \ILC\ model without \ILCcheck\ queries. We must discuss how to treat these queries. The verifier makes \ILCcheck\ queries $\vec{q}'=(q'_1,\ldots,q'_t)$ of linear combinations of committed vectors. Now, \ILCcheck\ queries handle the case where the verifier can compute what $\vect'_{(\vec{q})}\gets \vec{q}' V$ should be by themselves, using the results of other \ILCopen\ queries. Therefore, the prover need not send $\vect'_{(\vec{q})}$ to the verifier. The prover, given $\vec{q}'$, must still reveal $\vec{r}'_{(\vec{q})}=\vec{q}'R$. The verifier now asks for openings of $2\lambda$ columns $J=\{j_1,\dots,j_{2\lambda}\}$ in $E$ and verifies for these columns that $\vec{q}'E|_J=\ECC(\vect'_{(\vec{q})};\vec{r}'_{(\vec{q})})|_J$, using the value of $\vect'_{(\vec{q})}$ that they have computed using other openings. To avoid revealing any information about $\preECC(V)$, we must ensure that $\forall j\in [n]: j\in J\Rightarrow j+n\notin J$. If the spot checks pass, the verifier believes that $\vect'_{(\vec{q})}=\vec{q}'V$.
+%\red{When using RS codes, much less randomness is required, actually just $2\sep$ entries, and the proof will go through. Also, for long vectors, Merkle trees should be used, otherwise the prover will send a lot of hash values.}
+
+\begin{figure}[!h]
+\centering
+\begin{minipage}[t]{15cm}
+$$\begin{array}{ccc} 
+\left(\begin{array}{ccc}\qquad &\quad\vect_0\quad \ &\ \qquad \\ &\quad \vdots\quad\ & \\ \qquad & \quad \vect_t \quad\ & \quad \end{array} \right) & \quad \overset{\ECC}{\longrightarrow} \quad & \left(\begin{array}{ccc|ccc} \qquad  & \quad \preECC(\vect_0)+\vec{r}_0 \quad \ & \qquad  &\qquad \qquad & \quad \vec{r}_0 \quad\ & \quad \\ 
+&\vdots &&& \vdots & \\
+\qquad  & \quad \preECC(\vect_t)+\vec{r}_t \quad \ & \qquad &\qquad \qquad & \quad \vec{r}_t \quad\ & \quad \ \\
+\end{array}\right)\\
+&\quad &\\
+\vec{q}\downarrow && \quad\vec{q}\downarrow_{j_1} \,\,\dots\,\, \vec{q}\downarrow_{j_\lambda} \quad \vec{q}\downarrow_{j_{\lambda+1}} \dots \vec{q}\downarrow_{j_{2\lambda}}\\
+&\quad & \\ 
+\left(\begin{array}{ccc}\qquad &\quad \vect_{(\vec{q})} \quad \ & \ \qquad \end{array}\right) & \quad \overset{\ECC}{\longrightarrow} \quad & \left(\begin{array}{ccc|ccc} \qquad  & \quad \preECC(\vect_{(\vec{q})})+\vec{r}_{(\vec{q})} \quad\ & \qquad &\quad\, & \quad \vec{r}_{(\vec{q})} \quad\ & \qquad \ \end{array}\right)
+\end{array}$$
+\end{minipage}
+\caption{Vectors $\vect_\rownr$ organized in matrix $V$ are encoded row-wise as matrix $E=\ECC(V;R)$. The vertical line in the right matrix and vector denotes concatenation of matrices respectively vectors. The prover commits to each column of $E$. When the prover given $\vec{q}$ wants to reveal the linear combination $\vect_{(\vec{q})}=\vec{q}V$ she also reveals $\vec{r}_{(\vec{q})}=\vec{q}R$. Given $\vec{q}'$, the prover also reveals $\vec{r}'_{(\vec{q})}=\vec{q}'R$. The verifier now asks for openings of $2\lambda$ columns $J=\{j_1,\dots,j_{2\lambda}\}$ in $E$ and verifies for these columns that $\vec{q}E|_J=\ECC(\vect_{(\vec{q})};\vec{r}_{(\vec{q})})|_J$ and $\vec{q}'E|_J=\ECC(\vect'_{(\vec{q})};\vec{r}'_{(\vec{q})})|_J$, where the verifier computed $\vect'_{(\vec{q})}$ by themselves. To avoid revealing any information about $\preECC(V)$, we must ensure that $\forall j\in [n]: j\in J\Rightarrow j+n\notin J$. If the spot checks pass, the verifier believes that $\vect_{(\vec{q})}=\vec{q}V$ and $\vect'_{(\vec{q})}=\vec{q}'V$.}\label{fig:spotcheck}
+\end{figure}
+
+We also add a check, where the verifier sends an extra random linear combination $\chalx\in \F^\totalnumvec$ to ensure that if a malicious prover commits to values of $\ecc_\rownr$ that are far from being codewords, the verifier will most likely reject. The reason the challenges $\vec{q}$ and $\vec{q}'$ from the $\ILC$ proof are not enough to ensure this is that they are not chosen uniformly at random. One could, for instance, imagine that there was a vector $\vect_\rownr$ that was never queried in a non-trivial way, and hence the prover could choose it to be far from a codeword. To make sure this extra challenge $\chalx$ does not reveal information to the verifier, the prover picks a random blinding vector $\vect_0$, which is added as the first row of $V$ and will be added to the linear combination of the challenge $\chalx$.
+
+\subsection{Reed-Solomon Codes}
+
+In order to show that we can instantiate our construction efficiently, we give a short description of Reed-Solomon codes. Reed Solomon codes are a simple example of linear codes with a constant relative minimum distance and an efficient (quasilinear) encoding algorithm. As such, they are a good choice for instantiating the error-correcting codes in our proofs.
+
+A Reed-Solomon code over a field $\F$ is defined as follows. Fix distinct points $a_1,\ldots,a_n \in \F$.
+\[
+\lbrace (p(a_1),\ldots,p(a_n) : p(X) \text{ is a polynomial of degree at most } k \text{ over } \F \rbrace
+\]
+
+We can encode a vector of length $k$ by embedding the coefficients into the coefficients of a polynomial $p$, and then using the codeword corresponding to $p$. Reed-Solomon codes have minimum distance $n-k+1$. Choosing $a_1,\ldots,a_n$ to be suitable roots of unity in $\F$, the codeword can be computed in $O(n \log n)$ field operations. To achieve constant relative minimum distance, we can choose $n=2k-1$, for example.
+
+Note that we will not use the multiplicative properties of Reed-Solomon codes. In our compilation, the verifier only does linear calculations on elements of codewords. The one place where the verifier may do non-linear calculations on values sent by the prover is as part of \ILCcheck\ queries, but here, the operations are done prior to encoding. This is important to note. Otherwise, the algebraic degree of the \ILC\ verifier might lead to restrictions on our choices of parameters, since for the product of Reed-Solomon codewords to be a valid codeword, the degrees of the polynomials associated with the codewords must not be too high.
+
+\subsection{Construction}\label{ssec:constrILCtoIOP}
+Let $(\KKILC,\PoILC,\VILC)$ be a {\em non-adaptive} $\numround$-round SHVZK proof of knowledge with straight-line extraction over $\ILC$ for a relation $\R$. Here, non-adaptive means that the verifier waits until the last round before querying linear combinations of vectors and they are queried all at once instead of the queries depending on each other.\footnote{The construction can be easily modified to an adaptive $\ILC$ proof. For each round of queries in the $\ILC$ proof, there will one extra round in the compiled proof.}
+ Let $\text{Gen}_{\preECC}$ be a generator that given field $\F$ and length parameter $\sizevect$ outputs a constant rate linear code $\preECC$ that is efficiently computable given its description, and has linear minumum distance. Define the $\ECC$ with code length $\sizeecc$ as above:  $\ECC(\vect;\vec{r})=(\preECC(\vect)+\vec{r},\vec{r})$. Finally, let $(\ComSetup,\ComCommit)$ be a non-interactive commitment scheme.
+
+We now define a proof of knowledge $(\KK,\Po,\V)$ in Fig. \ref{fig:defILCtoIOP}, where we use the following notation:
+given matrices $V_1,\dots, V_\mu$, $R_1,\ldots,R_\mu$ and $E_1,\ldots,E_\mu$ we define $$V=\left(\begin{matrix}V_1\\ \vdots \\ V_\mu\end{matrix}\right) \qquad R=\left(\begin{matrix}R_1\\ \vdots \\ R_\mu\end{matrix}\right) \qquad E=\left(\begin{matrix}E_1\\ \vdots \\ E_\mu\end{matrix}\right).$$ 
+The matrices $V_1,\ldots,V_\mu$ are formed by the row vectors $\PoILC$ commits to, and we let $t_1,\ldots,t_\mu$ be the numbers of vectors in each round, i.e., for all $\roundnum$ we have $V_\roundnum\in \F^{t_\roundnum \times \sizevect}$.  
+
+We say that a set $J\subset [2n]$ is \emph{allowed} if $|J\cap [n]|=\chals$ and $|J\setminus [n]|=\chals$ and there is no $j\in J$ such that $j+n\in J$. In the following we will always assume codewords have length $n\geq 2\sep$.
+We use $\ECC(V;R)$ to denote the function that applies $\ECC$ \emph{row-wise}.
+In the protocol for $\V$, we are using that $\ECC(\vec{v};\vec{r})|_J$ can be computed from just $\vec{v}$ and $\vec{r}|_{\{j\in [n]:j\in J \vee j+n\in J\}}$. We use $\ComCommit(E;\vec{s})$ to denote the function that applies $\ComCommit$ \emph{column-wise} on $E$ and returns a vector $\vec{c}$ of $2n$ commitments. 
+We group all $\VILC$'s queries in two matrices $\Chal \in \F^{\qc\times \totalnumvec}$ and $\Chal' \in \F^{\qc' \times \totalnumvec}$, where $\totalnumvec$ is the total number of vectors committed to by $\Po$, $\qc$ is the \ILCopen\ query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}$ that $\VILC$ requests to be opened, and $\qc'$ is the \ILCcheck query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}'$ that $\VILC$ requests to be checked.
+
+\paragraph{Remark}\label{welldef} For the protocol to be well-defined, we need $n\geq 2\sep$ so we have sufficiently many columns. Otherwise no allowed $J$ exists. If the output of $\preECC$ is shorter than $2\sep$, $\KKIOP$ will extend $\preECC$ by a factor $\left\lceil \frac{2\sep}{n}\right\rceil$ to ensure that output length $n$ satisfies $n\geq 2\sep$. Here the extension of $\preECC$ is given by $\{(e,\dots,e): e\in\preECC\}$, where the number of $e$'s is the factor of the extension. In particular, extending by a factor $1$ leaves everything unchanged. Extending by a larger factor keeps the input length constant while extending the output length. Notice that we are interested in efficiency when $\ell$ is large compared to $\sep$, in which case no extension is needed.
+
+\begin{figure}[!h]
+\resizebox{\textwidth}{!}{\begin{minipage}[t]{13cm}
+
+\begin{algorithm}[H]
+\caption*{$\Po(\crs, \stm, \wit)$}
+\begin{itemize} \item\textbf{Parse input}: 
+\begin{itemize}
+\item Parse $\crs=(\crs_{\ILC},\preECC,ck)$
+\item Parse $\crs_{\ILC}=(\F,\sizevect)$
+\item Get $n$ from $\preECC$
+\end{itemize} 
+\item \textbf{Round $1$}: 
+\begin{itemize}
+\item $\vect_0\gets \F^{\sizevect}$
+\item $\ecc_0\gets \ECC(\vect_0;\vec{r}_0)$
+\item $(\ILCcommit,V_1)\gets \PoILC(\crs_{\ILC},\stm,\wit)$
+\item $E_{1}\gets \ECC(V_{1};R_{1})$
+\item Let $E_{01}=\left(\begin{array}{c} \ecc_0\\ E_1\end{array} \right)$
+\item $\vec{c}_1=\ComCommit(E_{01};\vec{s}_1)$
+\item Send $(\vec{c}_1,t_1)$ to $\V$
+\end{itemize} 
+\item \textbf{Rounds $2 \leq \roundnum \leq \mu$}:
+\begin{itemize}
+\item Get challenge $x_{\roundnum-1}$ from $\V$
+\item $(\ILCcommit,V_\roundnum)\gets \PoILC(x_{\roundnum-1})$
+\item $E_\roundnum \gets \ECC(V_\roundnum;R_\roundnum)$
+\item $\vec{c}_\roundnum=\ComCommit(E_\roundnum;\vec{s}_\roundnum)$
+\item Send $(\vec{c}_\roundnum,t_\roundnum)$ to $\V$
+\end{itemize} 
+%\;
+\item \textbf{Round $\mu+1$}: 
+
+\begin{itemize}
+\item Get $(\chalx,\Chal,\Chal')$ from $\V$
+\item $\vec{v}_{(\chalx)}\gets \vect_0+\chalx V$
+\item $\vec{r}_{(\chalx)}\gets \vec{r}_0+\chalx R$
+\item $V_{(Q)}\gets \Chal V$
+\item $R_{(Q)}\gets \Chal R$
+\item $R_{(Q')}\gets \Chal' R$
+\item Send $(\vec{v}_{(\chalx)},\vec{r}_{(\chalx)},V_{(Q)},R_{(Q)},R_{(Q)}')$ to $\V$
+\end{itemize}
+
+\item \textbf{Round $\mu+2$}: 
+
+\begin{itemize}
+\item Get $J\subset [2n]$ from $\V$
+\item Send $(E_{01}|_J,\vec{s}_1|_J,\ldots,E_\mu,\vec{s}_\mu|_J)$
+to $\V$
+\end{itemize}
+
+\end{itemize} 
+\vspace{2.47cm}
+\end{algorithm}
+\end{minipage}%
+\begin{minipage}[t]{6.5cm}
+\vspace{0cm}
+\begin{algorithm}[H]
+\caption*{$\KK(1^\sep)$\vspace{-1pt}}
+\begin{itemize}
+\item $\crs_{\ILC}\gets \KKILC(1^\sep)$
+\item Parse $\crs_{\ILC}=(\F,\sizevect)$
+\item $\preECC\gets {\text{Gen}}_{\preECC}(\F,\sizevect)$
+\item $ck\gets \ComSetup(1^\sep)$
+\item Return $\crs=(\crs_{\ILC},\preECC,ck)$
+\end{itemize}
+\end{algorithm}
+%\vspace{0.1cm}
+\vspace{-30pt}
+\begin{algorithm}[H]
+\caption*{$\V(\crs, \stm)$}
+\begin{itemize} \item \textbf{Parse input} 
+\begin{itemize}
+\item Parse $\crs=(\crs_{\ILC},\preECC,ck)$
+\item Parse $\crs_{\ILC}=(\F,\sizevect)$
+\item Get $n$ from $\preECC$
+\item Give input $(\crs_{\ILC},u)$ to $\VILC$
+\end{itemize}
+\item \textbf{Rounds $1 \leq \roundnum < \mu$}:
+\begin{itemize}
+\item Receive $(\vec{c}_\roundnum,t_\roundnum)$
+\item $(\ILCsend,x_\roundnum)\gets \VILC(t_\roundnum)$
+\item Send $x_\roundnum$ to $\Po$ 
+\end{itemize}
+\item \textbf{Round $\mu$}: 
+\begin{itemize}
+\item Receive $(\vec{c}_\mu,t_{\mu})$
+\item $\chalx\gets \F^{\sum_{\roundnum=1}^\mu t_\roundnum}$
+\item $(\ILCopen,\Chal)\gets \VILC(t_\mu)$
+\item $(\ILCcheck,\Chal')\gets \VILC(t_\mu)$
+\item Send $(\chalx,\Chal,\Chal')$ to $\Po$ 
+\end{itemize} 
+\item\textbf{Round $\mu+1$}: 
+\begin{itemize}
+\item Receive $(\vec{v}_{(\chalx)},\vec{r}_{(\chalx)},V_{(Q)},R_{(Q)})$
+\item $\VILC$ computes the answers $V'_{(Q)}$ to its \ILCcheck\ queries
+\item Choose random allowed $J\subset [2n]$
+\item Send $J$ to $\Po$ % \item If $\ECC(v'_\chalx,r'_\chalx)|_J\neq e_0|_J+\chalx (E|_J)$ reject
+\end{itemize}
+\item \textbf{Round $\mu+2$}:
+\begin{itemize}
+\item Receive $(E_{01}|_J,\vec{s}_1|_J,\ldots,E_\mu,\vec{s}_\mu|_J)$
+\item Check $\vec{c}_1|_J=\ComCommit(E_{01}|_J;\vec{s}_1|_J),$\\ $\ldots,\vec{c}_\mu|_J=\ComCommit(E_\mu|_J;\vec{s}_\mu|_J)$
+\item Check $\ECC(\vec{v}_{(\chalx)},\vec{r}_{(\chalx)})|_J= \vec{e}_0|_J+\chalx E|_J$
+\item Check $\ECC(V_{(Q)},R_{(Q)})|_J= \Chal E|_J$
+\item Check $\ECC(V'_{(Q)},R'_{(Q)})|_J= \Chal' E|_J$
+\item If all checks pass, return decision of $\VILC(V_{(Q)})$, else return 0
+% reject
+%\item Otherwise, ACCEPT
+\end{itemize}
+\end{itemize}
+\end{algorithm}
+\end{minipage}}
+\caption{Construction of $(\KK,\Po,\V)$ from $(\KKILC,\PoILC,\VILC)$, commitment scheme $(\ComSetup,\ComCommit)$ and error-correcting code $\codeset$.}
+%For explanation, see Subsection~\ref{ssec:constrILCtoIOP}}
+\label{fig:defILCtoIOP}
+\end{figure}
+
+\subsection{Security Analysis}
+\label{sec:IPCPsec}
+%Security Proof of the IPCP Protocol
+    \begin{theorem}[Completeness]
+    If $(\KKILC,\PoILC,\VILC)$ is complete for relation $\R$ over $\ILC$, then $(\KK,\Po,\V)$ in Fig.~\ref{fig:defILCtoIOP} is complete for relation $\R$.
+    \end{theorem}  
+   \begin{proof}
+All the commitment openings are correct, so they will be accepted by the verifier. In the execution of $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle$, the fact that $\preECC$ is linear implies $\ECC$ is linear and hence all the linear checks will be true. If $(\crs,\stm,\wit)\in \R$ then $(\crs_{\ILC},\stm,\wit)\in \R$ and being complete $\langle \PoILC(\crs_{\ILC},\stm,\wit)\ilc\VILC(\crs_{\ILC},stm)\rangle =1$ so $\V$'s internal copy of $\VILC$ will accept. Thus, in this case, $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle=1$, which proves completeness.\qed
+    \end{proof}
+  
+  
+      \begin{theorem}[Knowledge Soundness]\label{thm:sound}
+    If $(\KKILC,\PoILC,\VILC)$ is statistically knowledge sound with a straight-line extractor for relation $\R$ over $\ILC$ and $(\ComSetup,\ComCommit)$ is computationally (statistically) binding, then $(\KK,\Po,\V)$ as constructed above is computationally (statistically) knowledge sound for relation $\R$.
+    \end{theorem}   
+    \begin{proof}
+
+We prove the computational case. The statistical case is similar.%, but slightly simpler. %(Check that that is true!)
+
+
+In order to argue that $(\KK,\Po,\V)$ is computationally knowledge sound, we will first show that for every DPT $\PoMal$ there exists a deterministic (but not necessarily efficient) $\PoILCMal$ such that for all PPT $\A$ we have 
+\begin{align}\Pr&\left[\begin{array}{c} \crs\gets \KK(1^\sep);(\crs_\ILC,\cdot)=\crs;(\stm,s) \gets \A(\crs):\\
+\langle \PoMal(s)\std\V(\crs,\stm;(\rho_{\ILC},\rho))\rangle = 1 \, \\
+\wedge~~\langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_{\ILC},\stm;\rho_{\ILC})\rangle = 0
+\end{array}
+\right]\approx 0.\label{zkip:ineq:pilcstar}
+\end{align}
+Note that the randomness $\rho_{\ILC}$ in $\V$ which comes from the internal $\VILC$ in line two is the same as the randomness used by $\VILC$ in line three. 
+
+Our constructed $\PoILCMal$ will run an internal copy of $\PoMal$.
+When the internal $\PoMal$ in round $i$ sends a message $(\vec{c}_i,t_i)$, $\PoILCMal$ will simulate $\PoMal$ on every possible continuation of the transcript, and for each $j=1,\ldots,2n$ find the most frequently occurring correct opening $((E_i)_j,(\vec{s}_i)_j)$ of $(\vec{c}_i)_j$. $\PoILCMal$ will then use this to get matrices $\Emal_i$. For each row $\eccmal_\rownr$ of these matrices, $\PoILCMal$ finds a vector $\vect_{\rownr}$ and randomness $\eccrand_\rownr$ such that $\hamdist(\ECC(\vect_\rownr,\eccrand_\rownr),\eccmal_\rownr)<\maxdist$ if such a vector exists.
+%Here $\maxdist=\floor{\frac{\minhamdist}{3}}$. 
+If for some $\rownr$ no such vector $\vect_\rownr$ exists, then $\PoILCMal$ aborts. Otherwise we let $V_i$ and $R_i$ denote the matrices formed by the row vectors $\vec{v}_\rownr$ and $\vec{r}_\rownr$ in round $i$ and $\PoILCMal$ sends $V_i$ to the $\ILC$.
+Notice that since the minimum distance of $\ECC$ is at least $\minhamdist$, there is at most one such vector $\vect_\rownr$ for each $\eccmal_\rownr$. 
+
+The internal copy of $\PoMal$ will expect to get two extra rounds, where in the first it should receive $\chalx$, $\Chal$ and $\Chal'$, and should respond with $\vectmal{\chalxt},\eccrandmal{\chalxt},V_{(Q)}$, $R_{(Q)}$ and $R'_{(Q)}$, and in the second it should receive $J$ and send $E_{01}|_J,\vec{s}_1|_J,\ldots,E_\mu,\vec{s}_\mu|_J$.
+Since $\PoILCMal$ does not send and receive corresponding messages, $\PoILCMal$ does not have to run this part of $\PoMal$. Of course, for each commitment sent by $\PoMal$, these rounds are internally simulated many times to get the most frequent opening. Notice that a $\VILC$ communicating over $\ILC$ with our constructed $\PoILCMal$ will, on query $\Chal$ receive $V_{(Q)}=\Chal V$ from the $\ILC$.
+
+
+
+The verifier $\V$ accepts only if its internal copy of $\VILC$ accepts. Hence, the only three ways $ \langle \PoMal(s)\std\V(\crs,u;(\rho_{\ILC},\rho))\rangle$ can accept without %the internal  %%The VILC that communicates with P*ILC is not internal
+$\langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_{\ILC},\stm;\rho_{\ILC})\rangle$ being accepting are 
+\begin{enumerate}
+\item if $\PoMal$ makes an opening of a commitment that is not its most frequent opening of that commitment, or
+\item if $\PoILCMal$ has an error because for some $\rownr$ no $\vect_\rownr,\eccrand_\rownr$ with $\hamdist(\ECC(\vect_\rownr,\eccrand_\rownr),\eccmal_\rownr)< \maxdist$ exists, or
+\item if $\PoMal$ sends some $V_{(Q)}^*\neq V_{(Q)}$ .
+\end{enumerate}
+We will now argue that for each of these three cases, the probability that they happen and $\V$ accepts is negligible.
+
+\paragraph{First Case} Since $\PoMal$ runs in polynomial time and the commitment scheme is computationally binding, there is only negligible probability that $\PoMal$ sends a valid opening that is not the most frequent. Since $\V$ will reject any opening that is not valid, the probability of $\V$ accepting in case 1 is negligible. 
+
+\paragraph{Second Case} To do so, define the event $\event$ that $E^*$ is such that for some $\chaloptx\in \F^{\totalnumvec}$ we have $\hamdist(\tilde{\codeset}, {\chaloptx} E^*)\geq \maxdist$. Here $\tilde{\codeset}$ denotes the image of $\ECC$, i.e. $\tilde{\codeset}=\{(c+r,r):c\in \codeset, r\in \F^n\}$. Clearly, if $\PoILCMal$ returns an error because no $\vect_i,\eccrand_i$ with $\hamdist(\ECC(\vect_i,\eccrand_i),\eccmal_i)< \maxdist$ exist then we have $\event$. 
+
+\begin{lemma}%Remember a copy of the claim is in appendix. If you change this, change appendix
+Let $\eccmal_0,\ldots, \eccmal_{\totalnumvec}\in \F^{2n}$. If $\event$ occurs, then for uniformly chosen $\chalx\in \F^\totalnumvec$, there is probability at most $\frac{1}{|\F |}$ that $\hamdist(\tilde\codeset,\xce)<\frac{\minhamdist}{6}$.
+\end{lemma}
+
+\begin{proof}
+Assume $\event$, that is, there exist $\chaloptx\in \F^{\totalnumvec}$ with $\hamdist\left(\tilde\codeset, \chalx^* E^*\right)\geq \maxdist$. We will show that for any $\claimr\in \F^{\times}$ we have 
+\begin{align}\hamdist\left(\tilde\codeset,\xce\right)+\hamdist\left(\tilde\codeset,e^*_0+(\chalx+r\chalx^*)E^*\right)\geq \hamdist\left(\tilde\codeset,\chalx^* E^*\right)\geq \maxdist.\label{zkip:ineq:triangle}
+\end{align}
+This implies that at most one of $\xce$ and $\xcer$ can have distance less than $\frac{\minhamdist}{6}$ to $\tilde\codeset$. That is, for at most one $\chalx\in \F^{\totalnumvec}$ in each equivalence class in $\F^\totalnumvec/ \chaloptx \F$ can $\xce$ have distance less than $\frac{\minhamdist}{6}$ to $\tilde\codeset$. Since each such equivalence class contains $|\F|$ elements, there is probability at most $\frac{1}{|\F|}$ that a random $\chalx\in\F^{\totalnumvec}$ satisfies $\hamdist\left(\tilde\codeset,\xce\right)<\frac{\minhamdist}{6}$. 
+
+To finish the proof, we need to prove (\ref{zkip:ineq:triangle}). Write $\xce=\codeword_1+\restword_1$ and $\xcer=\codeword_2+\restword_2$ with $\codeword_1,\codeword_2\in \tilde\codeset$ and $\hamweight(\restword_1)=\hamdist\left(\tilde\codeset,\xce\right), \hamweight(\restword_2)=\hamdist\left(\tilde\codeset,\xcer\right)$. Now 
+\begin{align*}\chaloptx E^*=&(\xcer - (\xce))\claimr^{-1}\\
+%=& ((\chalx+\claimr\cdot \chaloptx)E^*-\chalx E^*)\claimr^{-1}\\
+=&(\codeword_2+\restword_2-\codeword_1-\restword_1)\claimr^{-1}\\
+=& (\codeword_2-\codeword_1)\claimr^{-1} + (\restword_2-\restword_1)\claimr^{-1}
+\end{align*}
+Here $ (\codeword_2-\codeword_1)\claimr^{-1}\in \tilde\codeset$ and $(\restword_2-\restword_1)\claimr^{-1}$ has at most 
+\[\hamweight(\restword_1)+\hamweight(\restword_2)=\hamdist\left(\tilde\codeset,\xce\right)+\hamdist\left(\tilde\codeset,\xcer \right)\]
+non-zero elements. This proves inequality (\ref{zkip:ineq:triangle}), and hence the lemma.\qed
+\end{proof}
+
+Thus, if $ \event$ then with probability at least $1-\frac{1}{|\F|}$ the vector $\chalx$ is going to be such that $\hamdist(\tilde\codeset,\eccmal_0+\vec{\gamma} E^*)\geq \frac{\minhamdist}{6}$. If this happens, then for the vectors $(\vectmal{\chalxt},\eccrandmal{\chalxt})$ sent by $\PoMal$, we must have $\hamdist(\ECC(\vectmal{\chalxt},\eccrandmal{\chalxt}),\eccmal_0+\chalxt E^*)\geq \frac{\minhamdist}{6}$. This means that either in the first half of the codeword $\ECC(\vectmal{\chalxt},\eccrandmal{\chalxt})$ or in the second half, there will be at least $\frac{\minhamdist}{12}$ values of $\chalj$ where it differs from $\eccmal_0+\chalxt E^*$. It is easy to see that the $\chals$ values of $\chalj$ in one half of $[2\sizeeccrand]$ are chosen uniformly and independently at random conditioned on being different.
+
+
+For each of these $\chalj$, there is a probability at most $1-\frac{\minhamdist}{12\sizeeccrand}$ that $\ECC(\vect_{(\chalxt)},\eccrand_{(\chalxt)})_\chalj= \eccmal_{0,\chalj}+\chalxt E^*|_j$, and since the $\chalj$'s are chosen uniformly under the condition that they are distinct, given that this holds for the first $i$ values, the probability is even smaller for the $i+1$'th. Hence, the probability that it holds for all $\chalj$ in this half is negligible. This shows that the probability that $\event$ happens and $\V$ accepts is negligible. %???This covers all of case 2 and some of case 3.
+
+\paragraph{Third Case} Now we turn to the third case, where $\event$ does not happen but $\PoMal$ sends a $V_{(Q)}^*\neq V_{(Q)}$.
+In this case, for all $\chaloptx\in \F^{\totalnumvec}$, we have $\hamdist(\tilde\codeset, \sum^t_{\rownr=1}\chaloptx_\rownr\eccmal_\rownr)< \maxdist$. In particular, this holds for the vector $\chalx$ given by $\chalx_\rownr=1$ and $\chalx_{\rownr'}=0$ for $\rownr'\neq \rownr$, so the $\vect_\rownr$'s are well-defined. 
+
+For two matrices $A$ and $B$ of the same dimensions, we define their Hamming distance $\hamdist_2(A,B)$ to be the number of $j$'s such that the $j$th column of $A$ and $j$th column of $B$ are different. This agrees with the standard definition of Hamming distance, if we consider each matrix to be a string of column vectors.
+
+\begin{lemma}
+Assume $\neg \event$ and let $V$ and $R$ be defined as above. 
+Then for any $\vec{q}\in \F^{\totalnumvec}$ there exists an $\vec{r}_{(\vec{q})}$ with $\hamdist(\ECC(\vec{q} V, \vec{r}_{(\vec{q})}), \vec{q} E^*)< \maxdist$. 
+
+In particular, for any $V_{(Q)}^*\neq QV$, and any $R_{(Q)}^*$ we have 
+\[ \hamdist_2\left(\ECC\left(V_{(Q)}^*,R_{(Q)}^*\right),QE^*\right)\geq 2\maxdist.\]
+\end{lemma}
+
+Of course, the same statement holds for $\vec{q}'$, $\vec{r}'_{(\vec{q})}$, $V_{(Q)}^{'*}\neq Q'V$ and $R_{(Q)}^{'*}$.
+
+\begin{proof}
+Assume that $\neg \event$, that is for all $\vec{q}\in \F^{\totalnumvec}$ we have $\hamdist(\tilde\codeset, \vec{q} E^*)< \maxdist$. Informally, we need to strengthen this by showing that the elements in $\tilde\codeset$ that are close to each $\vec{q} E^*$, are themselves linear in $\vec{q}$. 
+
+
+We have chosen $\vect_\rownr$'s and $\eccrand_\rownr$'s such that $\hamdist(\ECC(\vect_\rownr,\eccrand_\rownr),\eccmal_\rownr)<\maxdist$, and $V$ is the matrix where the $\rownr$th row is $v_\rownr$. We will show by induction on number of non-zero elements $\hamweight(\vec{q})$ in $\vec{q}$ that there exists $\vec{r}_{(\vec{q})}$ with $\hamdist(\ECC(\vec{q} V, \vec{r}_{(\vec{q})}), \vec{q} E^*)< \maxdist$. 
+
+
+This is trivially true for $\hamweight(\vec{q})=0$. For $\hamweight(\vec{q})=1$ it follows from our choice of $\vect_\rownr$. Assume for induction that it is true for all $\vec{q}$ with $\hamweight(\vec{q})\leq \indupara$ and consider a $\vec{q}$ with $\hamweight(\vec{q})\leq 2\indupara$.
+We can now write $\vec{q}=\vec{q}_1+\vec{q}_2$ where $\hamweight(\vec{q}_1),\hamweight(\vec{q}_2)\leq \indupara$. By the induction hypothesis, there exists $\vec{r}_{(\vec{q}_1)}$ such that
+$\hamdist(\ECC(\vec{q}_1 V,\vec{r}_{(\vec{q}_1)}), \vec{q}_1 E^*)< \maxdist$ and similar for $\vec{q}_2$. Since $\vec{q}=\vec{q}_1+\vec{q}_2$ this implies 
+\begin{align*}
+\hamdist&\left(\ECC \left(\vec{q} V, \vec{r}_{(\vec{q}_1)}+\vec{r}_{(\vec{q}_2)}\right), \vec{q} E^*\right)\\
+&= \hamdist\left(\ECC\left((\vec{q}_1+\vec{q}_2) V, \vec{r}_{(\vec{q}_1)}+\vec{r}_{(\vec{q}_2)}\right),(\vec{q}_1+\vec{q}_2) E^*\right)\\
+&\leq \hamdist\left(\ECC \left(\vec{q}_1 V,\vec{r}_{(\vec{q}_1)}\right),\vec{q}_1 E^*\right)+\hamdist\left(\ECC \left(\vec{q}_2 V, \vec{r}_{(\vec{q}_2)}\right),\vec{q}_2 E^*\right)\\
+&< 2\maxdist.
+\end{align*}
+Since we assume $\neg \event$, we know that there exist \emph{some} $\vect_{(\vec{q})}$ and $\eccrand_{(\vec{q})}$ such that $\hamdist(\ECC(\vect_{(\vec{q})},\eccrand_{(\vec{q})}),\vec{q} E^*)<\maxdist$. Now, by the triangle inequality for Hamming distance, this implies
+\begin{align*}
+\hamdist&\left(\ECC\left(\vect_{(\vec{q})},\eccrand_{(\vec{q})}\right), \ECC\left(\vec{q} V, \vec{r}_{(\vec{q}_1)}+\vec{r}_{(\vec{q}_2)}\right)\right)\\
+&\leq \hamdist\left(\ECC\left(\vect_{(\vec{q}) },\eccrand_{(\vec{q})}\right),\vec{q} E^*\right) + \hamdist\left(\vec{q} E^*,\ECC\left(\vec{q} V,\vec{r}_{(\vec{q}_1)}+\vec{r}_{(\vec{q}_2)}\right)\right)\\
+&< \maxdist+2\maxdist = \minhamdist
+\end{align*}
+Since $\minhamdist$ is the minimum distance of $\ECC$, we must have $\vect_{(\vec{q})}=\vec{q} V$, and hence $\hamdist(\ECC(\vec{q} V, \vec{r}_{(\vec{q})}), \vec{q} E^*)< \maxdist$. This finishes the induction argument. 
+
+The triangle inequality for Hamming distance shows that for any $(\vectmal{\vec{q}},\eccrandmal{\vec{q}})$ with $\vectmal{\vec{q}}\neq \vec{q} V$ we have $\hamdist(\ECC(\vectmal{\vec{q}},\eccrandmal{\vec{q}}),\vec{q} E^*)\geq 2\maxdist$. Now for any $V_{(Q)}^*\neq QV$ there is a row $\rownr$ where the two matrices differ. Let $\vec{q}$ be the $\rownr$th row of $Q$. Then $\hamdist(\ECC(\vectmal{\vec{q}},\eccrandmal{\vec{q}}),\vec{q} E^*)\geq 2\maxdist$ tells us that the $\rownr$th row of $\ECC(V_{(Q)}^*,R_{(Q)}^*)$ and $\rownr$th row of $QE^*$ differs in at least $2\maxdist$ positions. In particular, $ \hamdist_2\left(\ECC\left(V_{(Q)}^*,R_{(Q)}^*\right),QE^*\right)\geq 2\maxdist.$ \qed
+\end{proof}
+
+This means that if $\neg \event$ occurs and $\PoMal$ attempts to open a $V_{(Q)}^*\neq V_{(Q)}=QV$ then 
+\[ \hamdist_2\left(\ECC\left(V_{(Q)}^*,R_{(Q)}^*\right), QE^*\right)\geq 2\maxdist.\]
+As argued above, if the distance between two strings of length $\sizeecc$ is at least $\maxdist$, the probability that $\chalJ$ will not contain a $\chalj$ such that the two strings differ in position $\chalj$ is negligible. Hence, the probability that $\ECC\left(V_{(Q)}^*,R_{(Q)}^*\right)|_J= QE^*|_J$ is negligible. Thus, the probability that $\neg \event$ and $\V$ accepts while $\VILC$ does not is negligible. This proves (\ref{zkip:ineq:pilcstar}).
+
+Next, we want to define a \emph{transcript extractor} $\Extrans$ that given rewindable access to ${\langle \Po^*(s)\std\V(\crs,\stm)\rangle}$ outputs $\viewpilcsim$, which we would like to correspond to all messages sent between $\PoILCMal$ and the channel in $ \langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_\ILC,\stm;\rho_{\ILC})\rangle $. Here $\rho_{\ILC}$ is the randomness used by the $\VILC$ inside $\V$ in the first execution of $\Extrans$'s oracle ${\langle \Po^*(s)\std\V(\crs,\stm)\rangle}$. However, we allow $\Extrans$ to fail if $\V$ does not accept in this first transcript and further to fail with negligible probability. Formally, we want $\Extrans$ to run in expected PPT such that for all PPT $\A$: 
+
+\begin{align}\Pr&\left[\begin{array}{c} \crs\gets \KK(1^\sep);(\crs_\ILC,\cdot)=\crs;(\stm,s) \gets \A(\crs);\\
+%\langle \PoMal(s)\std\V(\crs,u;(\rho_{\ILC},\rho))\rangle = b ; \\
+\viewpilcsim \gets \Extrans^{\langle \Po^*(s)\std\V(\crs,\stm)\rangle}(\crs,\stm);\\
+\viewpilc \gets \langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_\ILC,u;\rho_{\ILC})\rangle:\\
+b=1~~\wedge~~\viewpilc \neq \viewpilcsim
+\end{array}
+\right]\approx 0.\label{zkip:ineq:mal}
+\end{align}
+Here $b$ is the value output by $\V$ the first time $\Extrans$'s oracle runs $\langle \Po^*(s)\std\V(\crs,\stm)\rangle$, and the randomness $\rho_{\ILC}$ used by $\VILC$ in the third line is identical to the random value used by the $\VILC$ inside $\V$ in the first transcript. 
+On input $(\crs,u)$, the transcript extractor $\Extrans$ will first use its oracle to get a transcript of $ \langle \PoMal(s)\std\V(\crs,u;(\rho_{\ILC},\rho))\rangle$.  
+If $\V$ rejects, $\Extrans$ will just abort. If $\V$ accepts, $\Extrans$ will rewind the last message of $\PoMal$ to get a transcript for a new random challenge $J$. $\Extrans$ continues this way, until it has an accepting transcript for $2n$ independently chosen sets $J$. Notice that if there is only one choice of $J$ that results in $\V$ accepting, $\PoMal$ will likely have received  each allowed challenge around $2n$ times and $\Extrans$ will get the exact same transcript $2n$ times before it is done rewinding. Still, 
+$\Extrans$ runs in expected polynomial time: if a fraction $p$ of all allowed sets $J$ results in accept, the expected number of rewindings \emph{given} that the first transcript accepts is $\frac{2n-1}{p}$. However, the probability that the first run accepts is $p$, and if it does not accept, $\Extrans$ does not do any rewindings. In total, that gives $\frac{(2n-1)p}{p}=2n-1$ rewindings in expectation. 
+
+We let $J_1,\dots, J_{2n}$ denote the set of challenges $J$ in the accepting transcripts obtained by $\Extrans$. If  $\bigcup_{i=1}^{2n} J_i$ has less than $2n-\maxdist$ elements, $\Extrans$ terminates. Otherwise, $\Extrans$ is defined similarly to $\PoILCMal$: it uses the values of the openings to get at least $2n-\maxdist$ columns of each $E_i$. For each of the row vectors, $\vec{e}_\rownr$, it computes $\vec{v}_\rownr$ and $\vec{r}_\rownr$ such that $\ECC(\vec{v}_\rownr,\vec{r}_\rownr)$ agrees with $\vec{e}_\rownr$ in all entries $(\vec{e}_\rownr)_j$ for which the $j$'th column have been revealed, if such $\vec{v}$ exists. Since $\Extrans$ will not correct any errors, finding such $\vec{v}_\rownr$ and $\vec{r}_\rownr$ corresponds to solving a linear set of equations. Notice that since the minimum distance is more than $2\maxdist$ there is at most one such $\vec{v}_\rownr$ for each $\rownr\in [t]$.  If for some $\rownr$ there is no such $\vec{v}_{\rownr}$, then $\Extrans$ aborts, otherwise $\Extrans$ use the resulting vectors $\vec{v}_\rownr$ as the prover messages to define $\viewpilcsim$.
+
+If $|\bigcup_{i=1}^\kappa J_i|<2n-\maxdist$, there are at least $\frac{\minhamdist}{6}$ numbers in $[n]\setminus \bigcup_{i=1}^\kappa J_i$ or in $\{n+1,\dots,2n\}\setminus \bigcup_{i=1}^\kappa J_i$. In either case, a random allowed $J$ has negligible probability of being contained in $\bigcup_{i=1}^\kappa J_i$. Since $\Extrans$ runs in expected polynomial time, this implies by induction that there is only negligible probability that $|\bigcup_{i=1}^{\kappa}J_i|<\min(\kappa,2n-\maxdist)$ and therefore $|\bigcup_{i=1}^{2n}J_i|<2n-\maxdist$. 
+
+Finally, we need to show 
+\begin{lemma}\label{lem:malform}
+The probability that for some $\rownr$ there are no $\vec{v}_\rownr$ and $\vec{r}_\rownr$ such that $\ECC(\vec{v}_\rownr,\vec{r}_\rownr)$ agrees with $\vec{e}_\rownr$ on the opened $j\in \bigcup_{i=1}^{2n}J_i$ and $b=1$ is negligible. 
+
+In particular, the probability that $b=1$ but $\Extrans$ does not extract the transcript of $\PoILCMal$ is negligible. 
+\end{lemma}
+\begin{proof}
+Since we can ignore events that happen with negligible probability, and the expected number of rewindings is polynomial, we can assume that in all the rewindings, $\PoMal$ only makes openings to the most common openings. 
+We showed that the probability that $b=1$ but $\PoMal$ sends a $V_{(Q)}^*\neq QV$, or $\V$ computes a $V_{(Q)}^{'*}\neq Q'V$ is negligible and by the same argument the probability that $b=1$ but $\PoMal$ sends
+$\vec{v}^*_{(\vec{\gamma})}\neq \vec{v}_{(\vec{\gamma})}$ is negligible. Therefore, in the following, we will assume $\vec{v}^*_{(\vec{\gamma})}=\vec{v}_{(\vec{\gamma})}$.
+
+%\red{The next paragraph is specific to this method of adding randomness into codewords. But essentially says that the codeword is badly formed}
+Now suppose that there is some $\vec{e}_{\rownr}$ such that the opened values are inconsistent with being $\ECC(\vec{v}_\rownr,\vec{r}_\rownr)$ for any $\vec{r}_{\rownr}$. That is, there is some $j$ such that $j,n+j\in \bigcup_{i=1}^{2n}J_i$ and $(\vec{e}_{\rownr})_j-(\vec{e}_{\rownr})_{n+j}\neq \preECC(\vec{v})_j$. For uniformly chosen $\vec{\gamma}_\rownr\in \F$, we get that $\vec{\gamma}_\rownr((\vec{e}_{\rownr})_j-(\vec{e}_{\rownr})_{n+j}- \preECC(\vec{v})_j)$ is uniformly distributed in $\F$. Hence for a random $\vec{\gamma}\in\F^t$, we have that $\vec{\gamma}\cdot ((\vec{e})_j-(\vec{e})_{n+j}- \preECC(\vec{v})_j)$ is uniformly distributed. When $\V$ sends $\vec{\gamma}$, $\PoMal$ will respond with $\vec{v}^*_{(\vec{\gamma})}=\vec{v}_{(\vec{\gamma})}$ and some $\vec{r}^*_{(\vec{\gamma})}$. 
+$\V$ will only accept on a challenge $J$ if for all $j\in J$ we have $(\vec{e}_0+\vec{\gamma}\vec{e})_j=\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_j$. 
+Since $j,n+j\in \bigcup_{i=1}^{2n} J_i$ we have $(\vec{e}_0+\vec{\gamma}\vec{e})_j=\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_j$ and $(\vec{e}_0+\vec{\gamma}\vec{e})_{n+j}=\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_{n+j}$ so 
+\begin{align*}
+(\vec{e}_0)_j-(\vec{e}_0)_{n+j}+\vec{\gamma}\vec{e}_j-\vec{\gamma}\vec{e}_{n+j}=&\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_j-\ECC(\vec{v}_{(\vec{\gamma})},\vec{r}^*_{(\vec{\gamma})})_{n+j}\\
+=&\preECC(\vec{v}_{(\vec{\gamma})})_j\\ 
+=& (\preECC(\vec{v}_0)+\vec{\gamma} \preECC(\vec{v}))_j
+\end{align*}
+that is, 
+\[\vec{\gamma}\vec{e}_j-\vec{\gamma}\vec{e}_{n+j}-\vec{\gamma} \preECC(\vec{v})_j=\preECC(\vec{v}_0)_j-(\vec{e}_0)_j+(\vec{e}_0)_{n+j}\]
+For random $\vec{\gamma}$ the left-hand side is uniform and the right-hand side is fixed, hence equality only happens with negligible probability. That proves the lemma. \qed
+\end{proof}
+
+
+Since $\ExILC^{\langle \PoILC^*(s,\crs,\stm)\ilc\VILC(\crs_\ILC,\stm)\rangle}(\crs,\stm)$ is a straight-line extractor, we can simply assume that it gets the transcript as an input, and can be written as $\ExILC(\crs_\ILC,\stm,\viewpilc)$. 
+For any PPT $\A$ consider the following experiment.
+\begin{align}
+\left[\begin{array}{c} \crs\gets \KK(1^\sep);(\crs_\ILC,\cdot)=\crs;(\stm,s) \gets \A(\crs); \\
+\viewpilcsim \gets \Extrans^{\langle \Po^*(s)\std\V(\crs,\stm\rangle}(\crs,u);\\ 
+%\langle \PoMal(s)\std\V(\crs,u;(\rho_{\ILC},\rho))\rangle = b ; \\
+\viewpilc \gets \langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_\ILC,\stm;\rho_{\ILC})\rangle = b_{\ILC};\\ 
+\wit\gets \ExILC(\crs_\ILC,\stm,\viewpilc);\\
+\witsim\gets \ExILC(\crs_\ILC,\stm,\viewpilcsim);
+\end{array}\right]
+\end{align}
+We have shown that when doing this experiment, the probability that $b=1\wedge b_\ILC=0$ and the probability that $b=1\wedge \viewpilc\neq \viewpilcsim$ are both negligible. By knowledge soundness of $(\KKILC,\PoILC,\VILC)$, the probability that $b_{\ILC}=1\wedge (\crs,\stm,\wit)\notin \R$ is also negligible. Finally, if $\viewpilc =\viewpilcsim$ then clearly $\wit=\witsim$. Taken together this implies that the probability of $b=1\wedge (\crs,\stm,\witsim)\notin R$ is negligible. We now define $\E^{\langle \Po^*(s)\longleftrightarrow \V(\crs,\stm)\rangle}(\crs,\stm)$ to compute $\ExILC(\crs_\ILC,\stm,\Extrans^{\langle \Po^*(s) \longleftrightarrow \V(\crs,\stm)\rangle}(\crs,\stm))$. The above experiment shows that $(\KK,\Po,\V)$ is knowledge sound with $\Ex$ as extractor. \qed
+\end{proof}
+
+
+\begin{theorem}[SHVZK]
+If $(\KKILC,\PoILC,\VILC)$ is perfect SHVZK 
+and $(\ComSetup,\ComCommit)$ is computationally (statistically) hiding then $(\KK,\Po,\V)$ is computationally (statistically) SHVZK.
+\end{theorem}
+\begin{proof}
+To prove we have SHVZK we describe how the simulator $\Sim(\crs,\stm,\rho)$ should simulate the view of $\V$. Along the way, we will argue why, the variables output by $\Sim$ have the correct joint distribution. To keep the proof readable, instead of saying that ``the joint distribution of [random variable] and all previously defined random variables is identical to the distribution in the real view of $\V$ in $\langle \Po(\crs,\stm,\wit)\std \V(\crs,\stm)\rangle$'' we will simply say that ``[random variable] has the correct distribution''.
+
+Using the randomness $\rho$ the simulator learns the queries $\rho_{\ILC}=(x_1,\ldots,x_{\mu-1},Q)$ the internal $\VILC$ run by the honest $\V$ will send. $\Sim$ can therefore run $\Sim_{\ILC}(\crs_{\ILC},\stm,\rho_{\ILC})$ to simulate the view of the internal $\VILC$. This gives it $(t_1,\ldots,t_\mu,V_{(Q)})$. By the SHVZK property of $(\KKILC,\PoILC,\VILC)$ these random variables will all have the correct joint distribution. 
+
+Then $\Sim$ reads the rest of $\rho$ to learn also the challenges $\chalx$ and $J$ that $\V$ will send. The simulator picks uniformly at random $\vect_{(\vec{\gamma})}\gets \F^{\sizevect}$. Since in a real proof $\vect_0$ is chosen at random, we see that the simulated $\vect_{(\vec{\gamma})}$ has the correct distribution. Now $\Sim$ picks $E_{01}|_J,\ldots,E_{\mu}|_J$ uniformly at random. Recall that we defined $\ECC(\vect;\vec{r})=(\preECC(\vect)+\vec{r},\vec{r})$ and by definition of $J$ being allowed, we have for all $j\in J$ that $j+n\notin J$. This means for any choice of $\vect_0\in \F^{\sizevect}$ and $V\in \F^{t\times \sizevect}$ that when we choose random $\vec{r}_0\gets \F^n$ and $R\gets \F^{t\times n}$ we get uniformly random $\ECC(\vect_0;\vec{r}_0)|_J$ and $\ECC(V;R)$. Consequently, $E_{01}|_J,\ldots,E_{\mu}|_J$ have the correct distribution.
+
+Next, the simulator picks $\vec{r}_{(\vec{\gamma})}\in \F^n$ and $R_{(Q)}\in \F^{t\times n}$ one entry and column at a time. For all $j$ such that $j\notin J$ and $j+n\notin J$ the simulator picks random $(\vec{r}_{(\vec{\gamma})})_j\gets \F$ and random $R_j\gets \F^t$. For all $j$ such that $j\in J$ or $j+n\in J$, the simulator then computes the unique $(\vec{r}_{(\vec{\gamma})})_j\in \F$ and $R_j\in \F^t$ such that we get $\ECC(\vect_{(\vec{\gamma})};\vec{r}_{(\vec{\gamma})})=\ecc_0|_J+\chalx E|_J$ and $\ECC(V_{(Q)};R_{(Q)})=QE|_J$ and $\ECC(V'_{(Q)};R'_{(Q)})=Q'E|_J$.
+
+Finally, $\Sim$ defines $E_{01}|_{\bar{J}},\ldots,E_{\mu}|_{\bar{J}}$ to be $0$ matrices. It then picks $\vec{s}_1,\ldots,\vec{s}_\mu$ at random and makes the commitments $\vec{c}_1,\ldots,\vec{c}_\mu$ as in the protocol. For $j\in J$ we see that all the $\vec{c}_i|_j$ commitments are computed as in the real execution from values that have the same distribution as in a real proof. Hence, they will have the correct distribution. The $\vec{c}_i|_j$s for $j\notin J$ are commitments to different values than in a real proof. However, by the computational (statistical) hiding property of the commitment scheme, they have a distribution that is computationally (statistically) indistinguishable from the correct distribution. 
+\qed
+\end{proof}
+
+\subsection{Efficiency}
+
+We will now estimate the efficiency of a compiled proof of knowledge $(\KK,\Po,\V)$ for $(\crs,\stm,\wit)\in \R$. Let $\mu$ be the number of rounds, $t=\sum_{\roundnum=1}^\mu t_\roundnum$, $k,n$ given in $\preECC$, $\qc$ the \ILCopen\ query complexity, i.e., $\Chal \in \F^{\qc\times t}$, and $\qc'$ the \ILCcheck\ query complexity, i.e., $\Chal' \in \F^{\qc'\times t}$. Let $T_{\PoILC}$ be the running time of $\PoILC(\crs_{\ILC},\stm,\wit)$, $T_{\ECC\!}(\sizevect)$ be the encoding time for a vector in $\F^\sizevect$, $T_{\ComCommit}(t_\roundnum)$ be the time to commit to $t_\roundnum$ field elements, $T_{\text{Mmul}}(\qc,\totalnumvec,b)$ be the time it takes to multiply matrices in $\F^{\qc\times \totalnumvec}$ and $\F^{\totalnumvec\times b}$ and similarly for $\qc'$. Let $T_{\VILC}$ be the running time of $\VILC(\crs_{\ILC},\stm)$, and let $C_{\ILC}$ be the communication from the verifier to the prover in $\langle \PoILC \ilc \VILC\rangle$, $C_{\ComCommit}(t_\roundnum)$ be the combined size of commitment and randomness for a message consisting of $t_\roundnum$ field elements.
+
+We give the dominant factors of efficiency of the compiled proof in Fig.~\ref{fig:IOPeff}. The estimates presume $T_{\ComCommit}(t_1+1)$ is not too far from $T_{\ComCommit}(t_1)$. Of course, in many realistic cases, the cost of computing queries will be less than $T_{\text{Mmul}}(\qc,\totalnumvec,b)$ if the query matrix contains large zero-submatrices, or has some other special form.
+
+\begin{figure}[!h]
+%\hspace{-9mm}
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{1}{|c|}{\bf Measure} & {\bf Cost} \\
+\hline
+Prover Computation & $T_{\PoILC} + \totalnumvec \cdot T_{\ECC\!}(\sizevect) + 2n\cdot \sum_{\roundnum=1}^{\mu} T_{\ComCommit}(t_\roundnum)$ \\
+&$ + T_{\text{Mmul}}(\qc+\qc'+1,\totalnumvec,k+n)$ \\
+\hline
+Verifier Computation & $T_{\VILC} + (\qc+\qc'+1)\cdot T_{\ECC\!}(\sizevect) + 2\sep \cdot \sum_{\roundnum=1}^{\mu} T_{\ComCommit}(t_\roundnum)$ \\
+& $+ T_{\text{Mmul}}(\qc+\qc'+1,\totalnumvec,2\sep)$\\
+\hline
+Communication & $C_{\ILC} + 2n\cdot \sum_{\roundnum=1}^{\mu} C_{\ComCommit}(t_\roundnum) + (\qc+1)\cdot(k+n)+\qc' n$ \\
+& $+(\qc+\qc'+1)\cdot t+ 2\sep\cdot t$ \\
+\hline
+Round Complexity & $\mu + 2$ \\
+\hline
+\end{tabular}
+\caption{Efficiency of a compiled proof of knowledge $(\KK,\Po,\V)$ for $(\crs,\stm,\wit)\in \R$. Communication is measured in field elements and computation in field operations.}\label{fig:IOPeff}
+\end{figure}
+
+\subsection{Optimisations}\label{subsec:ipcpopt}
+
+Motivated by the argument in Section \ref{subsec:3rndsqrt}, we discuss two possible optimisations to the compilation procedure. Consider the following \ILC\ check query.
+\begin{align*}
+\left(\vec{\bar{a}}\cdot \vec{w}_1,\ldots,\vec{\bar{a}}\cdot \vec{w}_Q \right) ~&\vereq~ (c_1,\ldots,c_Q) \quad + \sum_{j\neq 0,j=-3m}^{3m} \vec{h}_j {x^j}
+\end{align*}
+
+Since this is a check query, the prover will not need to send the value of $(c_1,\ldots,c_Q) \quad + \sum_{j\neq 0,j=-3m}^{3m} \vec{h}_j {x^j}$ to the verifier, because the verifier can compute what this value out to be for themself. This was the reason for introducing the \ILCcheck\ queries in the first place, because otherwise, if this was handled as a \ILCsend\ query, the prover would have had to send a vector of length $Q$ to the verifier in the compiled proof. Since $Q$ may be as large as $O(N)$, this would have prevented the proof from having sub-linear communication costs.
+
+However, the compiled proof introduces a further causes for concern. An obvious issue is that the prover commits to matrices column-wise, so the prover will  produce $Q$ commitments. This is easily solved however, by hashing all of these commitments into a Merkle tree, and opening the commitments required for the verification checks. This changes the communication costs associated with committing from $O(N)$ hash values to $O(1)$ hash values, and the cost of opening from $O(\lambda)$ openings to $O(\lambda \log N)$ openings, and adds some computational overhead. This option was not considered in \cite{BootleCGGHJ17}, but was unnecessary for the asymptotic results in that protocol.
+
+In the compiled proof, we use the randomised encoding $\ECC(\vect;\vec{r})=(\preECC(\vect)+\vec{r},\vec{r})$, and the prover commits to the randomised encodings. This means that the prover still needs to send some randomness to the verifier, computed from a linear combination of the randomness used to commit to the vectors $\vec{h}_i$, which are vectors of length $Q$. Then the vectors of randomness will be of length $Q$ too, resulting in a vector of length $Q$ being sent to the verifier.
+
+We can remove the dependency of the length of the randomness vector on the length of the vector, $\sizevect$. Fix distinct points $a_1,\ldots,a_{2\sep} \in \F$ at the beginning of the protocol. Instead of sampling a truly random vector $\vec{r} \in \F^\sizevect$, the prover selects a vector $\vec{r}' \gets \F^{2\sep}$. This specifies the coefficients of a polynomial of degree $2\sep-1$. The prover computes the Reed-Solomon encoding of $\vec{r}'$ with respect to points $a_1,\ldots,a_{2\sep}$ and gets a vector $\vec{r} \in \F^\sizevect$.
+
+Now, if the prover uses this $\vec{r}$ as randomness for the randomised encoding instead of choosing one uniformly at random, then they need only send a vector of length $\sep$ to the verifier. Changes to the security proofs are given in Appendix \ref{appendix:optproofs}.
+
+Note that we should consider the \ILC\ protocol compilation both with and without these optimisations, as these optimisations will add unecessary computational overhead into the compilation when applied to short vectors. Therefore, we can use the optimisations when compiling \ILC\ protocols with vectors of multiple lengths, and only apply them to the long vectors.
+
+We give the dominant factors of efficiency of the compiled proof in Fig.~\ref{fig:IOPeff2}. The estimates presume $T_{\ComCommit}(t_1+1)$ is not too far from $T_{\ComCommit}(t_1)$. Notation is as before, with $\HashOutLen$ the output length of the hash function used for committing, and $T_{RS}(2\sep)$ the time taken to compute a Reed-Solomon codeword of length $n$ from an input word of length $2\sep$.
+
+\begin{figure}[!h]
+%\hspace{-9mm}
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{1}{|c|}{\bf Measure} & {\bf Cost} \\
+\hline
+Prover Computation & $T_{\PoILC} + \totalnumvec \cdot (T_{\preECC\!}(\sizevect) + T_{RS}(2\sep)) + 2n\cdot \sum_{\roundnum=1}^{\mu} T_{\ComCommit}(t_\roundnum)$ \\
+& $+ 2\mu n \cdot T_{\text{hash}}(2\HashOutLen) + T_{\text{Mmul}}(\qc+\qc'+1,\totalnumvec,k+2\sep)$ \\
+\hline
+Verifier Computation & $T_{\VILC} + (\qc+\qc'+1)\cdot (T_{\preECC\!}(\sizevect)+ T_{RS}(2\sep)) + 2\sep \cdot \sum_{\roundnum=1}^{\mu} T_{\ComCommit}(t_\roundnum)$ \\
+& $+\sep \log n \cdot T_{\text{hash}}(2\HashOutLen)+ T_{\text{Mmul}}(\qc+\qc'+1,\totalnumvec,2\sep)$\\
+\hline
+Communication & $C_{\ILC} + (\mu + \sep(2\log n+1))\cdot C_{\ComCommit}(2\HashOutLen) + (\qc+1)\cdot(k+2\sep)$ \\
+&$+ 2\sep\qc'+(\qc+\qc'+1)\cdot t+ 2\sep\cdot t$ \\
+\hline
+Round Complexity & $\mu + 2$ \\
+\hline
+\end{tabular}
+\caption{Efficiency of a compiled proof of knowledge $(\KK,\Po,\V)$ for $(\crs,\stm,\wit)\in \R$ with optimisations made to the compiler. Communication is measured in field elements and computation in field operations.}\label{fig:IOPeff2}
+\end{figure}
+
+\section{Compiling into Discrete-Logarithm-Based Proofs}
+
+In this section, we show how to compile a proof of knowledge with straight-line extraction for relation $\R$ over the communication channel \ILC\ into a proof of knowledge for the same relation over the standard channel based on the discrete logarithm assumption, provided that the \ILC\ protocol satisfies some simple additional conditions. In fact, this compilation will work for any homomorphic commitment scheme over the field $\F$ in which the \ILC\ protocol takes place, but for concreteness and efficiency, we use Pedersen commitments. These will give rise to efficient zero-knowledge arguments as Pedersen commitments are extremely succinct; only one group element is required to commit to a large number of field elements.
+
+The idea behind this compilation of an $\ILC$ proof is that instead of committing to vectors $\vect_\rownr$ using the channel $\ILC$, the prover commits to each vector using a real homomorphic commitment scheme. When the verifier wants to open a linear combination of the original vectors using an \ILCopen\ command, he sends the coefficients $\vec{q}=(q_1,\ldots,q_t)$ of the linear combination to the prover, and the prover responds with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$.
+As before, we will use the notation $\vect_{(\vec{q})}$ to denote vectors that depend on $\vec{q}$.
+
+Now, to check that the prover is not giving a wrong $\vect_{(\vec{q})}$, the verifier will compute a commitment to $\vect_{(\vec{q})}$ using the real homomorphic commitment scheme, and check that this commitment is the correct linear combination of the commitments to $\vect_\rownr$. This works because the commitment scheme is homomorphic.
+
+Of course, to prevent real commitments from leaking information about committed vectors, randomnes is necessary. Each vector $\vect_\rownr$ will have the randomness $\vec{s}_\rownr$ used to commit to it concatenated to it, and then the prover will respond with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$ as before, plus $\vec{s}_{(\vec{q})}=\vec{q}\vec{s}$. Then SHVZK for the compiled proof is inherited from the underlying \ILC\ proof. Unlike the previous compilation technique which reveals some entries of committed codewords, almost all of the verifier's calculations are done on hiding commitments, along with a few openings that do not reveal any information due to the SHVZK property of the underlying \ILC\ proof. Therefore, it is not necessary to use any additional linear combinations in the proof.
+
+As before, we must discuss how to treat \ILCcheck\ queries. The verifier makes \ILCcheck\ queries $\vec{q}'=(q'_1,\ldots,q'_t)$ of linear combinations of committed vectors. Now, \ILCcheck\ queries handle the case where the verifier can compute what $\vect'_{(\vec{q})}\gets \vec{q}' V$ should be by themselves, using the results of other \ILCopen\ queries. Therefore, the prover need not send $\vect'_{(\vec{q})}$ to the verifier. The prover, given $\vec{q}'$, must still reveal $\vec{s}'_{(\vec{q})}=\vec{q}'\vec{s}$. To check that the prover is not giving a wrong $\vect'_{(\vec{q})}$, the verifier will compute a commitment to $\vect'_{(\vec{q})}$ using the real homomorphic commitment scheme with randomness $\vec{s}'_{(\vec{q})}$, and check that this commitment is the correct linear combination of the commitments to $\vect_\rownr$.
+%---------
+%\begin{figure}[!h]
+%\centering
+%\begin{minipage}[t]{15cm}
+%$$\begin{array}{ccc} 
+%\left(\begin{array}{ccc}\qquad &\quad\vect_0\quad \ &\ \qquad \\ &\quad \vdots\quad\ & \\ \qquad & \quad \vect_t \quad\ & \quad \end{array} \right) & \quad \overset{\ECC}{\longrightarrow} \quad & \left(\begin{array}{ccc|ccc} \qquad  & \quad \preECC(\vect_0)+\vec{r}_0 \quad \ & \qquad  &\qquad \qquad & \quad \vec{r}_0 \quad\ & \quad \\ 
+%&\vdots &&& \vdots & \\
+%\qquad  & \quad \preECC(\vect_t)+\vec{r}_t \quad \ & \qquad &\qquad \qquad & \quad \vec{r}_t \quad\ & \quad \ \\
+%\end{array}\right)\\
+%&\quad &\\
+%\vec{q}\downarrow && \quad\vec{q}\downarrow_{j_1} \,\,\dots\,\, \vec{q}\downarrow_{j_\lambda} \quad \vec{q}\downarrow_{j_{\lambda+1}} \dots \vec{q}\downarrow_{j_{2\lambda}}\\
+%&\quad & \\
+%\left(\begin{array}{ccc}\qquad &\quad \vect_{(\vec{q})} \quad \ & \ \qquad \end{array}\right) & \quad \overset{\ECC}{\longrightarrow} \quad & \left(\begin{array}{ccc|ccc} \qquad  & \quad \preECC(\vect_{(\vec{q})})+\vec{r}_{(\vec{q})} \quad\ & \qquad &\quad\, & \quad \vec{r}_{(\vec{q})} \quad\ & \qquad \ \end{array}\right)
+%\end{array}$$
+%\end{minipage}
+%\caption{Vectors $\vect_\rownr$ organized in matrix $V$ are encoded row-wise as matrix $E=\ECC(V;R)$. The vertical line in the right matrix and vector denotes concatenation of matrices respectively vectors. The prover commits to each column of $E$. When the prover given $\vec{q}$ wants to reveal the linear combination $\vect_{(\vec{q})}=\vec{q}V$ she also reveals $\vec{r}_{(\vec{q})}=\vec{q}R$. The verifier now asks for openings of $2\lambda$ columns $J=\{j_1,\dots,j_{2\lambda}\}$ in $E$ and verifies for these columns that $\vec{q}E|_J=\ECC(\vect_{(\vec{q})};\vec{r}_{(\vec{q})})|_J$. To avoid revealing any information about $\preECC(V)$, we must ensure that $\forall j\in [n]: j\in J\Rightarrow j+n\notin J$. If the spot checks pass, the verifier believes that $\vect_{(\vec{q})}=\vec{q}V$.}\label{fig:spotcheck2}
+%\end{figure}
+%-----------------------------------------
+
+\subsection{Construction}\label{ssec:constrILCtoIOP2}
+Let $(\KKILC,\PoILC,\VILC)$ be a {\em non-adaptive} $\numround$-round SHVZK proof of knowledge with tree extraction over $\ILC$ for a relation $\R$.    
+We now define a proof of knowledge $(\KK,\Po,\V)$ in Fig. \ref{fig:defILCtoIOP2}, where we use the same notation as in the previous section. That is, given matrices $V_1,\dots, V_\mu$ and vectors $\vec{s}_1,\dots, \vec{s}_\mu$, $\vec{c}_1,\dots, \vec{c}_\mu$, we define $$V=\left(\begin{matrix}V_1\\ \vdots \\ V_\mu\end{matrix}\right) \qquad \vec{s}=\left(\begin{matrix}\vec{s}_1\\ \vdots \\ \vec{s}_\mu\end{matrix}\right) \qquad \vec{c}=\left(\begin{matrix}\vec{c}_1\\ \vdots \\ \vec{c}_\mu\end{matrix}\right).$$ 
+The matrices $V_1,\ldots,V_\mu$ are formed by the row vectors $\PoILC$ commits to, and we let $t_1,\ldots,t_\mu$ be the numbers of vectors in each round, i.e., for all $\roundnum$ we have $V_\roundnum\in \F^{t_\roundnum \times \sizevect}$.
+
+This time, we use $\ComCommit(E;\vec{s})$ to denote the function that applies $\ComCommit$ \emph{row-wise} on $E$ and returns a vector $\vec{c}$ of $t = \sum_{i=1}^\mu t_i$ commitments.
+
+\begin{figure}[!h]
+%\hspace{-0.5cm}
+\resizebox{\textwidth}{!}{\begin{minipage}[t]{10cm}% \vspace{0pt} 
+
+\begin{algorithm}[H]
+\caption*{$\Po(\crs, \stm, \wit)$}
+\begin{itemize} \item\textbf{Parse input}: 
+\begin{itemize}
+\item Parse $\crs=(\crs_{\ILC},ck)$
+\item Parse $\crs_{\ILC}=(\F,\sizevect)$
+\item Get $n$ from $\preECC$
+\end{itemize} 
+\item \textbf{Round $1$}: 
+\begin{itemize}
+\item $(\ILCcommit,V_1)\gets \PoILC(\crs_{\ILC},\stm,\wit)$
+\item $\vec{c}_1=\ComCommit(V_1;\vec{s}_1)$
+\item Send $(\vec{c}_1,t_1)$ to $\V$
+\end{itemize} 
+\item \textbf{Rounds $2 \leq \roundnum \leq \mu$}:
+\begin{itemize}
+\item Get challenge $x_{\roundnum-1}$ from $\V$
+\item $(\ILCcommit,V_\roundnum)\gets \PoILC(x_{\roundnum-1})$
+\item $\vec{c}_\roundnum=\ComCommit(V_\roundnum;\vec{s}_\roundnum)$
+\item Send $(\vec{c}_\roundnum,t_\roundnum)$ to $\V$
+\end{itemize} 
+%\;
+\item \textbf{Round $\mu+1$}: 
+
+\begin{itemize}
+\item Get $(\Chal,\Chal')$ from $\V$
+\item $V_{(Q)}\gets \Chal V$
+\item $\vec{s}_{(Q)}\gets \Chal \vec{s}$
+\item $\vec{s}'_{(Q)}\gets \Chal' \vec{s}$
+\item Send $(V_{(Q)},\vec{s}_{(Q)},\vec{s}'_{(Q)})$ to $\V$
+\end{itemize}
+
+\end{itemize} 
+\vspace{2.47cm}
+\end{algorithm}
+\end{minipage}%
+\begin{minipage}[t]{6.5cm}
+\vspace{0cm}
+\begin{algorithm}[H]
+\caption*{$\KK(1^\sep)$\vspace{-1pt}}
+\begin{itemize}
+\item $\crs_{\ILC}\gets \KKILC(1^\sep)$
+\item Parse $\crs_{\ILC}=(\F,\sizevect)$
+\item $ck\gets \ComSetup(1^\sep)$
+%\item Extend $\preECC$ by factor $\left\lceil \frac{2\sep}{n}\right\rceil$
+\item Return $\crs=(\crs_{\ILC},ck)$
+\end{itemize}
+\end{algorithm}
+% \vspace{0.1cm}
+\vspace{-30pt}
+\begin{algorithm}[H]
+\caption*{$\V(\crs, \stm)$}
+\begin{itemize} \item \textbf{Parse input} 
+\begin{itemize}
+\item Parse $\crs=(\crs_{\ILC},ck)$
+\item Parse $\crs_{\ILC}=(\F,\sizevect)$
+\item Give input $(\crs_{\ILC},u)$ to $\VILC$
+\end{itemize}
+\item \textbf{Rounds $1 \leq \roundnum < \mu$}:
+\begin{itemize}
+\item Receive $(\vec{c}_\roundnum,t_\roundnum)$
+\item $(\ILCsend,x_\roundnum)\gets \VILC(t_\roundnum)$
+\item Send $x_\roundnum$ to $\Po$ 
+\end{itemize}
+\item \textbf{Round $\mu$}: 
+\begin{itemize}
+\item Receive $(\vec{c}_\mu,t_{\mu})$
+\item $(\ILCopen,\Chal)\gets \VILC(t_\mu)$
+\item $(\ILCcheck,\Chal')\gets \VILC(t_\mu)$
+\item Send $(\Chal,\Chal')$ to $\Po$ 
+\end{itemize} 
+\item\textbf{Round $\mu+1$}: 
+\begin{itemize}
+\item Receive $(V_{(Q)},\vec{s}_{(Q)},\vec{s}'_{(Q)})$
+\item $\VILC$ computes the answers $V'_{(Q)}$ to its \ILCcheck\ queries
+\item Check $\ComCommit(V_{(Q)};\vec{s}_{(Q)})= \Chal \vec{c}$
+\item Check $\ComCommit(V'_{(Q)};\vec{s}'_{(Q)})= \Chal' \vec{c}$
+\item If all checks pass, return decision of $\VILC(V_{(Q)})$, else return 0
+% reject
+%\item Otherwise, ACCEPT
+\end{itemize}
+\end{itemize}
+\end{algorithm}
+\end{minipage}}
+\caption{Construction of $(\KK,\Po,\V)$ from $(\KKILC,\PoILC,\VILC)$, and homomorphic commitment scheme $(\ComSetup,\ComCommit)$.}
+%For explanation, see Subsection~\ref{ssec:constrILCtoIOP}}
+\label{fig:defILCtoIOP2}
+\end{figure}
+
+\subsection{Security Analysis}
+\label{sec:IPCPsec2}
+%Security Proof of the IPCP Protocol
+    \begin{theorem}[Completeness]
+    If $(\KKILC,\PoILC,\VILC)$ is complete for relation $\R$ over $\ILC$, then $(\KK,\Po,\V)$ in Fig.~\ref{fig:defILCtoIOP} is complete for relation $\R$.
+    \end{theorem}  
+   \begin{proof}
+All the commitment openings are correct, so they will be accepted by the verifier. In the execution of $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle$, the fact that the commitment scheme is homomorphic implies that all the linear checks will be true. If $(\crs,\stm,\wit)\in \R$ then $(\crs_{\ILC},\stm,\wit)\in \R$ and being complete $\langle \PoILC(\crs_{\ILC},\stm,\wit)\ilc\VILC(\crs_{\ILC},stm)\rangle =1$ so $\V$'s internal copy of $\VILC$ will accept. Thus, in this case, $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle=1$, which proves completeness.\qed
+    \end{proof}
+
+      \begin{theorem}[Knowledge Soundness]
+    If $(\KKILC,\PoILC,\VILC)$ is statistically knowledge sound for relation $\R$ over $\ILC$, has tree-special soundness with a linear extraction algorithm, and $(\ComSetup,\ComCommit)$ is computationally (statistically) binding, then $(\KK,\Po,\V)$ as constructed above is computationally (statistically) knowledge sound for relation $\R$.
+    \end{theorem}   
+    \begin{proof}
+Given that $(\KKILC,\PoILC,\VILC)$ has tree-special-soundness, we know that it is possible to extract a witness to the protocol from sufficiently many structured views of $\VILC$. In $(\KK,\Po,\V)$, the view of $\VILC$ is given by the final message that $\Po$ sends to $\V$. We first show that $(\KK,\Po,\V)$ satisfies the same tree-special-soundness as $(\KKILC,\PoILC,\VILC)$, with the same values of $n_i$.
+
+Suppose that we have a tree of accepting transcripts for $(\KK,\Po,\V)$ with the same values of $n_i$ as in the tree-special-soundness of $(\KKILC,\PoILC,\VILC)$. Now, $\V$ checks the verification equations $\ComCommit(V_{(Q)};\vec{s}_{(Q)})= \Chal \vec{c}$ and $\ComCommit(V'_{(Q)};\vec{s}'_{(Q)})= \Chal' \vec{c}$. In $(\KKILC,\PoILC,\VILC)$, we would know, by the properties of the \ILC\ model, that $V_{(Q)} = \Chal V$ and $V'_{(Q)} = \Chal' V$, where $V$ is the matrix consisting of vectors committed by $\PoILC$. Consider the linear system created by vertically stacking every copy of $V_{(Q)} = \Chal V$ and $V'_{(Q)} = \Chal' V$ for every transcript in the tree. By the fact that the \ILC\ protocol has a linear extraction algorithm, there is a linear map $M$ which, when applied to the left and right hand side of this linear system, recovers each row of $V$. To extract a witness for $(\KK,\Po,\V)$, consider a similar linear system created by vertically stacking every copy of the verification equations $\ComCommit(V_{(Q)};\vec{s}_{(Q)})= \Chal \vec{c}$ and $\ComCommit(V'_{(Q)};\vec{s}'_{(Q)})= \Chal' \vec{c}$. If we apply the linear map $M$ to this system, which solves for the rows of the linear system, we obtain openings to each commitment in $\vec{c}$, given by the rows of a matrix $V^*$. We know when each commitment was made, so for each opening, we know that it cannot be a function of the challenges which the prover saw before the commitment was made. Furthermore, we know that by the binding property of the commitment scheme, $V_{(Q)} = Q V^*$, and similarly, $V'_{(Q)} = Q' V^*$, because the compiled protocol $(\KK,\Po,\V)$ checks the same equations as the \ILC\ protocol, but in committed format. By the soundness of $(\KKILC,\PoILC,\VILC)$, the verifier $\V$ would not accept unless $V^*$ provided a valid witness for the \ILC\ protocol.
+
+Finally, by Lemma \ref{lem:fork}, given rewindable black-box access to $(\KK,\Po,\V)$, one can sample a tree of accepting transcripts with the correct values of $n_i$ in expected polynomial time.
+ \qed
+\end{proof}
+
+\begin{theorem}[SHVZK]
+If $(\KKILC,\PoILC,\VILC)$ is perfect SHVZK, with an \ILC\ query matrix $Q^* = \left(\begin{tabular}{l} Q \\ Q' \end{tabular}\right)$ which has full rank, and fewer rows than columns, and $(\ComSetup,\ComCommit)$ is computationally (statistically) hiding then $(\KK,\Po,\V)$ is computationally (statistically) SHVZK.
+\end{theorem}
+\begin{proof}
+To prove we have SHVZK we describe how the simulator $\Sim(\crs,\stm,\rho)$ should simulate the view of $\V$. Along the way, we will argue why, the variables output by $\Sim$ have the correct joint distribution.
+
+Using the randomness $\rho$ the simulator learns the queries $\rho_{\ILC}=(x_1,\ldots,x_{\mu-1},Q)$ the internal $\VILC$ run by the honest $\V$ will send. $\Sim$ can therefore run $\Sim_{\ILC}(\crs_{\ILC},\stm,\rho_{\ILC})$ to simulate the view of the internal $\VILC$. This gives it $(t_1,\ldots,t_\mu,V_{(Q)},V'){(Q)})$. By the SHVZK property of $(\KKILC,\PoILC,\VILC)$ these random variables will all have the correct joint distribution. 
+
+Since the query matrix has full rank, in an honest proof, where $\vec{s}_i$ are chosen uniformly at random, $\vec{s}_{(Q)}$ and $\vec{s}'_{(Q)}$ will also be uniformly random vectors. Therefore, the simulator selects each element of $\vec{s}_{(Q)}$ and $\vec{s}'_{(Q)}$ uniformly at random from $\F$. Finally, $\Sim$ picks $\vec{c}_1,\ldots,\vec{c}_\mu$ uniformly at random, conditioned on $\ComCommit(V_{(Q)},\vec{s}_{(Q)}) = Q \vec{c}$ and $\ComCommit(V'_{(Q)},\vec{s}'_{(Q)}) = Q' \vec{c}$. Since $Q^*$ has fewer rows than columns, this can be done by writing $Q^*$ in reduced row echelon form. Each column of $Q^*$ corresponds to a commitment or committed value, and some entry of a $\vec{c}_i$. Then, all entries of $\vec{c}_1,\ldots,\vec{c}_\mu$ which do not correspond to a column of $Q$ with a leading order $1$ can be chosen uniformly at random. The other entries which do correspond to columns with a leading order $1$ are now fully determined by the values of the entries which have already been chosen, and the fact that $\ComCommit(V_{(Q)},\vec{s}_{(Q)}) = Q \vec{c}$ and $\ComCommit(V'_{(Q)},\vec{s}'_{(Q)}) = Q' \vec{c}$.
+
+Now, just as in the real protocol, $\vec{s}_{(Q)}$ and $\vec{s}'_{(Q)}$ are distributed uniformly at random, and the commitments are all uniformly random conditioned on satisfying $\ComCommit(V_{(Q)},\vec{s}_{(Q)}) = \Chal \vec{c}$ and $\ComCommit(V'_{(Q)},\vec{s}'_{(Q)}) = Q' \vec{c}$.
+\qed
+\end{proof}
+
+    \subsection{Efficiency}
+We will now estimate the efficiency of a compiled proof of knowledge $(\KK,\Po,\V)$ for $(\crs,\stm,\wit)\in \R$. Let $\mu$ be the number of rounds, $t=\sum_{\roundnum=1}^\mu t_\roundnum$, $k,n$ given in $\preECC$, $\qc$ the \ILCopen\ query complexity, i.e., $\Chal \in \F^{\qc\times t}$, and $\qc'$ the \ILCcheck\ query complexity, i.e., $\Chal' \in \F^{\qc\times t}$. Let $T_{\PoILC}$ be the running time of $\PoILC(\crs_{\ILC},\stm,\wit)$, $T_{\ComCommit}(t_\roundnum)$ be the time to commit to $t_\roundnum$ field elements, $T_{\text{Mmul}}(\qc,\totalnumvec,b)$ be the time it takes to multiply matrices in $\F^{\qc\times \totalnumvec}$ and $\F^{\totalnumvec\times b}$, and $T_{\VILC}$ is the running time of $\VILC(\crs_{\ILC},\stm)$. Let furthermore $C_{\ILC}$ be the communication from the verifier to the prover in $\langle \PoILC \ilc \VILC\rangle$, $C_{\ComCommit}(t_\roundnum)$ be the combined size of commitment and randomness for a message consisting of $t_\roundnum$ field elements. %, and $\mu$ be the number of rounds of the $\ILC$ proof.% already mentioned earlier in the paragraph
+
+We give the dominant factors of efficiency of the compiled proof in Fig.~\ref{fig:IOPeff2}. As before, estimates presume $T_{\ComCommit}(t_1+1)$ is not too far from $T_{\ComCommit}(t_1)$.% and that the cost of computing $\chalx V$ and $\chalx R$ is small compared to the rest of the computation. %% Instead of this assumption, we will just add 1 to qc
+
+
+\begin{comment}
+We will now determine the complexities of $(\KKIOP,\PoIOP,\VIOP)$ as constructed above, when compiled from an efficient SHVZK proof of knowledge for arithmetic circuit satisfiability relations $\R$ in the \ILC model. The full proof of knowledge is given in section~\ref{sec:ACtoILC} of the supplementary material, and draws inspiration from techniques of~\cite{MatrixZK,Bootle}, who created efficient arguments of knowledge with sublinear communication, in the discrete logarithm setting.
+We assume that $\ECC$ is a family of linear-time computable codes with constant rate, so $\sizeeccrand=\bigO(\sizevect)$ linear minimum distance and $\chals=\sep$. See Fig.~\ref{fig:IOPeff} for a table of efficiencies of an arbitrary proof of knowledge $(\KKILC,\PoILC,\VILC)$ using the $\IOP$ channel, and the efficiency of the proof of knowledge for arithmetic circuits from section~\ref{sec:ACtoILC} of the Supplementary Material when compiled to $\IOP$. 
+\end{comment}
+
+\begin{figure}[!h]
+%\centering
+%\hspace{-9mm}
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{1}{|c|}{\bf Measure} & {\bf Cost} \\
+\hline
+Prover Computation & $T_{\PoILC} + \totalnumvec \cdot \sum_{\roundnum=1}^{\mu} T_{\ComCommit}(\sizevect) + T_{\text{Mmul}}(\qc+\qc'+1,\totalnumvec,k+1)$ \\
+Verifier Computation & $T_{\VILC} + (\qc + \qc') \cdot T_{\ComCommit}(\sizevect+ \totalnumvec + 1)$\\
+Communication & $C_{\ILC} + \totalnumvec \cdot C_{\ComCommit} + (\sizevect+1) \qc + \qc' + (\qc+\qc')\totalnumvec$ \\
+Round Complexity & $\mu + 1$ \\
+\hline
+\end{tabular}
+\caption{Efficiency of a compiled proof of knowledge $(\KK,\Po,\V)$ for $(\crs,\stm,\wit)\in \R$ based on homomorphic commitments. Communication is measured in field elements and computation in field operations. Here $\kappa$ is the cost of computing a group exponentiation in the commitment space. }\label{fig:IOPeff2}
+\end{figure}

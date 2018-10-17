@@ -1,0 +1,78 @@
+% !TEX root = ..\Main.tex
+% I may change the way this is done in a future version, 
+%  but given that some people needed it, if you need a different degree title 
+%  (e.g. Master of Science, Master in Science, Master of Arts, etc)
+%  uncomment the following 3 lines and set as appropriate (this *has* to be before \maketitle)
+% \makeatletter
+% \renewcommand {\@degree@string} {Master of Things}
+% \makeatother
+
+\title{Designing Efficient Zero-Knowledge Proofs in the Ideal Linear Commitment Model}
+\author{Jonathan Bootle}
+\department{Computer Science Department}
+
+\maketitle
+\makedeclaration
+
+\begin{abstract} % 300 word limit
+%Zero-knowledge proofs are cryptographic protocols enabling a prover to demonstrate to a verifier that a public statement is true, without giving away any of the prover's secret information, or revealing why the statement is true. They were first introduced by Goldwasser, Micali and Rackoff \cite{STOC:GolMicRac85}. Since then, zero-knowledge proofs have been the subject of extensive research. People have developed zero-knowledge proofs with strong security guarantees, optimised the efficiency of zero-knowledge proofs for both general purpose and special purpose statements, and found numerous applications to other cryptosystems, such as electronic voting, group and ring signatures, verifiable computation, and cryptocurrencies.
+%
+%Zero-knowledge proofs can be categorised into several broad categories. The most important distinction is between interactive zero-knowledge proofs, in which the prover and verifier engage in an extended interaction, and non-interactive zero-knowledge proofs, in which the zero-knowledge proof consists of a single message sent from the prover to the verifier, which can then be checked. This thesis will be focussed on interactive zero-knowledge proofs.
+%
+%Interactive zero-knowledge proofs can be categorised according to the cryptographic assumptions that they use, and whether the techniques they use are more algebraic, or more combinatorial in nature. This thesis will be focussed on interactive zero-knowledge proofs which use primarily algebraic techniques. Such protocols often make use of homomorphic commitment schemes. The primary goal of this thesis is to demonstrate that one can separate the algebraic machinery used to design the protocols from the cryptographic assumptions and commitment schemes used to prove that the protocols are secure, and still exhibit highly efficient protocols which improve asymptotically on the prior state-of-the-art.
+%
+%Briefly convey all of the essential info in thesis
+%Present the objective, methods, results and conclusions
+%Contain key terms associated with thesis
+%Succinct and non-repetitive
+%No more than 500 words
+%Comes first, written last
+%Problem, main argument, aim, hypothesis, research question, objectives
+%Methods, special techniques
+%Results and key findings
+%Conclusions, key discussion points, new questions raised, directions for future research
+Zero-knowledge proofs are cryptographic protocols where a prover convinces a verifier that a statement is true, without revealing why it is true or leaking any of the prover's secret information. Since the introduction of zero-knowledge proofs, researchers have found numerous applications to other cryptographic schemes, such as electronic voting, group signatures, and verifiable computation. Zero-knowledge proofs have also become an integral part of blockchain-based cryptocurrencies.
+
+Thus, designing efficient zero-knowledge proofs is an important goal. Recently, the design space has become extremely large. To simplify protocol design, designers have begun to separate the process into modular steps. Information theoretic protocols are designed in idealised communication models and compiled into real protocols with cryptographic assumptions.
+
+In this thesis, we investigate the Ideal Linear Commitment model, which characterises interactive zero-knowledge protocols where the prover and verifier use homomorphic commitment schemes. We demonstrate the model's power by exhibiting efficient protocols for useful tasks including NP-Complete problems and other more specialised problems. We demonstrate the model's versatility by compiling the idealised protocols into real protocols under two completely different cryptographic assumptions; the discrete logarithm assumption, and the existence of collision-resistant hash functions.
+
+We show that the Ideal Linear Commitment model is a useful and effective abstraction for producing zero-knowledge protocols. Furthermore, by identifying the limitations of the model and finding protocols outside these constraints, we display special techniques which result in more efficient zero-knowledge proofs than ever.
+
+The results are novel and highly efficient protocols. Results include the first ever discrete-logarithm argument for general statements with logarithmic communication cost, the first ever three-move discrete-logarithm argument for arithmetic circuit satisfiability with sub-linear communication costs, and an argument for list membership with sub-logarithmic communication, less than the number of bits required to specify a list index. Every single one of our protocols improves the theoretical state-of-the-art.
+\end{abstract}
+
+\newpage
+
+\section*{Impact Statement}
+
+%The statement should describe, in no more than 500 words, how the expertise, knowledge, analysis, discovery or insight presented in your thesis could be put to a beneficial use.  Consider benefits both inside and outside academia and the ways in which these benefits could be brought about.
+%The benefits inside academia could be to the discipline and future scholarship, research methods  or methodology, the curriculum; they might be within your research area and potentially within other research areas.  
+%The benefits outside academia could occur to commercial activity, social enterprise, professional practice, clinical use, public health, public policy design, public service delivery, laws, public discourse, culture, the quality of the environment or quality of life. The impact could occur locally, regionally, nationally or internationally, to individuals, communities or organisations and could be immediate or occur incrementally, in the context of a broader field of research, over many years, decades or longer. Impact could be brought about through disseminating outputs (either in scholarly journals or elsewhere such as specialist or mainstream media), education, public engagement, translational research, commercial and social enterprise activity, engaging with public policy makers and public service delivery practitioners, influencing ministers, collaborating with academics and non-academics etc.  
+
+This thesis demonstrates how real cryptographic protocols for a variety of tasks can be designed using a special communication model. It shows that one can separate the algebraic machinery used to design the protocols from the cryptographic assumptions and commitment schemes used to prove that the protocols are secure, and still exhibit highly efficient protocols which improve asymptotically on the prior state-of-the-art. This is likely to benefit the discipline considerably as it lowers the barriers to understanding and producing secure protocols of this type. Cryptographic assumptions can be quite specialised, and it can be difficult to understand the mathematics behind them. Having a framework within which one can prove idealised protocols secure and knowing that the result can be made into a real protocol drastically simplifies the task of protocol designers. Several subtle changes to the Ideal Linear Commitment model were also introduced to make it more realistic and effective.
+
+Furthermore, by showing that certain proofs all fit into a framework, it becomes easier to understand their limitations. Linear algebra is an important part of security proofs in the Ideal Linear Commitment model. Therefore, in future, zero-knowledge protocols can be analysed through the lens of linear algebra. Linear algebra is very well studied, and powerful techniques from this discipline may lead to strong results about zero-knowledge protocols, such as lower bounds on the communication complexity of certain types of interactive zero-knowledge protocol.
+
+The protocols presented in this work led to the creation of the zero-knowledge argument Bulletproofs \cite{BunzBBPWM18}. Bulletproofs has been implemented by cryptocurrencies including Monero and PIVX. PIVX plans to bring Bulletproofs implementations into common use later in 2018. Following a first successful code audit, Bulletproofs is also set to enter widespread use on Monero's blockchain later in 2018, subject to further successful audits. As a result, the author's work will soon have a sizeable impact on the efficiency of payment systems in the real world, which at the time of writing, amount to a market capitalisation value of roughly two billion dollars and a daily trade volume of roughly thirty four million dollars \footnotemark[1]. The addition of Bulletproofs will lead to much smaller amounts of proof data being stored on the blockchains for these cryptocurrencies, which means better performance and functionality. This may have a measurable impact on cryptocurrency adoption and pricing.
+
+Zero-knowledge proofs are becoming better and better known, not only among research scientists, but increasingly among companies and technology enthusiasts. There are also ongoing standardisation efforts. The implementation of cryptographic protocols is a notoriously difficult task even for experts, and errors can have disastrous consequences. Making protocols easier to design and understand will be of great benefit to interested, non-expert parties who might try to use protocols in the future, promote their usage among wider user communities, or implement them in software or hardware.
+
+\footnotetext[1]{Data taken from \texttt{coinmarketcap.com}, on the 17th of September 2018.}
+
+\begin{acknowledgements}
+During the four years of study which led to this thesis, I have been incredibly lucky to have the chance to interact with not only my colleagues from the information security group at UCL, but researchers from NTT Secure Platform Laboratory, Universit\'{e} Rennes 1, Microsoft Research Redmond, and IBM Research Zurich. Our discussions always served to open my mind and help me consider things in new ways.
+
+Thanks to my coauthors, collaborators and friends Pyrros Chaidos, Christophe Petit, Essam Ghadafi, Mohammed Hajiabadi, Sune Jakobsen, Mary Maller, Mehdi Tibouchi, Keita Xagawa, Benedikt Bunz, Dan Boneh, Andrew Poelstra, Pieter Wuille, Greg Maxwell, Carsten Baum, Vadim Lyubashevsky, Rafael del Pino, Claire Delaplace, Thomas Espitau and Pierre-Alain Fouque.
+
+Thanks to my supervisor Jens Groth who was a great mentor and provided me with a better model for how to be an academic researcher than I could ever have hoped for. Thanks to Andrea Cerulli who was always willing to help and discuss things, probably at the expense of his own work. Thanks to Vasilios Mavroudis and David Kohan Marzgao for providing wonderful distractions in the form of exciting mathematical puzzles. Thanks to my mother, whose motivation when I was a child made all of this possible.
+\end{acknowledgements}
+
+\setcounter{tocdepth}{2} 
+% Setting this higher means you get contents entries for
+%  more minor section headers.
+
+\tableofcontents
+\listoffigures
+\listoftables
+

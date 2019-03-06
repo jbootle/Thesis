@@ -3,6 +3,9 @@
 \label{chapterlabel:AlgIntProofs}
 
 \section{Variant of the Schwarz-Zippel Lemma}
+
+A Laurent polynomial is a polynomial which also has terms with negative powers in some variable. For example, a Laurent polynomial in one formal variable $X$ with coefficients in the field $\F$ is an expression of the form $\sum_{i \in I} a_i X^i$ where $I$ is a finite set of integers (some of which may be negative) and $a_i$ is an element of $\F$ for each $i \in I$.
+
 \begin{lemma}
 \label{lem:szvariant}
 Let $\F$ be a field. Let $P$ be a function of the following form, where $Q(X)$ is a Laurent polynomial of total degree at most $d$ and $R_j(X)$ are \emph{arbitrary functions} and not necessarily polynomials.
@@ -11,7 +14,7 @@ P(X,Y) = Q(X) + \sum_{j=-d', j \neq 0}^{d'} R_{j}(X) \ Y^{j}
 \]
 Let $S$ be a finite subset of $\F^\times$. Let $x,$ and $y$ be selected at random independently and uniformly from $S$. Let $\eventsz$ be the event that either $Q(X)$ is not the zero polynomial or one of the values of $R_j(x)$ is not zero. Then
 \[
-\Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \right] \leq \frac{d+2d'+1)}{|S|}
+\Pr \left[ \lbrace P(x,y) = 0 \rbrace \wedge \eventsz \right] \leq \frac{(d+2d'+1)}{|S|}
 \]
 \end{lemma}
 \paragraph{Remark} This lemma can be extensively generalised to functions with more variables, and used to prove the security of \ILC~ protocols with a larger number of random challenges. See in particular \cite{BootleCGGHJ17}.

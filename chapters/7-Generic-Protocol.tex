@@ -322,7 +322,7 @@ In the case where the protocol is later instantiated using an elliptic curve gro
 
 \subsection{Computation} 
 Over $\F$, the prover must perform$$O( (\ell_a+\ell_b+\ell_P) td_P \log md_P +(\ell_a+\ell_b+\ell_Q) td_Q \log md_Q ) + td_P \mathsf{Eval}_P+td_Q \mathsf{Eval}_Q$$ multiplications. Here, $\mathsf{Eval}_P$ is the cost of evaluating $P$ once, and similarly for $Q$. The vectors of polynomials $\vec{P}^*(X),\vec{Q}^*(X)$ are computed using FFT techniques.
-Over $\F$, the verifier must perform $O( (\ell_P+\ell_Q)n ) +  n\mathsf{Eval}_P+n \mathsf{Eval}_Q$ multiplications. To compute the verifier's queries, the \ILC~ uses $\ell_P d_P mn + \ell_Q d_Q mn$ multiplications to compute the verifier's polynomial commitment queries, and $mn(\ell_a+\ell_b)$ multiplications to compute the verifier's other \ILC\ queries.
+Over $\F$, the verifier must perform $O( (\ell_P+\ell_Q)n +  n\mathsf{Eval}_P+n \mathsf{Eval}_Q)$ multiplications. To compute the verifier's queries, the \ILC~ uses $\ell_P d_P mn + \ell_Q d_Q mn$ multiplications to compute the verifier's polynomial commitment queries, and $mn(\ell_a+\ell_b)$ multiplications to compute the verifier's other \ILC\ queries.
 
 \subsection{Applications}
 

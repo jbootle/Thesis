@@ -8,7 +8,7 @@ We define cryptographic assumptions relative to instance generators $\instancege
 
 \section{The Discrete Logarithm Assumption}
 
-The discrete logarithm assumption is a computational hardness assumption in any group $\G$. Given two group elements $g$ and $h$ in $\G$, the discrete logarithm problem is to compute an integer $k$ such that $g^k = h$ in $\G$.
+The discrete logarithm assumption is a computational hardness assumption relative to a given group $\G$. Given two group elements $g$ and $h$ in $\G$, the discrete logarithm problem is to compute an integer $k$ such that $g^k = h$ in $\G$.
 
 The discrete logarithm problem has been extensively studied. It forms the basis for cryptosystems and commitments, such as the ElGamal encryption scheme and the Pedersen commitment scheme. Researchers have also devised algorithms to solve the discrete logarithm problem, some of which work for any group, and some of which work for particular choices of group.
 
@@ -69,7 +69,7 @@ $$ \Pr \left[ s \gets \instancegen(1^\sep) : \adversary(s) = (x,x'), \ x,x'\in \
 
 Let $T_{m,n}$ be the space of $m \times n$ Toeplitz matrices over $\Z_2$. This is the collection of matrices such that for each top-left to bottom-right diagonal, every element in the diagonal is equal. Note that $A$ can be described using $m+n-1$ bits.
 
-Figure \label{alg:com:hash} gives a commitment scheme with message space $\{0,1\}^\HashInLen$, randomness space $\{0,1\}^{O(\HashOutLen)}$ and commitment space $\{0,1\}^{O(\HashOutLen)}$.
+Figure \ref{alg:com:hash} gives a commitment scheme with message space $\{0,1\}^\HashInLen$, randomness space $\{0,1\}^{O(\HashOutLen)}$ and commitment space $\{0,1\}^{O(\HashOutLen)}$.
 
 \begin{figure}[t]
   \caption{Hash-Based Commitment}

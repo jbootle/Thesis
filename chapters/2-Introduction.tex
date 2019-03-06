@@ -16,7 +16,7 @@ Zero-knowledge proofs satisfy three basic requirements.
 
 \paragraph{Completeness.} When the statement is true, the prover always succeeds in convincing the verifier. In other words, when $u \in \LL$, and the prover has a valid witness $w$, the verifier will always accept at the end of the protocol. Completeness can be viewed as more of a functionality requirement than a security requirement, and this property guarantees that the protocol works properly when the prover and verifier are honest.
 
-\paragraph{Soundness.} When the statement is false, or the prover does not know a valid witness, the prover can never convince the verifier, and the verifier will always reject the proof. Viewed another way, if the verifier accepted the proof, then $u \in \LL$, and the prover has a valid witness $w$. Soundness can be seen as a converse to completeness. It is a security requirement which protects the verifier from being fooled into accepting by a malicious prover. As such, it can be seen as a property of the verification algorithm.
+\paragraph{Soundness.} When the statement is false, or the prover does not know a valid witness, the prover can practically never convince the verifier, and the verifier will almost always reject the proof. Viewed another way, if the verifier accepted the proof, then $u \in \LL$, and the prover has a valid witness $w$. Soundness can be seen as a converse to completeness. It is a security requirement which protects the verifier from being fooled into accepting by a malicious prover. As such, it can be seen as a property of the verification algorithm.
 
 \paragraph{Zero-Knowledge.} Despite taking part in the protocol with the prover, the verifier can never learn anything from the interaction except that the statement is true. This is modelled by showing that the entire interaction between the prover and the verifier can be simulated without any knowledge of the witness. If convincing-looking proofs can be simulated without any secret information, then it follows that nothing secret can be learned from real proofs. Zero-knowledge is a security requirement which protects the prover against a malicious verifier who is trying to learn the prover's secrets. As such, it can be seen as a property of the proving algorithm.
 
@@ -52,7 +52,7 @@ In their security proofs, the protocols all seem to use the same techniques, bas
 
 One can ask whether it is possible to find the techniques common to all interactive zero-knowledge protocols based on the discrete logarithm assumption, and place them into a single framework. This would drastically simplify the tasks of designing protocols, and proving mathematically that they are secure. Having fully understood or implemented one protocol of this type, it would be much easier to understand or implement any other. In this thesis, we will explore the question of whether there is an information-theoretic framework which provides a good abstraction for discrete-logarithm based interactive zero-knowledge protocols.
 
-Still, however easy it is to understand protocols from a simple framework, the framework is useless unless it can be used to create efficient protocols for a wide range of tasks. Thus, we can extend our question in several directions, and propose the following hypothesis for investigation.
+However, the framework is useless unless it can be used to create efficient protocols for a wide range of tasks. Thus, we can extend our question in several directions, and propose the following hypothesis for investigation.
 
 There is an information-theoretic framework which provides a good abstraction for discrete-logarithm based interactive zero-knowledge protocols, and further;
 \begin{enumerate}
@@ -381,7 +381,6 @@ In this work, the authors give zero-knowledge arguments for arithmetic circuit s
 \item \cite{BootleCGGHJ17}, which defines the Ideal Linear Commitment model, and gives linear-time zero-knowledge protocols for arithmetic circuit satisfiability based on hash-functions and error-correcting codes. From this paper, we use the \ILC\ model and compilation of \ILC\ protocols into real protocols using hashes and error-correcting codes.
 \item \cite{BaumBCPGL18}, which contains a square-root communication argument for arithmetic circuit satisfiability based on the Short Integer Solution problem. From this paper, we use the soundness-boosting techniques over finite field extensions.
 \end{enumerate}
-
 We also include the following pieces of unpublished work.
 \begin{enumerate}
 \item A novel argument for arithmetic circuit satisfiability with three moves and a sub-linear communication complexity, which highlights issues with the \ILC\ model as given in previous work.

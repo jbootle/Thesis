@@ -42,7 +42,7 @@ Commitment schemes satisfy two basic requirements.
 
 \paragraph{Binding.} Once an envelope is sealed, it is not possible to change the message inside without breaking open the envelope. Given a commitment $c$ to a message $m$, it should be impossible to open $c$ to a different message.
 
-The protocols all use homomorphic commitments, where one can add two commitments together to obtain a commitment to the sum of the messages.
+The protocols all use homomorphic commitments, where one can combine two commitments together to obtain a commitment to the sum of the messages.
 
 These protocols also follow a similar pattern of interaction between the prover and the verifier. The prover sends an initial message $a_1$ to the verifier. The verifier responds with a random challenge value $e_1$. The prover sends another message $a_2$ to the verifier, who responds with another random challenge $e_2$. This process continues for $n$ rounds, until messages $a_n$ and $e_n$ have been exchanged. The prover sends a final message $a_{n+1}$ to the verifier, and then the verifier decides whether to accept or reject.
 

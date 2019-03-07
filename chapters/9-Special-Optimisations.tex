@@ -243,7 +243,7 @@ The degree of $f$ is $2\extdeg$, so if we choose the basis
 \[\mathcal{B} = \{ l_1(\phi),\ldots,l_\extdeg(\phi),l_0(\phi),\phi l_0(\phi),\ldots,\phi^{\extdeg-1} l_0(\phi)\]
 for $GF(\ACprime^{2\extdeg}) \}$ we can perform multiplications of extension field elements without any overflow modulo $f$ interfering with the individual product relations $a_i b_i = c_i$ in $\Z_\ACprime$. We can therefore port he above equality into $GF(\ACprime^{2\extdeg})$ as the equality $\left( \sum_{j=1}^\extdeg a_j l_j(\phi) \right) \cdot \left( \sum_{j=1}^\extdeg b_j l_j(\phi) \right) = \left( \sum_{j=1}^\extdeg c_j l_j(\phi) \right) + l_0(\phi) \sum_{j=0}^{\extdeg-2} c'_j \phi^j$.
 
-This allows one multiplication of committed values to be performed without any overflow modulo $f$. As we shall see in the next subsection, this is sufficient for verifying multiplication triples for arithmetic circuit satisfiability.
+This allows one multiplication of committed values to be performed without any overflow modulo $f$. As we shall see, this is sufficient for verifying multiplication triples for arithmetic circuit satisfiability.
 
 We also need to be able to view single commitments to elements of $\Z_\ACprime$ as elements of the extension field in a way that helps to verify linear consistency relations between the elements.
 

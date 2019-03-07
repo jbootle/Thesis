@@ -321,7 +321,7 @@ In the case where the protocol is later instantiated using an elliptic curve gro
 \paragraph{Batch Proof Case} When $t$ is large, we choose parameters so that the communication costs in compiled proofs are proportional to $\sqrt{t}$ rather than $t$. Set $k_2 =\left\lceil \sqrt{\frac{d_P m}{\ell_P n}} ~\right\rceil$, $k_1 \approx \frac{d_P m}{k_2}$. Set $t_2 =\left\lceil \sqrt{\frac{d_Q m}{\ell_Q n}} ~\right\rceil$, $t_1 \approx \frac{d_Q m}{t_2}$. Finally, set $m \approx \sqrt{\ell_a t}, n \approx \frac{t}{m}$. Then the protocol requires the prover to send roughly $\sqrt{\ell_a t} + \sqrt{d_P \ell_P t} + \sqrt{d_Q \ell_Q t}$ vectors to \ILC. The verifier's queries amount to a total of $\sqrt{\ell_a t} + \sqrt{d_P \ell_P t} + \sqrt{d_Q \ell_Q t}$ field elements.
 
 \subsection{Computation} 
-Over $\F$, the prover must perform$$O( (\ell_a+\ell_b+\ell_P) td_P \log md_P +(\ell_a+\ell_b+\ell_Q) td_Q \log md_Q ) + td_P \mathsf{Eval}_P+td_Q \mathsf{Eval}_Q$$ multiplications. Here, $\mathsf{Eval}_P$ is the cost of evaluating $P$ once, and similarly for $Q$. The vectors of polynomials $\vec{P}^*(X),\vec{Q}^*(X)$ are computed using FFT techniques.
+Over $\F$, the prover must perform$$O( (\ell_a+\ell_b+\ell_P) td_P \log md_P +(\ell_a+\ell_b+\ell_Q) td_Q \log md_Q + td_P \mathsf{Eval}_P+td_Q \mathsf{Eval}_Q)$$ multiplications. Here, $\mathsf{Eval}_P$ is the cost of evaluating $P$ once, and similarly for $Q$. The vectors of polynomials $\vec{P}^*(X),\vec{Q}^*(X)$ are computed using FFT techniques.
 Over $\F$, the verifier must perform $O( (\ell_P+\ell_Q)n +  n\mathsf{Eval}_P+n \mathsf{Eval}_Q)$ multiplications. To compute the verifier's queries, the \ILC~ uses $\ell_P d_P mn + \ell_Q d_Q mn$ multiplications to compute the verifier's polynomial commitment queries, and $mn(\ell_a+\ell_b)$ multiplications to compute the verifier's other \ILC\ queries.
 
 \subsection{Applications}
@@ -359,7 +359,7 @@ An alternative construction was given in \cite{BootleCCGGP15} that optimises the
 \end{itemize}
 \end{description}
 
-When $t=1$ and we are aiming for a constant number of commitments, the simple binary version of the argument gives the lowest communication costs. Otherwise, in the cases where $t$ is large, or where $t=1$ and we aim to minimise the total number of elements communicated in the compiled proof, setting $n=3$ gives the lowest communication costs. The protocol efficiency is reported in Table~\ref{taEfficiency}.
+When $t=1$ and we are aiming for a constant number of commitments, the simple binary version of the argument gives the lowest communication costs. Otherwise, in the cases where $t$ is large, or where $t=1$ and we aim to minimise the total number of elements communicated in the compiled proof, setting $n=3$ gives the lowest communication costs. The protocol efficiency is reported in Table~\ref{taEfficiency8}.
 
 \subsubsection{Polynomial Evaluation Argument}\label{app:poly}
 In a polynomial evaluation argument~\cite{FO97,BDD07}, we have a polynomial of degree $N$ and commitments to a point and its purported evaluation in that point. The prover wants to convince the verifier that the committed evaluation of the polynomial is correct. 
@@ -392,7 +392,7 @@ With alternative choices of the matrices $\vec{P},\vec{Q}$, we can improve the c
 \end{itemize}
 \end{description}
 
-When $t=1$ and we are aiming for a constant number of commitments, setting $n=4$ gives the lowest communication costs. When $t=1$ and we aim to minimise the total number of elements communicated in the compiled proof, we set $n = \frac{\log_2N}{\log_2 \log_2 N}$. Otherwise, in the cases where $t$ is large, setting $n=6$ gives the lowest communication costs. The protocol efficiency is reported in Table~\ref{taEfficiency}. 
+When $t=1$ and we are aiming for a constant number of commitments, setting $n=4$ gives the lowest communication costs. When $t=1$ and we aim to minimise the total number of elements communicated in the compiled proof, we set $n = \frac{\log_2N}{\log_2 \log_2 N}$. Otherwise, in the cases where $t$ is large, setting $n=6$ gives the lowest communication costs. The protocol efficiency is reported in Table~\ref{taEfficiency9}. 
 
 We would like to highlight the results when $t=1$ and $n = \frac{\log_2N}{\log_2 \log_2 N}$. In this case, the total communication complexity of the polynomial evaluation protocol is $O\left(\frac{\log N}{\log \log N}\right)$ commitments and field elements in the discrete logarithm settting. In particular, this protocol has the best asymptotic efficiency for polynomial evaluation in zero-knowledge based on the discrete-logarithm assumption. If we use the polynomial to specify a set through its roots, then argument gives a membership argument where the communication costs are asymptotically less than $\log N$, the number of bits required to specify an element of the set. The best known arguments for general arithmetic circuits \cite{BootleCCGP16,BunzBBPWM18} achieve a logarithmic communication complexity, as the number of multiplication gates required to compute a polynomial of degree $N$ is $N$. This protocol also uses commitments to vectors of length $O(\log N)$ rather than $O(N)$ which translates to dramatically fewer cryptographic operations.
 
@@ -417,7 +417,7 @@ In range proofs~\cite{Bou02,Lip03}, we have a commitment and a range $[A;B]$. Th
 \end{itemize}
 \end{description}
 
-With an alternative choice of $\vec{P},\vec{Q}$, following \cite{Chaabouni2010}, it is possible to improve the communication costs of the argument by using an $n$-ary base. This gives rise to the efficiencies listed in Table~\ref{taEfficiency}.
+With an alternative choice of $\vec{P},\vec{Q}$, following \cite{Chaabouni2010}, it is possible to improve the communication costs of the argument by using an $n$-ary base. This gives rise to the efficiencies listed in Table~\ref{taEfficiency9}.
 \begin{description}
 \item[ Polynomial Encoding: ] Let $N=n^m-1$. Let $a_0,\ldots,a_{m-1}$ be the $n$-ary representation of $a$, so that $\prod_{k=0}^{n-1} (a_i - k) = 0$ for $0 \leq i \leq m-1$. Then $a = \sum_{i=0}^{m-1} a_i n^i$.
 \item[ Parameter Choice: ] \ 
@@ -430,7 +430,7 @@ With an alternative choice of $\vec{P},\vec{Q}$, following \cite{Chaabouni2010},
 \end{itemize}
 \end{description}
 
-When $t=1$ and we are aiming for a constant number of commitments, setting $n=4$ gives the lowest communication costs. When $t=1$ and we aim to minimise the total number of elements communicated in the compiled proof, we set $n = \frac{\log_2N}{\log_2 \log_2 N}$. Otherwise, in the cases where $t$ is large, setting $n=6$ gives the lowest communication costs. The protocol efficiency is reported in Table~\ref{taEfficiency}.
+When $t=1$ and we are aiming for a constant number of commitments, setting $n=4$ gives the lowest communication costs. When $t=1$ and we aim to minimise the total number of elements communicated in the compiled proof, we set $n = \frac{\log_2N}{\log_2 \log_2 N}$. Otherwise, in the cases where $t$ is large, setting $n=6$ gives the lowest communication costs. The protocol efficiency is reported in Table~\ref{taEfficiency9}.
 
 \section{3-Move Square-Root Protocol} \label{subsec:3rndsqrt}
 

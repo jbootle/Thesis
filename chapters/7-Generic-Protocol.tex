@@ -178,7 +178,7 @@ The basis for the protocol in this section was originally published in joint wor
 
 We present an \ILC\ protocol that allows the prover to prove knowledge of values which satisfy a polynomial relation of low-degree. This type of relation is useful when giving zero-knowledge membership and non-membership proofs, such as the membership proof in \cite{GrothK15}, its subsequent optimisation in \cite{BootleCCGGP15}, and the polynomial evaluation proof of \cite{BayerG13}. This protocol is the same as the main protocol given in \cite{BootleG18}, but is rewritten slightly as an $\ILC~$ protocol.
 
-Let $\lbrace \vec{b}_{i,j} \rbrace_{i\in[m],j\in[n]}$ be some public vectors. We assume that the prover has already committed to $C$ which we will write with square brackets in the instance $[C]$. We give a proof of knowledge of values $\lbrace \vec{a}_{i,j} \rbrace_{i\in[m],j\in[n]}$, such that $\vec{P}(\vec{a}_{i,j},\vec{b}_{i,j})=\vec{0}$ for $i \in [m], j \in [n]$, and such that
+The idea is to prove that the prover knows solutions to polynomial relations encoding various statements, but allow the statements to be tweaked through an extra input to the polynomial. Let $\lbrace \vec{b}_{i,j} \rbrace_{i\in[m],j\in[n]}$ be some public vectors, representing the extra inputs or `tweaks'. Let $\vec{P}$ and $\vec{Q}$ be vectors of polynomials which take two inputs, $\lbrace \vec{a}_{i,j}, \vec{b}_{i,j} \rbrace_{i\in[m],j\in[n]}$. We assume that the prover has already committed to $C$ which we will write with square brackets in the instance $[C]$. We give a proof of knowledge of values $\lbrace \vec{a}_{i,j} \rbrace_{i\in[m],j\in[n]}$, such that $\vec{P}(\vec{a}_{i,j},\vec{b}_{i,j})=\vec{0}$ for $i \in [m], j \in [n]$, and such that
 $$C = \left(\begin{array}{lll}
 \vec{Q}(\vec{a}_{1,1},\vec{b}_{1,1}),&\vec{Q}(\vec{a}_{1,2},\vec{b}_{1,2}),& \ldots,\vec{Q}(\vec{a}_{1,n},\vec{b}_{1,n}) \\
 \vec{Q}(\vec{a}_{2,1},\vec{b}_{2,1}),&\vec{Q}(\vec{a}_{2,2},\vec{b}_{2,2}),& \ldots,\vec{Q}(\vec{a}_{2,n},\vec{b}_{2,n}) \\
@@ -203,13 +203,13 @@ C = \left(\begin{array}{lll}
 \subsection{Intuition behind Protocol}
 The protocol embeds multiple instances of the same polynomial equality into a single polynomial by using Lagrange interpolation polynomials, inspired by \cite{Gennaro2013,Bayer2014}. To recover a single instance, simply evaluate the polynomial in one of the interpolation points.
 
-More concretely, let $z_1,\ldots,z_m$ be distinct points in $\F$, and let $l_1(X),\ldots,l_m(X)$ be their associated Lagrange polynomials such that $l_i(z_j)=\delta_{i,j}$. Let $l_0(X) = \prod_{i=1}^m (X-z_i)$. The prover commits to the following vectors.
+More concretely, the prover commits to the following vectors.
 $$\begin{array}{llllll}
-(\vec{a}_{0,1}||&\vec{a}_{0,2}||&\ldots||&\vec{a}_{0,n}&) \\
-(\vec{a}_{1,1}||&\vec{a}_{1,2}||&\ldots||&\vec{a}_{1,n}&) \\
-(\vec{a}_{2,1}||&\vec{a}_{2,2}||&\ldots||&\vec{a}_{2,n}&) \\
+(\vec{a}_{0,1}||&\vec{a}_{0,2}||&\ldots||&\vec{a}_{0,n}) \\
+(\vec{a}_{1,1}||&\vec{a}_{1,2}||&\ldots||&\vec{a}_{1,n}) \\
+(\vec{a}_{2,1}||&\vec{a}_{2,2}||&\ldots||&\vec{a}_{2,n}) \\
 \;\vdots \\
-(\vec{a}_{m,1}||&\vec{a}_{m,2}||&\ldots||&\vec{a}_{m,n}&) \\
+(\vec{a}_{m,1}||&\vec{a}_{m,2}||&\ldots||&\vec{a}_{m,n}) \\
 \end{array}$$
 Here, the values $\vec{a}_{0,1},\ldots,\vec{a}_{0,n} \in \mathbb{Z}_p^{l_a}$, where the value of the first index is $0$, are blinding values chosen uniformly at random. These are completely unrelated to the values of the witness, which are $\vec{a}_{1,1},\ldots,\vec{a}_{m,n}$, where the first index has a value strictly greater than $0$. The verifier chooses a random challenge $x$ and queries the \ILC~ to obtain $(\bar{\vec{a}}_1,\ldots,\bar{\vec{a}}_n) = \sum_{i=0}^m (\vec{a}_{i,1},\ldots,\vec{a}_{i,n}) l_i(x)$.
 
@@ -260,7 +260,7 @@ The protocol has perfect completeness, knowledge-soundness, and perfect special 
 \end{lemma}
 
 \begin{proof}
-Perfect completeness of the protocol follows by perfect completeness of the PolyCommit sub-protocol, and by careful inspection.
+Perfect completeness of the protocol follows by perfect completeness of the PolyCommit sub-protocol, which was used to commit to $\left( \vec{P}_1^*(X)||\ldots||\vec{P}_n^*(X)\right)$ and $\left( \vec{Q}_1^*(X)||\ldots||\vec{Q}_n^*(X)\right)$, and by careful inspection.
 
 For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator selects $\bar{\vec{a}}_j \gets \F^{\ell_a}$ and $\bar{\vec{q}}_j\gets \F^{\ell_Q}$ for each j. All these values are distributed exactly as in a real protocol, where they are also uniformly random. She then simulates the view of the verifier when running $\verifier_\mathrm{PC}(x,id=1)$ and $\verifier_\mathrm{PC}(x,id=2)$ using the evaluation point $x$ and evaluations $\bar{\vec{p}}$ and $\bar{\vec{q}}$, which are determined by the values already simulated. By the perfect SHVZK of the polynomial commitment scheme, the simulated values have identical distribution to the real proofs.
 
@@ -303,7 +303,7 @@ The verifier sees the following queries as part of the protocol.
 (\bar{\vec{a}}_1||\ldots||\bar{\vec{a}}_n) &= \sum_{i=0}^m ( \vec{a}_{i,1}||\ldots||\vec{a}_{i,n}) {l_i(x)} \\
 (\bar{\vec{c}}_1||\ldots||\bar{\vec{c}}_n) &= \sum_{i=0}^m ( \vec{c}_{i,1}||\ldots||\vec{c}_{i,n}) {l_i(x)}
 \end{align*}
-These all correspond to cases of Lemma \ref{lem:linextract}. Therefore, given the verifier's view for sufficiently many distinct values of $x$, one can recover the committed polynomial using a linear map. \qed
+These both correspond to case 2 of Lemma \ref{lem:linextract}. Therefore, given the verifier's view for sufficiently many distinct values of $x$, one can recover the committed polynomial using a linear map. \qed
 \end{proof}
 
 \begin{lemma}
@@ -493,7 +493,7 @@ Since all of the coefficients are public, the verifier can compute $\vec{w}_q(x)
 
 This protocol was the main motivation for introducing the \ILCcheck\ command to the \ILC\ model. If this command had not been introduced, then the verifier might have made a \ILCopen\ query for $(K_1,\ldots,K_Q) + \sum_{j\neq 0, j=-3m}^{3m} \vec{h}_j {x^j}$. Following the compilation in \cite{BootleCGGHJ17}, this would have resulted in the prover sending a vector of length $Q$ to the verifier. In general, $Q$ could be as large as $N$, the number of multiplication gates in the arithmetic circuit. However, it is unnecessary for the prover to send this value to the verifier, as in a real proof, the verifier can compute $( \vec{\bar{e}}\cdot \vec{w}_1(x),\ldots, \vec{\bar{e}}\cdot \vec{w}_Q(x) )$ and check this value against succinct commitments to the $\vec{h}_j$.
 
-\begin{description}
+\begin{description}\label{prot:3ac}
 \item[Common input:] Setup information $\crs_\ILC = (\F,n,Q,(z_1,\ldots,z_m))$. The description of an arithmetic circuit $u = \left( \{\vec{w}_{q,{a,i}},\vec{w}_{q,{b,i}},\vec{w}_{q,{c,i}}\}_{q \in [Q], i \in [m]}, \{K_{q}\}_{q \in [Q]}\right)$.
 \item[Prover's witness:] Satisfying assignments $\wit = \{\vec{a}_i,\vec{b}_i,\vec{c}_i\}_{i \in m}$ to the wires of the circuit.
 \item[Protocol:]
@@ -535,7 +535,7 @@ The verifier performs the following checks, using one \ILCcheck\ query for each.
 \end{description}
 
 \begin{thm}
-The argument for satisfiability of an arithmetic circuit has perfect completeness, knowledge-soundness and special honest verifier zero-knowledge.
+The argument of subsection \ref{prot:3ac} for satisfiability of an arithmetic circuit has perfect completeness, knowledge-soundness and special honest verifier zero-knowledge.
 \end{thm}
 
 \begin{proof} Perfect completeness follows by careful inspection.
@@ -548,7 +548,7 @@ Recall that the verifier makes \ILCopen \ queries in order to obtain the followi
 \bar{\vec{a}} = \sum_{i=0}^m \vec{a}_{i} l_i(x) &&
 \bar{\vec{b}} = \sum_{i=0}^m \vec{b}_{i} l_i(x)
 \end{align*}
-Now, substitute these expressions into the expression containing $\bar{\vec{a}}$ and $\dot{\vec{b}}$ that arises from the \ILCcheck\ query. This yields the following polynomial equation evaluated at $x$.
+Now, substitute these expressions into the expression containing $\bar{\vec{a}}$ and $\bar{\vec{b}}$ that arises from the \ILCcheck\ query. This yields the following polynomial equation evaluated at $x$.
 \begin{align}\label{eq:lagrangeprod}
 \left( \sum_{i=0}^m \vec{a}_i l_i(x) \right) \circ \left( \sum_{i=0}^m \vec{b}_i l_i(x) \right) - \sum_{i=0}^m \vec{c}_{i} l_i(x) - \sum_{i=0}^m \vec{\DDelta}_i l_0(x) = 0
 \end{align}
@@ -762,7 +762,7 @@ u = \left( \{\vec{w}_{q,{a,i}},\vec{w}_{q,{b,i}},\vec{w}_{q,{c,i}}\}_{q \in [Q],
 \]
 This relation has been modified slightly in comparison with the previous relation $\R_\text{AC1}$ used for the previous two arithmetic circuit protocols. The only changes are in the setup information. The previous protocols used Lagrange polynomials, so interpolation points $(z_1,\ldots,z_m)$ were included in the setup material. The previous protocols also required the prover to commit to vectors of lengths $n$ and $Q$, whereas this protocol only requires commitments to vectors of length $n$.
 
-\paragraph{Motivation} Although \ref{subsec:3rndsqrt} already presents a protocol for arithmetic circuit satisfiability, it does not seem to admit further optimisation techniques or improvements. However, the protocol in this section reduces checking arithmetic circuit satisfiability to a scalar product check on committed values. If one considers the scalar-product argument of Chapter \ref{chapterlabel:Special-Optimisations} as a special opening protocol for scalar products on Pedersen commitments, one can combine the two protocols to produce a protocol for arithmetic circuit satisfiability with logarithmic communication complexity, as in \cite{BootleCCGP16}, and later in \cite{BunzBBPWM18}.
+\paragraph{Motivation} Although \ref{subsec:3rndsqrt} already presents a protocol for arithmetic circuit satisfiability, it does not seem to admit further optimisation techniques or improvements. The protocol in this section reduces checking arithmetic circuit satisfiability to a scalar product check on committed values. If one considers the scalar-product argument of Chapter \ref{chapterlabel:Special-Optimisations} as a special opening protocol for scalar products on Pedersen commitments, one can combine the two protocols to produce a protocol for arithmetic circuit satisfiability with logarithmic communication complexity, as in \cite{BootleCCGP16}, and later in \cite{BunzBBPWM18}.
 
 \paragraph{Overview} The argument works by folding both the Hadamard matrix product and the linear constraints of Section \ref{sec:AC} into a single polynomial equation, where a Laurent polynomial has 0 as its constant term, and use an \ILC~ protocol to prove that this is the case. We can optionally integrate the inner product argument of Section~\ref{se:innerproduct} into the compiled proof to reduce communication. 
 %Next, we reduce this to a specific polynomial evaluating to 0. Next, we reduce the Hadamard product equation and the linear constraints to the Laurent polynomial evaluation problem considered in Section~\ref{sec:polcom}. Finally, we reduce the polynomial evaluation to an inner product relation. We then provide a formal description of our argument and analyse its security and efficiency.
@@ -860,7 +860,7 @@ The verifier computes $\vec{s}(x), \vec{r}'(x) $ and $K$, then checks if $v = \v
 The verifier accepts the argument if both checks are satisfied.
 %As described so far, the argument requires communicating $O(m)$ group elements and $O(n)$ field elements, so setting $m \approx n$ leads to square root communication. The argument improves on~\cite{Groth2009,Seo2011} by requiring only 5 moves without computational overhead and significantly reduces the computational complexity. However, breaking this ostensible square root communication barrier requires new ideas that we describe later.
 
-\subsection{Protocol Description}
+\subsection{Protocol Description}\label{prot:5ac}
 
 \begin{description}
 \item[Common input:] Setup information $\crs_\ILC = (\F,n)$. The description of an arithmetic circuit $u = \left( \{\vec{w}_{q,{a,i}},\vec{w}_{q,{b,i}},\vec{w}_{q,{c,i}}\}_{q \in [Q], i \in [m]}, \{K_{q}\}_{q \in [Q]}\right)$.
@@ -901,11 +901,10 @@ $$\vec{r}\cdot \vec{r}'-2K \vereq v$$
 
 \subsection{Security Analysis.}
 \begin{thm}\label{th:mainAC}
-The argument for satisfiability of an arithmetic circuit has perfect completeness, perfect special honest verifier zero-knowledge and statistical witness-extended emulation for extracting either a breach of the binding property of the commitment scheme or a witness for the satisfiability of the circuit.
+The argument of subsection \ref{prot:5ac} for satisfiability of an arithmetic circuit has perfect completeness, perfect special honest verifier zero-knowledge and statistical witness-extended emulation for extracting either a breach of the binding property of the commitment scheme or a witness for the satisfiability of the circuit.
 \end{thm}
 
-\subsection{Proof of Theorem~\ref{th:mainAC}}\label{ap:proofAC}
-\begin{proof}
+\begin{proof}\label{ap:proofAC}
 Perfect completeness follows by inspection and using the fact that the polynomial commitment protocol  and inner product argument also have perfect completeness.
 
 For perfect special honest verifier zero-knowledge we are given $y,x\in \F^*$, which allows us to compute $\vec{w}_{a,i},\vec{w}_{b,i},\vec{w}_{c,i}$ and $K$ from the circuit. The simulator picks $\vec{r}\gets \F^n$. To see that the simulated components have the same distribution as a real argument observe $\vec{r}$ is uniformly random.

@@ -12,7 +12,9 @@ $f(\sep) \approx 1$ and $f$ is \emph{negligible} if $f(\sep) \approx 0$.
 
 Write $y=A(x;r)$ when the algorithm $A$ outputs $y$ on input $x$ with randomness $r$. We write $y \gets A(x)$ to mean selecting $r$ at random and setting $y=A(x;r)$. We write $y \gets S$ for sampling $y$ uniformly at random from a set $S$. We define $[n]$ to be the set of integers $1,\ldots,n$.
 
-We use bold letters such as $\vec{v}$ for row vectors. For $\vec{v}\in \F^n$ and a set $J=\{j_1,\dots, j_k\}\subset [n]$ with $j_1<\dots<j_k$ we define the vector $\vec{v}|_J$ to be $(\vec{v}_{j_1},\dots, \vec{v}_{j_k})$. Similarly, for a matrix $V\in \F^{m\times n}$ we let $V|_{J}\in \F^{m\times k}$ be the submatrix of $V$ restricted to the columns indicated in $J$.
+We use $\F$ to denote a finite field. We use bold letters such as $\vec{v}$ for row vectors. For $\vec{v}\in \F^n$ and a set $J=\{j_1,\dots, j_k\}\subset [n]$ with $j_1<\dots<j_k$ we define the vector $\vec{v}|_J$ to be $(\vec{v}_{j_1},\dots, \vec{v}_{j_k})$. Similarly, for a matrix $V\in \F^{m\times n}$ we let $V|_{J}\in \F^{m\times k}$ be the submatrix of $V$ restricted to the columns indicated in $J$.
+
+Let $z_1,\ldots,z_m$ be distinct points in a finite field $\F$. and let $l_1(X),\ldots,l_m(X)$ be their associated Lagrange polynomials. Explicitly, $$l_i(X) = \prod_{j \neq i} \frac{X-z_j}{z_i - z_j}$$ Note that $l_i(z_j)=\delta_{i,j}$, so it is easy to see how to combine the Lagrange polynomials to produce a polynomial which interpolates a given function at $z_1, \ldots, z_m$. Let $l_0(X) = \prod_{i=1}^m (X-z_i)$. 
 
 \section{Zero-Knowledge Proofs}
 \label{shvzkdef}

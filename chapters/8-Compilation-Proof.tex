@@ -60,7 +60,7 @@ given matrices $V_1,\dots, V_\mu$, $R_1,\ldots,R_\mu$ and $E_1,\ldots,E_\mu$ we 
 The matrices $V_1,\ldots,V_\mu$ are formed by the row vectors $\PoILC$ commits to, and we let $t_1,\ldots,t_\mu$ be the numbers of vectors in each round, i.e., for all $\roundnum$ we have $V_\roundnum\in \F^{t_\roundnum \times \sizevect}$.  
 
 We say that a set $J\subset [2n]$ is \emph{allowed} if $|J\cap [n]|=\chals$ and $|J\setminus [n]|=\chals$ and there is no $j\in J$ such that $j+n\in J$. In the following we will always assume codewords have length $n\geq 2\sep$.
-We use $\ECC(V;R)$ to denote the function that applies $\ECC$ \emph{row-wise}.
+We use $\ECC(V;R)$ to denote the function that applies $\ECC$ \emph{row-wise} to $V$ and $R$.
 In the protocol for $\V$, we are using that $\ECC(\vec{v};\vec{r})|_J$ can be computed from just $\vec{v}$ and $\vec{r}|_{\{j\in [n]:j\in J \vee j+n\in J\}}$. We use $\ComCommit(E;\vec{s})$ to denote the function that applies $\ComCommit$ \emph{column-wise} on $E$ and returns a vector $\vec{c}$ of $2n$ commitments. 
 We group all $\VILC$'s queries in two matrices $\Chal \in \F^{\qc\times \totalnumvec}$ and $\Chal' \in \F^{\qc' \times \totalnumvec}$, where $\totalnumvec$ is the total number of vectors committed to by $\Po$, $\qc$ is the \ILCopen\ query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}$ that $\VILC$ requests to be opened, and $\qc'$ is the \ILCcheck query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}'$ that $\VILC$ requests to be checked.
 

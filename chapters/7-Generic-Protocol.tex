@@ -18,6 +18,8 @@ As discussed earlier, when the verifier makes a \ILCcheck\ query, the result wil
 
 Throughout this chapter, we will present \ILC \ protocols over a field $|\F|$ and prove that they have soundness error $poly(\sep) / |\F|$. We will assume that $|\F|$ is sufficiently large so that the protocols have negligible soundness error. However, if this is not the case, then in Section \ref{sec:fieldext}, we provide a technique to boost soundness with minimal overhead, which applies to the three-move arithmetic circuit protocol in Section \ref{subsec:3rndsqrt}.
 
+For each protocol, we will prove that with high probability, the \ILC\ query matrix for the protocol has full rank, and fewer rows than columns. This will be useful in Chapter \ref{chapterlabel:Compilation-Proof} when arguing that compiled protocols satisfy the zero-knowledge property.
+
 \section{Polynomial Commitment Sub-Protocol} \label{subsec:polycommit}
 
 The basis for the polynomial commitment protocol in this section was originally published in joint work \cite{BootleG18} with Jens Groth, as a discrete-logarithm based protocol.

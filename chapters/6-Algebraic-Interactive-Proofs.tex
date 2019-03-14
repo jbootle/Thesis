@@ -56,7 +56,7 @@ We now provide a proof of the Forking Lemma we need for Theorems~\ref{th:log} an
 For simplicity in the following lemma, we assume that the challenges are chosen uniformly from $\mathbb{Z}_p$ where $\left| p \right| = \lambda$, but any sufficiently large challenge space would suffice.
 
 \begin{proof}\label{forkproof}
-Suppose that for deterministic polynomial time $\mathcal{P}^*$ there is a non-uniform polynomial time interactive adversary $\mathcal{A}$ in the sense of witness-extended emulation, such that
+Suppose that for deterministic polynomial time $\mathcal{P}^*$ there is a polynomial time interactive adversary $\mathcal{A}$ in the sense of witness-extended emulation, such that
 $$ \Pr \Big{[}(u,s) \leftarrow\mathcal{A}(1^\sep); tr \leftarrow \langle \mathcal{P}^*(u,s), \mathcal{V}(u)\rangle: \mathcal{A}(tr)=1\Big{]} = \epsilon.$$
 Note that if $\epsilon$ is negligible, then we do not need to extract a witness, since the emulator can simply fail every time and trivially achieve witness-extended emulation. Therefore, from now on, we assume that $\epsilon$ is not negligible.
 
@@ -102,7 +102,7 @@ For $1 \leq i \leq \mu+1$:
 
 Fix $1 \leq i \leq \mu$, and fix $x_1,\ldots,x_{i-1}$. We say that $\mathcal{T}(i)$ has failed if it returns $(tr,\bot)$.
 
-Let $\epsilon'$ be the probability that the $\mathcal{T}(i)$ fails for this choice of challenges, and let $\epsilon'(x_i)$ be the probability that $\mathcal{T}(i+1)$ fails for this choice of challenges continued with $x_i$. The $i$th tree-finder can fail only if the $(i+1)$th tree-finder fails the first time it is called. This implies that for uniformly random $x_i$, the probability that $\mathcal{T}(i+1)$ fails is $\epsilon' = \sum_{x_i \in \F} \Pr[X=x_i] \epsilon'(x_i)$.
+Let $\epsilon'$ be the probability that $\mathcal{T}(i)$ fails for this choice of challenges, and let $\epsilon'(x_i)$ be the probability that $\mathcal{T}(i+1)$ fails for this choice of challenges continued with $x_i$. The $i$th tree-finder can fail only if the $(i+1)$th tree-finder fails the first time it is called. This implies that for uniformly random $x_i$, the probability that $\mathcal{T}(i+1)$ fails is $\epsilon' = \sum_{x_i \in \F} \Pr[X=x_i] \epsilon'(x_i)$.
 
 Therefore, the expected number of times that $\mathcal{T}(i)$ runs $\mathcal{T}(i+1)$ is $1+\epsilon' \frac{(n_i-1)}{\epsilon'} = n_i$. The final tree-finder $\mathcal{T}(k+1)$ merely checks whether the transcript is accepting or not. Hence, the total expected running time for $\mathcal{T}(1)$ to be $\prod_{i=1}^{\mu} n_i$ multiplied by the time taken to check whether a transcript is accepting. We conclude that the emulator $\mathcal{E}$ runs in expected polynomial time.
 

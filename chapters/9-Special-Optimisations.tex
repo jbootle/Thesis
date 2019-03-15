@@ -7,11 +7,11 @@
 Using Pedersen commitments as our commitment scheme, we will now give an inner product argument of knowledge of two vectors $\vec{a},\vec{b}\in \Z_p^n$ such that $A=\ComCommit_{ck}(\vec{a})$, $B=\ComCommit_{ck'}(\vec{b})$ and $\vec{a}\cdot \vec{b}=z$. Here, we assume that $z \in \Z_p$, commitments $A$, $B$ and commitment keys $ck,ck'$ are known to both the prover and the verifier. The argument will be used as a subroutine where zero-knowledge is not required, so the prover could in principle just reveal the witness $\vec{a},\vec{b}$ to the verifier. In the following we show how to use interaction to reduce the communication from linear to logarithmic in $n$, the length of the vectors.
 
 The basic step in our inner product argument is a 2-move reduction to a smaller statement using techniques similar to \cite{BG12}. It will suffice for the prover to reveal the witness for the smaller statement in order to convince the verifier about the validity of the original statement.
-In the full argument, prover and verifier recursively run the reduction to obtain increasingly smaller statements. The argument is then concluded with the prover revealing a %and at the end the prover simply reveals a 
+In the full argument, the prover and the verifier recursively run the reduction to obtain increasingly smaller statements. The argument is then concluded with the prover revealing a %and at the end the prover simply reveals a 
 witness for a very small statement.
 The outcome of this is a $O(\log{n})$-move argument with an overall communication of $O(\log{n})$ group and field elements. The inner product argument will be used in the next section to build a logarithmic size argument for circuit satisfiability. 
 
-Due to the obvious relationship with Pedersen commitments, we will think of multi-exponentiations $\vec{g}^{\vec{a}}$ and $\vec{h}^{\vec{b}}$ as commitments with randomness set equal to zero, and to $\vec{a},\vec{b}$ as openings with respect to commitment keys $\vec{g},\vec{h}$.
+Due to the obvious relationship with Pedersen commitments, we will think of multi-exponentiations $\vec{g}^{\vec{a}}$ and $\vec{h}^{\vec{b}}$ as commitments with randomness set to zero, and to $\vec{a},\vec{b}$ as openings with respect to commitment keys $\vec{g},\vec{h}$.
 
 %\red{This argument could be easily turned into a zero-knowledge argument of knowledge for inner product of vectors with logarithmic communication. Since it goes beyond the main purpose of the paper, we address the reader to the appendix for a separate discussion.}
 
@@ -90,7 +90,7 @@ Notice that $A_0=A$ is already known to the verifier since it is part of the sta
 At this point, both the prover and the verifier can compute $\vec{g}':=\prod_{i=1}^m\vec{g}_i^{x^{-i}}$ and $A':=\prod_{k=1-m}^{m-1}A_k^{x^k}$. 
 %
 If the prover is honest then we have $A'=(\vec{g}')^{\vec{a}'}$, namely $A'$ is a commitment to $\vec{a}'$ under the key $\vec{g}'$.
-Furthermore, even if the prover is dishonest, we can show that if the prover can open $A'$ with respect to the key $\vec{g}'$ for $2m-1$ different challenges, then we can extract opening $(\vec{a}_1,\ldots,\vec{a}_m)$ corresponding to $A=\prod_{i=1}^m\vec{g}_i^{\vec{a}_i}$. %and that the opening of $A'$ must be $\vec{a}'$.
+Furthermore, even if the prover is dishonest, we can show that if the prover can open $A'$ with respect to the key $\vec{g}'$ for $2m-1$ different challenges $x$, then we can extract openings $(\vec{a}_1,\ldots,\vec{a}_m)$ corresponding to $A=\prod_{i=1}^m\vec{g}_i^{\vec{a}_i}$. %and that the opening of $A'$ must be $\vec{a}'$.
 
 
 The same type of argument can be applied in parallel to $B$ with the inverse challenge $x^{-1}$ giving us a sum of the form $\vec{b}'=\sum_{i=1}^m\vec{b}_ix^{-i}$ and a new base $\vec{h}'=\prod_{i=1}^m\vec{h}_i^{x^{i}}$. %where $B=\prod_{i=1}^m\vec{h}_i^{\vec{b}_i}$. 
@@ -284,4 +284,4 @@ $ a(x)=a_0 + \sum_{i=1}^\ACnumvec (M_{\vec{y}})^i (M_{\vec{x}})^i a_{i} $.
 
 \subsection{How to Apply This Idea}
 
-Suppose that we wish to give an argument for arithmetic circuit satisfiability over a small field $\F$. The way to use this technique to apply the 3-move square-root protocol over an algebraic extension of $\F$, and use the above technique to embed the conditions for circuit satisfiability into extension field operations. This yields an arithmetic circuit satisfiability argument over $\F$ with negligible soundness error in a single run, and the argument over the extension field will have the same asymptotic communication costs as one over the base field, but with the negligible soundness error.
+Suppose that we wish to give an argument for arithmetic circuit satisfiability over a small field $\F$. The way to use this technique to apply the 3-move square-root protocol over an algebraic extension of $\F$, and use the above technique to embed the conditions for circuit satisfiability into extension field operations. This yields an arithmetic circuit satisfiability argument over $\F$ with negligible soundness error in a single run, and the argument over the extension field will have the same asymptotic communication costs as one over the base field, but with negligible soundness error.

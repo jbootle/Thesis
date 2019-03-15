@@ -6,11 +6,11 @@
 
 \section{Introduction}
 
-A zero-knowledge proof~\cite{GoldwasserMR85} is a protocol between two parties: a prover and a verifier. The prover may want to convince the verifier that an instance $u$ belongs to a specific language $\LL$ in NP. She wants to convince the verifier that the instance $u\in \LL$ is a true statement without revealing any confidential information. Such secret information, unknown to the verifier, which could make the statement easier to prove, should not be leaked as part of the protocol.
+A zero-knowledge proof~\cite{GoldwasserMR85} is a protocol between two parties: a prover and a verifier. The prover may want to convince the verifier that an instance $u$ belongs to a specific language $\LL$ in NP. She wants to convince the verifier that the instance $u\in \LL$ is a true statement without revealing any confidential information. Naturally, the protocol should not leak any secret information which is unknown to the verifier and could make the statement easier to prove.
 
 Zero-knowledge proofs are widely used in cryptography since it is often useful to verify that a party is following a protocol without requiring her to divulge secret keys or other private information. Applications range from digital signatures and public-key encryption to secure multi-party computation schemes with strong security guarantees, anonymous credentials, and verifiable cloud computing.
 
-More formally, a zero-knowledge proof consists of a triple of algorithms $(\crsgen,\prover,\verifier)$. These are the prover \prover\ and the verifier \verifier, and they engage in the protocol. The common-reference-string generator \crsgen\ produces the necessary setup information for \prover\ and \verifier\ to run the protocol. In this thesis, the prover and verifier are interactive algorithms. Based on the setup information produced by the generator, the prover and the verifier  exchange messages. At the end of the protocol, the verifier decides whether the proof was convincing or not, and accepts or rejects the proof.
+More formally, a zero-knowledge proof consists of a triple of algorithms $(\crsgen,\prover,\verifier)$. These are the prover \prover\ and the verifier \verifier, and they engage in the protocol. The common-reference-string generator \crsgen\ produces the necessary setup information for \prover\ and \verifier\ to run the protocol. In this thesis, the prover and verifier are interactive algorithms. Based on the setup information produced by the generator, the prover and the verifier exchange messages. At the end of the protocol, the verifier decides whether the proof was convincing or not, and accepts or rejects the proof.
 
 Zero-knowledge proofs satisfy three basic requirements.
 
@@ -32,7 +32,7 @@ Zero-knowledge proofs satisfy three basic requirements.
 %\red{Proof-of-knowledge}
 %\red{Honest-Verifier Zero-Knowledge}
 
-Many efficient zero-knowledge proofs are based on the discrete logarithm assumption~\cite{Schnorr91,Cramer1998a,Groth2009b,Seo2011a,BootleCCGP16,BunzBBPWM18,GrothK15,BootleCCGGP15,BayerG13,BootleG18}. Although efficiency has improved over time, it looks as though all of these protocols draw on the same small collection of techniques, some used for optimising efficiency, and some for proving security.
+Many efficient zero-knowledge proofs are based on the discrete logarithm assumption~\cite{Schnorr91,Cramer1998a,Groth2009b,Seo2011a,BootleCCGP16,BunzBBPWM18,GrothK15,BootleCCGGP15,BayerG13,BootleG18}. Although efficiency has improved over time, it looks as though all of these protocols draw on the same small collection of techniques, some used for improbing efficiency, and some for proving security.
 
 For instance, all of the protocols use commitment schemes. These allow either party to `commit' to a message, so that the message stays hidden but is fixed relative to the commitment, and can be revealed later. A party can commit to a message $m$ by applying a commitment algorithm with $m$ as input, and obtain $c$, a commitment to $m$. The commitment $c$ can then be sent to other parties. Later, the party can `open' $c$ by revealing $m$. The other parties may then check that $c$ corresponds to $m$.
 
@@ -79,7 +79,7 @@ One notable place where we improve communication efficiency over previous proofs
 
 See Tables \ref{taEfficiency8} and \ref{taEfficiency9} for our results in the discrete logarithm setting. $N$ is the instance-size, $t$ is the number of batched instances, $\Gr$ means the number of group elements transmitted, $\Z_p$ means the number of field elements transmitted, $(\Gr,exp)$ means the number of group exponentiations and $(\Z_p,\times)$ means the number of field multiplications. In the membership proofs, $N$ is the number of items in the list for which we prove membership. In the polynomial evaluation proofs, $N$ is the degree of the polynomial. In the range proofs, $N$ is the width of the range that we consider.
 
-See Tables \ref{taEfficiency1} for our results based on hash-functions.
+See Table \ref{taEfficiency1} for our results based on hash-functions.
 
 \footnotetext[1]{We compare against the efficiency when \cite{GrothK15} is instantiated using Pedersen commitments, and the prover and verifier know the openings of the list of commitments.}
 \footnotetext[2]{We compare against the efficiency when \cite{BootleCCGGP15} is instantiated using Pedersen commitments rather than Elgamal ciphertexts.}
@@ -118,7 +118,7 @@ Batch Range Proof &This Work, \ref{app:range} & $O(\sqrt{t\log N})$ & $O(\sqrt{t
 %6ary version
 \hline
 \end{tabular}
-\captionof{table}{Efficiency Comparisons when our low-depth circuit protocol is instantiated with hash functions.}\label{taEfficiency1}
+\captionof{table}{Efficiency comparisons when our low-depth circuit protocol is instantiated with hash functions.}\label{taEfficiency1}
 \end{landscape}
 \clearpage
 }
@@ -156,7 +156,7 @@ Membership Proof &This Work, \ref{app:member} & $2.7\sqrt{\log N}$ & $1.9 \log N
 Batch Membership Proof &This Work, \ref{app:member} & $4.1 \sqrt{t \log N}$ & $4.1\sqrt{t \log N}$ & $O(t \log tN)$ & $O(tN\log tN)$ & $O(\sqrt{t}\log tN)$ & $O(tN)$ \\
 \hline
 \end{tabular}
-\captionof{table}{Efficiency Comparisons when our low-depth circuit protocol is instantiated in the discrete logarithm setting.}\label{taEfficiency8}
+\captionof{table}{Efficiency comparisons when our low-depth circuit protocol is instantiated in the discrete logarithm setting.}\label{taEfficiency8}
 \end{landscape}
 \clearpage
 }
@@ -205,13 +205,12 @@ Batch Range Proof &This Work, \ref{app:range} & $2.8\sqrt{t\log N}$ & $2.8\sqrt{
 %6ary version
 \hline
 \end{tabular}
-\captionof{table}{Efficiency Comparisons when our low-depth circuit protocol is instantiated in the discrete logarithm setting.}\label{taEfficiency9}
+\captionof{table}{Efficiency comparisons when our low-depth circuit protocol is instantiated in the discrete logarithm setting.}\label{taEfficiency9}
 \end{landscape}
 \clearpage
 }
 
-\paragraph{Zero-Knowledge Proofs for Arithmetic Circuits.} One goal is to build an efficient argument system for the satisfiability of an arithmetic circuit, i.e., a circuit that consists of addition and multiplication gates over a finite field $\F$. The statement is the arithmetic circuit and some specified values for the circuit outputs. The prover's witness is a collection of input values for the arithmetic circuit which give the correct output. Arithmetic circuits are an attractive target for protocol design for several reasons.
-
+\paragraph{Zero-Knowledge Proofs for Arithmetic Circuits.} An arithmetic circuit is a circuit that consists of addition and multiplication gates over a finite field $\F$, whose wires take values from the field. Arithmetic circuits are an attractive target for zero-knowledge protocol design, where the goal is to build an efficient argument system to prove that an arithmetic circuit is satisfiable, meaning that there exist a set of input values to the circuit that produce the specified output value when the circuit is evaluated. The statement is the arithmetic circuit and some specified values for the circuit outputs. The prover's witness is a collection of input values for the arithmetic circuit which give the correct output. There are several reasons why this is useful.
 \begin{itemize}
 \item Given an arithmetic circuit and outputs, the problem of deciding whether there exist input wire values satisfying the circuit is NP-Complete. Therefore, if we can design zero-knowledge proofs for arithmetic circuit satisfiability, then this implies that we can give zero-knowledge proofs for all NP languages.
 \item Many cryptographic systems can be expressed in terms of arithmetic over finite fields of prime order. Given a zero-knowledge proof system for arithmetic circuit satisfiability, we can give zero-knowledge proofs which reason about other cryptographic schemes, often in order to provide stronger security guarantees.
@@ -260,7 +259,7 @@ This work & $O(\log{N})$  %\red{when m=2, mu = log N - 1}
 \hline
 \end{tabular}
 \vspace{.2cm}
-\caption{Efficiency comparison between our 5-move argument in the discrete logarithm setting and the most efficient constant-move interactive zero-knowledge arguments relying on discrete logarithms and hash-based . Since We express communication in number of group elements $\Gr$ and field elements $\Z_p$ and computation costs in number of exponentiations over $\Gr$ and multiplications over $\Z_p$. The efficiency displayed is for a circuit with $N$ multiplication gates.\label{table:previous}} 
+\caption{Efficiency comparison between our 5-move argument in the discrete logarithm setting and the most efficient constant-move interactive zero-knowledge arguments relying on discrete logarithms and hash-functions. We express communication in terms of numbers of group elements $\Gr$ and field elements $\Z_p$. We express computational costs in terms of numbers of exponentiations over $\Gr$ and multiplications over $\Z_p$. The efficiency displayed is for a circuit with $N$ multiplication gates.\label{table:previous}} 
 \end{table}
 
 \begin{table}

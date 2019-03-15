@@ -453,7 +453,7 @@ Round Complexity & $\mu + 2$ \\
 \caption{Efficiency of a compiled proof of knowledge $(\KK,\Po,\V)$ for $(\crs,\stm,\wit)\in \R$ with optimisations made to the compiler. Communication is measured in field elements and computation in field operations.}\label{fig:IOPeff2}
 \end{figure}
 
-\section{Compiling into Discrete-Logarithm-Based Proofs}
+\section{Compiling into Discrete-Logarithm-Based Proofs}\label{sec:ILCtoDLOG}
 
 In this section, we show how to compile a proof of knowledge with straight-line extraction for relation $\R$ over the communication channel \ILC\ into a proof of knowledge for the same relation over the standard channel based on the discrete logarithm assumption, provided that the \ILC\ protocol satisfies some simple additional conditions. In fact, this compilation will work for any homomorphic commitment scheme over the field $\F$ in which the \ILC\ protocol takes place, but for concreteness and efficiency, we use Pedersen commitments. These will give rise to efficient zero-knowledge arguments as Pedersen commitments are extremely succinct; only one group element is required to commit to a large number of field elements.
 

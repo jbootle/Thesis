@@ -14,7 +14,16 @@ In this section, we will define Ideal Linear Commitment protocols more precisely
 
 \subsection{Definitions}
 
-In a $\mu$-round Ideal Linear Commitment protocol, a prover and verifier will interact with each other, each sending $\mu$ messages to the other. An Ideal Linear Commitment protocol will defined over a field $\F$ and will use a fixed vector length $\sizevect$.
+We begin by defining general Ideal Linear Commitment protocols, and then specialise to the case of public-coin protocols.
+
+In a $\mu$-round Ideal Linear Commitment protocol, a prover $\PoILC$ and a verifier $\VILC$ will interact with each other via the \ILC, each sending $\mu$ messages. An Ideal Linear Commitment protocol is defined over a field $\F$ and will use a fixed vector length $\sizevect$. Let $(t_1,\ldots,t_\mu) \in \N^\mu$ be a tuple of message lengths. Let the initial state of $\PoILC$ be $\mathsf{state}^\Po_0$. Let the initial state of $\VILC$ be $\mathsf{state}^\V_0$. Let $\rho_\Po$ and $\rho_\V$ be the randomness for the prover and verifier respectively. Set $m_0 = \bot$ and $\Pi_0 = \bot$. In every round $\roundnum \in \{ 1,\ldots,\mu \}$:
+\begin{itemize}
+\item The prover takes as input the round number $\roundnum$, the verifier's previous messages $m_0,\ldots,m_{\roundnum-1}$, internal state $\mathsf{state}^\Po_{i-1}$, and randomness $\rho_\Po$, and outputs a matrix $V_i \in \F^{t_i \times \sizevect}$ and a new internal state $\mathsf{state}^\Po_{i}$. It commits to $V_i$ using the \ILCcommit command.
+\item After round $\roundnum$, the \ILC contains the vertical concatenation of the matrices $V_1,\ldots,V_\roundnum$.
+\item The verifier takes as input the round number $\roundnum$, internal state $\mathsf{state}^\V_{i-1}$, and randomness $\rho_\Po$. It makes linear \ILCopen and \ILCcheck queries on the contents of the $\ILC$. Then it computes a message \red{Fill in}
+\end{itemize}
+
+The \ILC could be viewed in several possible different ways, as a commitment functionality, communication channel, or a trusted third party. When Ideal Linear Commitment protocols are compiled into real zero-knowledge protocols, the functionality previously guaranteed by the \ILC will be enforced using various cryptographic tools.
 
 \section{Zero-Knowledge Proofs}
 \label{shvzkdef}

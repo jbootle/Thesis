@@ -7,8 +7,9 @@
 
 In this section, we will define Ideal Linear Commitment protocols more precisely. We will then compare and contrast this model with other models.
 \begin{itemize}
-\item Interactive Oracle Proofs (Ben-Sasson, Chiesa, Spooner)
-\item Linear Interactive Proofs and Linear PCPs (Nir Bitansky, Alessandro Chiesa, Yuval Ishai, Rafail Ostrovsky, Omer Paneth)
+\item Interactive Oracle Proofs (Ben-Sasson, Chiesa, Spooner). Pointwise access to separate oracles. But we need one big oracle that gets update to make linear combination queries for vectors from different rounds. Don't need this distinction when making pointwise queries.
+\item Linear Interactive Proofs (Nir Bitansky, Alessandro Chiesa, Yuval Ishai, Rafail Ostrovsky, Omer Paneth)
+\item Linear PCPs (Nir Bitansky, Alessandro Chiesa, Yuval Ishai, Rafail Ostrovsky, Omer Paneth)
 \item (Fully) Linear Interactive Oracle Proofs (Dan Boneh, Elette Boyle, Henry Corrigan-Gibbs, Niv Gilboa, Yuval Ishai)
 \end{itemize}
 
@@ -16,14 +17,81 @@ In this section, we will define Ideal Linear Commitment protocols more precisely
 
 We begin by defining general Ideal Linear Commitment protocols, and then specialise to the case of public-coin protocols.
 
-In a $\mu$-round Ideal Linear Commitment protocol, a prover $\PoILC$ and a verifier $\VILC$ will interact with each other via the \ILC, each sending $\mu$ messages. An Ideal Linear Commitment protocol is defined over a field $\F$ and will use a fixed vector length $\sizevect$. Let $(t_1,\ldots,t_\mu) \in \N^\mu$ be a tuple of message lengths. Let the initial state of $\PoILC$ be $\mathsf{state}^\Po_0$. Let the initial state of $\VILC$ be $\mathsf{state}^\V_0$. Let $\rho_\Po$ and $\rho_\V$ be the randomness for the prover and verifier respectively. Set $m_0 = \bot$ and $\Pi_0 = \bot$. In every round $\roundnum \in \{ 1,\ldots,\mu \}$:
+In a $\mu$-round Ideal Linear Commitment protocol, a prover $\PoILC$ and a verifier $\VILC$ will interact with each other via the \ILC, each sending $\mu$ messages. An Ideal Linear Commitment protocol is defined over a field $\F$ and will use a fixed vector length $\sizevect$. Let $(t_1,\ldots,t_\mu) \in \N^\mu$ be a tuple of message lengths. There is a setup generator $\KKILC$ which outputs $\crs_\ILC = (\F,\sizevect,(t_1,\ldots,t_\mu),\mathsf{aux})$, where $\mathsf{aux}$ consists of extra elements of $\F$ which might be useful when running the protocol. Let the initial state of $\PoILC$ be $\mathsf{state}^\Po_0$. Let the initial state of $\VILC$ be $\mathsf{state}^\V_0$. Let $\rho_\Po$ and $\rho_\V$ be the randomness for the prover and verifier respectively. Let $m_0 = \bot$. In every round $\roundnum \in \{ 1,\ldots,\mu \}$:
 \begin{itemize}
-\item The prover takes as input the round number $\roundnum$, the verifier's previous messages $m_0,\ldots,m_{\roundnum-1}$, internal state $\mathsf{state}^\Po_{i-1}$, and randomness $\rho_\Po$, and outputs a matrix $V_i \in \F^{t_i \times \sizevect}$ and a new internal state $\mathsf{state}^\Po_{i}$. It commits to $V_i$ using the \ILCcommit command.
-\item After round $\roundnum$, the \ILC contains the vertical concatenation of the matrices $V_1,\ldots,V_\roundnum$.
-\item The verifier takes as input the round number $\roundnum$, internal state $\mathsf{state}^\V_{i-1}$, and randomness $\rho_\Po$. It makes linear \ILCopen and \ILCcheck queries on the contents of the $\ILC$. Then it computes a message \red{Fill in}
+\item The prover takes as input the round number $\roundnum$, the verifier's previous messages $m_0,\ldots,m_{\roundnum-1}$, internal state $\mathsf{state}^\Po_{i-1}$, and randomness $\rho_\Po$, and outputs a matrix $V_i \in \F^{t_i \times \sizevect}$ and a new internal state $\mathsf{state}^\Po_{i}$. It commits to $V_i$ using the \ILCcommit\ command.
+\item After round $\roundnum$, the \ILC \ contains the vertical concatenation of the matrices $V_1,\ldots,V_\roundnum$.
+\item The verifier takes as input the round number $\roundnum$, internal state $\mathsf{state}^\V_{i-1}$, and randomness $\rho_\Po$. It makes linear \ILCopen\ and \ILCcheck\ queries on the contents of the $\ILC$. Then it outputs a new message $m_i \in \F$.
 \end{itemize}
 
-The \ILC could be viewed in several possible different ways, as a commitment functionality, communication channel, or a trusted third party. When Ideal Linear Commitment protocols are compiled into real zero-knowledge protocols, the functionality previously guaranteed by the \ILC will be enforced using various cryptographic tools.
+\paragraph{Remarks}
+\begin{itemize}
+\item It is of course easy to generalise to the case where the verifier's messages are not single field elements. We use the case of single field elements for notational simplicity and because it suffices for all of our protocols.
+\item The \ILC\ could be viewed in several possible different ways, as a commitment functionality, communication channel, a trusted third party, or an oracle for the verifier. When Ideal Linear Commitment protocols are compiled into real zero-knowledge protocols, the functionality previously guaranteed by the \ILC will be enforced using various cryptographic tools.
+\item We will assume that all parties output messages which parse correctly. In other words, no party or functionality will ever deviate from the protocol using messages which are from the wrong domain, or of incorrect length. This will not be a problem for security. Indeed, provided that checking the format of a message can be done efficiently, it would be simple, but tedious, to add such checks at the beginning of every algorithm, and instruct all algorithms to abort if the checks are failed. We assume that this is the case in all of our compiled protocols. 
+\end{itemize}
+
+To make our definitions more precise, we give pseudocode descriptions of an Ideal Linear Commitment protocol.
+
+\begin{figure}[!h]
+\resizebox{\textwidth}{!}{
+\begin{minipage}[t]{13cm}
+\begin{algorithm}[H]
+\caption*{An Ideal Linear Commitment Protocol on $\crs_\ILC,\rho_\Po$ }
+\begin{itemize} \item\textbf{Initialise protocol.}:
+\begin{itemize}
+\item Set $M = \bot$.
+\end{itemize} 
+\item \textbf{For $i = 1$ to $\mu$}: 
+\item \textbf{Run prover}:
+\begin{itemize}
+\item $(V_i,\mathsf{state}^\Po_i) \gets \Po_\ILC ( i, \lbrace m_j \rbrace_{j < i}, \mathsf{state}^\Po_{i-1}, \rho )$
+\item Use \ILCcommit\ command.
+\end{itemize}
+\item \textbf{Run verifier}:
+\begin{itemize}
+\item For $j = 1$ to:
+\item Make an open query.
+\item Make a check query.
+\item After all queries, compute output message and new state.
+\end{itemize} 
+\item \textbf{Accept or Reject}
+\end{itemize} 
+%\vspace{2.47cm}
+\end{algorithm}
+\end{minipage}
+%==============================================================
+\begin{minipage}[t]{6.5cm}
+\vspace{0cm}
+\begin{algorithm}[H]
+\caption*{\ILCcommit($V$)}
+\begin{itemize}
+\item If $M = \bot$ then set $M = V$.
+\item Otherwise, update $M$ by vertically concatenating it with $V$, with $V$ at the bottom.
+\end{itemize}
+\end{algorithm}
+\vspace{-1.07cm}
+\begin{algorithm}[H]
+\caption*{\ILCopen($Q$)}
+\begin{itemize}
+\item Output $QV$.
+\end{itemize}
+\end{algorithm}
+\vspace{-1.07cm}
+\begin{algorithm}[H]
+\caption*{\ILCcheck($Q', \vec{v}$)}
+\begin{itemize}
+\item If $Q'V = \vec{v}$ then output $\top$.
+\item Otherwise output $\bot$.
+\end{itemize}
+\end{algorithm}
+%\vspace{0.1cm}
+\end{minipage}
+}
+\caption{Description of how the parties in an \ILC\ protocol interact.}
+%For explanation, see Subsection~\ref{ssec:constrILCtoIOP}}
+\label{fig:ILCpseudocode}
+\end{figure}
 
 \section{Zero-Knowledge Proofs}
 \label{shvzkdef}

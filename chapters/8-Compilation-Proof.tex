@@ -193,6 +193,7 @@ to $\V$
 All the commitment openings are correct, so they will be accepted by the verifier. In the execution of $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle$, the fact that $\preECC$ is linear implies $\ECC$ is linear and hence all the linear checks will be true. If $(\crs,\stm,\wit)\in \R$ then $(\crs_{\ILC},\stm,\wit)\in \R$ and being complete $\langle \PoILC(\crs_{\ILC},\stm,\wit)\ilc\VILC(\crs_{\ILC},stm)\rangle =1$ so $\V$'s internal copy of $\VILC$ will accept. Thus, in this case, $\langle \Po(\crs,\stm,\wit)\std\V(\crs,\stm)\rangle=1$, which proves completeness.\qed
     \end{proof}
   
+%=================================================
   
       \begin{theorem}[Knowledge Soundness]\label{thm:sound}
     If $(\KKILC,\PoILC,\VILC)$ is statistically knowledge sound with a straight-line extractor for relation $\R$ over $\ILC$ and $(\ComSetup,\ComCommit)$ is computationally (statistically) binding, then $(\KK,\Po,\V)$ as constructed above is computationally (statistically) knowledge sound for relation $\R$.
@@ -366,6 +367,7 @@ For any PPT $\A$ consider the following experiment.
 We have shown that when doing this experiment, the probability that $b=1\wedge b_\ILC=0$ and the probability that $b=1\wedge \viewpilc\neq \viewpilcsim$ are both negligible. By knowledge soundness of $(\KKILC,\PoILC,\VILC)$, the probability that $b_{\ILC}=1\wedge (\crs,\stm,\wit)\notin \R$ is also negligible. Finally, if $\viewpilc =\viewpilcsim$ then clearly $\wit=\witsim$. Taken together this implies that the probability of $b=1\wedge (\crs,\stm,\witsim)\notin R$ is negligible. We now define $\E^{\langle \Po^*(s)\longleftrightarrow \V(\crs,\stm)\rangle}(\crs,\stm)$ to compute $\ExILC(\crs_\ILC,\stm,\Extrans^{\langle \Po^*(s) \longleftrightarrow \V(\crs,\stm)\rangle}(\crs,\stm))$. The above experiment shows that $(\KK,\Po,\V)$ is knowledge sound with $\Ex$ as extractor. \qed
 \end{proof}
 
+%==================================================================
 
 \begin{theorem}[SHVZK]
 If $(\KKILC,\PoILC,\VILC)$ is perfect SHVZK 

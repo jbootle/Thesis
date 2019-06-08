@@ -438,9 +438,12 @@ When $t=1$ and we are aiming for a constant number of commitments, setting $n=4$
 
 In this section, we present an \ILC\ protocol for arithmetic circuit satisfiability which consists of only 3 moves. This yields, for example, using the later compilation with discrete logarithm comitments, the first known zero-knowledge argument of knowledge for arithmetic circuit satisfiability that has square-root communication complexity, and only 3 moves, based on the discrete logarithm assumption. The previous best arguments \cite{Seo2011a,Groth2009b} consisted of 5 moves.
 
+One might ask why \red{Fill in!}
+
 We will construct SHVZK proofs of knowledge for the relation $\Rac$, where the instances are arithmetic circuits over a field $\F$ specified by $\crs$. An instance consists of many fan-in 2 addition and multiplication gates over $\F$, a description of how wires in the circuit connect to the gates, and values assigned to some of the input wires. Witnesses $\wit$ are the remaining inputs such that the output of the circuit is $0$. For an exact definition of how we represent an arithmetic circuit, see Section \ref{sec:AC}.
 
-In our later 5 round argument we check that committed vectors had the correct Hadamard product, and we checked consistency equations between them. The idea behind this protocol is to do exactly the same thing, but in 3 rounds. An approach similar to that of \cite{PHGR13} works well for doing many operations in parallel, so this will be used for the Hadamard product. Embedding field elements as the coefficients of polynomials as in \cite{Groth2009b} works well for scalar products, so will be used for the consistency equations.
+\red{Poor writing, instead of doing this here, put this in the 5-round section and refer to the earlier argument}
+In our later 5 round argument we check that committed vectors had the correct Hadamard product, and we check consistency equations between them. The idea behind this protocol is to do exactly the same thing, but in 3 rounds. An approach similar to that of \cite{PHGR13} works well for doing many operations in parallel, so this will be used for the Hadamard product. Embedding field elements as the coefficients of polynomials as in \cite{Groth2009b} works well for scalar products, so will be used for the consistency equations.
 
 The Hadamard product component of this argument is not new. It is the Hadamard Product argument of section 5.4, \cite{Bayer2014}.
 

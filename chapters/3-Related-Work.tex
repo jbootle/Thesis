@@ -158,6 +158,8 @@ All of the arguments mentioned above which rely on collision-resistant hash-func
 
 Other works give a composite approach, combining different zero-knowledge proof systems for both algebraic and non-algebraic techniques. Chase et al \cite{ChaseGM16} uses two approaches to interactive zero-knowledge. They use the garbled-circuit techniques of \cite{JawurekKO13} to prove non-algebraic statements, and algebraic protocols based on the discrete logarithm assumption and RSA assumption to prove algebraic statements. They leverage both techniques at the same time in order to construct efficient privacy-preserving credentials. \cite{AgrawalGM18} uses similar ideas to give non-interactive zero-knowledge proofs, this time by combining pairing-based SNARKs with discrete-logarithm-based interactive zero-knowledge proofs, after using the Fiat-Shamir heuristic to make the interactive protocols non-interactive.
 
+\red{Include more models here}
+
 Another model for protocols is that of interactive oracle proofs, introduced in \cite{Ben-SassonCS16}. Interactive oracle proofs are interactive proofs between a prover, and a verifier, in which the verifier only has query access to the prover's messages. They simultaneously generalise interactive proofs and PCPs. Intuitively, one way to view interactive oracle proofs is as PCPs where the interaction between the prover and the verifier means that the prover only has to compute a small part of the PCP for the verifier to check. In fact, Ideal Linear Commitment protocols can also be seen as interactive oracle proofs with some extra restrictions.
 
 %\paragraph{Low Depth Circuits and Special Applications}

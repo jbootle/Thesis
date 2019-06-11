@@ -104,12 +104,12 @@ We will now define general Ideal Linear Commitment protocols, and then specialis
 
 In a $\mu$-round Ideal Linear Commitment protocol, a prover $\PoILC$ and a verifier $\VILC$ will interact with each other via the \ILC, each sending $\mu$ messages. An Ideal Linear Commitment protocol is defined over a field $\F$ and will use a fixed vector length $\sizevect$. Let $(t_1,\ldots,t_\mu) \in \N^\mu$ be a tuple of message lengths. There is a setup generator $\KKILC$ which outputs $\crs_\ILC = (\F,\sizevect,(t_1,\ldots,t_\mu),\mathsf{aux})$, where $\mathsf{aux}$ consists of extra elements of $\F$ which might be useful when running the protocol.
 
-The prover and the verifier will run the protocol on given inputs. They will use random coins $\rho_\Po$ and $\rho_\V$, and they will maintain states $\mathsf{state}^\Po_i$ and $\mathsf{state}^\V_i$ that will allow them to remember information over several different rounds of the protocol. The initial state $\mathsf{state}^\Po_0$ of the prover will be equal to the prover's input. The initial state $\mathsf{state}^\V_0$ of the verifier will be equal to the prover's input.
+The prover and the verifier will run the protocol on given inputs. They will use random coins $\rho_\Po$ and $\rho_\V$, and they will maintain states $\mathsf{state}^\Po_i$ and $\mathsf{state}^\V_i$ that will allow them to remember information over several different rounds of the protocol. The initial state $\mathsf{state}^\Po_0$ of the prover will be equal to the prover's input. The initial state $\mathsf{state}^\V_0$ of the verifier will be equal to the prover's input. Initially, the \ILC\ will store $V_0$, which is either a matrix with $\sizevect$ columns, or equal to $\bot$.
 
 In every round $\roundnum \in \{ 1,\ldots,\mu \}$:
 \begin{itemize}
 \item The prover takes as input the round number $\roundnum$, the setup information $\crs_\ILC$, the verifier's previous messages $m_1,\ldots,m_{\roundnum-1}$, internal state $\mathsf{state}^\Po_{i-1}$, and randomness $\rho_\Po$, and outputs a matrix $V_i \in \F^{t_i \times \sizevect}$ and a new internal state $\mathsf{state}^\Po_{i}$. It commits to $V_i$ using the \ILCcommit\ command.
-\item After round $\roundnum$, the \ILC \ stores the vertical concatenation of the matrices $V_1,\ldots,V_\roundnum$.
+\item After round $\roundnum$, the \ILC \ stores the vertical concatenation of the matrices $V_0,\ldots,V_\roundnum$.
 \item The verifier takes as input the round number $\roundnum$, the setup information $\crs_\ILC$, internal state $\mathsf{state}^\V_{i-1}$, and randomness $\rho_\Po$. It makes linear \ILCopen\ and \ILCcheck\ queries on the contents of the $\ILC$. Then it outputs a new message $m_i \in \F$ and a new internal state $\mathsf{state}_i^\V$.
 \item The verifier's final message $m_\mu$ is either $1$, in which case we say the verifier has accepted, or $0$, in which case we say that the verifier has rejected.
 \end{itemize}
@@ -127,7 +127,7 @@ We give pseudocode descriptions of an Ideal Linear Commitment protocol in Figure
 \caption*{An \ILC\ Protocol on $\crs_\ILC,\rho_\Po,\rho_\V,\mathsf{state}_0^\Po, \mathsf{state}_0^\V$ }
 \begin{itemize} \item\textbf{Initialise protocol.}:
 \begin{itemize}
-\item Set $M = \bot$.
+\item Set $M = V_0$.
 \end{itemize} 
 \item \textbf{For $i = 1$ to $\mu$}: 
 \item \qquad \textbf{Run prover algorithm}:
@@ -230,7 +230,7 @@ In the case that a protocol is public-coin and has a verifier of degree $d \in \
 \caption*{A public coin \ILC\ Protocol on $\crs_\ILC,\rho_\Po,\rho_\V,\mathsf{state}_0^\Po, \mathsf{state}_0^\V$ }
 \begin{itemize} \item\textbf{Initialise protocol.}:
 \begin{itemize}
-\item Set $M = \bot$.
+\item Set $M = V_0$.
 \end{itemize} 
 \item \textbf{For $i = 1$ to $\mu-1$}: 
 \item \qquad \textbf{Run prover algorithm}:

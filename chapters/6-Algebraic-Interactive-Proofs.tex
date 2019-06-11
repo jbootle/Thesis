@@ -41,7 +41,7 @@ The first probability is bounded by the fact that $Q(X)$ is a polynomial of degr
 \section{A general forking lemma.}
 Suppose that we have a $(2\mu+1)$-move public-coin argument with $\mu$ challenges, $x_1,\ldots,x_\mu$ in sequence. Let $n_i\geq 1$ for $1\leq i \leq \mu$.  Consider $\prod_{i=1}^\mu n_i$ accepting transcripts with challenges in the following tree format. The tree has depth $\mu$ and $\prod_{i=1}^\mu n_i$ leaves. The root of the tree is labelled with the statement. Each node of depth $i<\mu$ has exactly $n_i$ children, each labelled with a distinct value for the $i$th challenge $x_i$. This can be referred to as an $(n_1,\ldots,n_\mu)$-tree of accepting transcripts. 
 
-\begin{definition}[$(n_1,\ldots,n_\mu)$-tree special soundness]
+\begin{definition}[$(n_1,\ldots,n_\mu)$-tree special soundness]\label{def:treespecsound}
 Let $(\crsgen,\prover,\verifier)$ be an interactive argument. Let $n_1(\sep),\ldots,n_\mu(\sep) \in \N$ such that $\prod_{i=1}^\mu n_i$ is bounded above by a polynomial in the security parameter $\sep$. Suppose that there exists a DPT algorithm $\chi$ such that given $\viewV$ for each transcript of an $(n_1,\ldots,n_\mu)$-tree of accepting transcripts as input, $\chi$ outputs a valid witness $w$ for the statement at the root of the tree. Then we say that $(\crsgen,\prover,\verifier)$ has $(n_1,\ldots,n_\mu)$-tree special soundness.
 \end{definition}
 

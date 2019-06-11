@@ -170,6 +170,8 @@ The basis for the protocol in this section was originally published in joint wor
 
 We present an \ILC\ protocol that allows the prover to prove knowledge of values which satisfy a polynomial relation of low-degree. This type of relation is useful when giving zero-knowledge membership and non-membership proofs, such as the membership proof in \cite{GrothK15}, its subsequent optimisation in \cite{BootleCCGGP15}, and the polynomial evaluation proof of \cite{BayerG13}. This protocol is the same as the main protocol given in \cite{BootleG18}, but is rewritten slightly as an $\ILC~$ protocol.
 
+A special case of this protocol, a zero-knowledge proof of membership described in \ref{app:member}, has been prototyped in Python.
+
 The idea is to prove that the prover knows solutions to polynomial relations encoding various statements, but allow the statements to be tweaked through an extra input to the polynomial. Let $\lbrace \vec{b}_{i,j} \rbrace_{i\in[m],j\in[n]}$ be some public vectors, representing the extra inputs or `tweaks'. Let $\vec{P}$ and $\vec{Q}$ be vectors of polynomials which take two inputs, $\lbrace \vec{a}_{i,j}, \vec{b}_{i,j} \rbrace_{i\in[m],j\in[n]}$. We assume that the prover has already committed to $C$ which we will write with square brackets in the instance $[C]$. We give a proof of knowledge of values $\lbrace \vec{a}_{i,j} \rbrace_{i\in[m],j\in[n]}$, such that $\vec{P}(\vec{a}_{i,j},\vec{b}_{i,j})=\vec{0}$ for $i \in [m], j \in [n]$, and such that
 $$C = \left(\begin{array}{lll}
 \vec{Q}(\vec{a}_{1,1},\vec{b}_{1,1}),&\vec{Q}(\vec{a}_{1,2},\vec{b}_{1,2}),& \ldots,\vec{Q}(\vec{a}_{1,n},\vec{b}_{1,n}) \\

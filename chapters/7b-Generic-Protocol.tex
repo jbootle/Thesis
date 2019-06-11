@@ -428,14 +428,19 @@ When $t=1$ and we are aiming for a constant number of commitments, setting $n=4$
 
 \section{3-Move Square-Root Protocol} \label{subsec:3rndsqrt}
 
-In this section, we present an \ILC\ protocol for arithmetic circuit satisfiability which consists of only 3 moves. This yields, for example, using the later compilation with discrete logarithm comitments, the first known zero-knowledge argument of knowledge for arithmetic circuit satisfiability that has square-root communication complexity, and only 3 moves, based on the discrete logarithm assumption. The previous best arguments \cite{Seo2011a,Groth2009b} consisted of 5 moves.
+In this section, we present an \ILC\ protocol for arithmetic circuit satisfiability which consists of only 3 moves.
 
-One might ask why \red{Fill in!}
+One might ask why it is necessary to include both a 3-move protocol and a 5-move protocol in this thesis. The 5-move protocol is more efficient in almost every way except for the number of moves. Furthermore, many users are more interested in non-interactive protocols anyway. After making the 5-move argument non-interactive using the Fiat-Shamir heuristic, does the existence of the 3-move protocol matter?
+
+There are several reasons why it was important to include the 3-move argument. Firstly, it yields, for example, using the later compilation with discrete logarithm comitments, the first known zero-knowledge argument of knowledge for arithmetic circuit satisfiability that has square-root communication complexity, and only 3 moves, based on the discrete logarithm assumption. The previous best arguments \cite{Seo2011a,Groth2009b} consisted of 5 moves.
+
+Secondly, it was this argument that drew attention to some corner cases within the \ILC\ model, and led to the creation of the \ILCcheck\ command alongside the \ILCopen\ command. Finally, when both proofs have been compiled into real protocols using homomorphic commitments and the compilation procedure in Section \ref{sec:ILCtoDLOG}, the 3-move protocol requires much less rewinding of the prover and verifier in order to prove knowledge soundness. This is a potential advantage either when one is thinking about the concrete security of each protocol and the tightness of security reductions, or when one is trying to give security proofs in a quantum security model\footnotemark[1] where rewinding techniques are still only applicable in quite limited scenarios.
+
+\footnotetext[1]{The compilation procedure from Section \ref{sec:ILCtoDLOG} was given with discrete-logarithm-based commitments in mind, but applies to all homomorphic commitments, including those which might be secure against attacks by quantum adversaries.}
 
 We will construct SHVZK proofs of knowledge for the relation $\Rac$, where the instances are arithmetic circuits over a field $\F$ specified by $\crs$. An instance consists of many fan-in 2 addition and multiplication gates over $\F$, a description of how wires in the circuit connect to the gates, and values assigned to some of the input wires. Witnesses $\wit$ are the remaining inputs such that the output of the circuit is $0$. For an exact definition of how we represent an arithmetic circuit, see Section \ref{sec:AC}.
 
-\red{Poor writing, instead of doing this here, put this in the 5-round section and refer to the earlier argument}
-In our later 5 round argument we check that committed vectors had the correct Hadamard product, and we check consistency equations between them. The idea behind this protocol is to do exactly the same thing, but in 3 rounds. An approach similar to that of \cite{PHGR13} works well for doing many operations in parallel, so this will be used for the Hadamard product. Embedding field elements as the coefficients of polynomials as in \cite{Groth2009b} works well for scalar products, so will be used for the consistency equations.
+In this argument, we use the earlier reduction of arithmetic circuit satisfiability give in \ref{sec:AC}, and check that some committed vectors have the correct Hadamard product and satisfy some linear consistency equations. An approach similar to that of \cite{PHGR13} works well for doing many operations in parallel, so this will be used for the Hadamard product. Embedding field elements as the coefficients of polynomials as in \cite{Groth2009b} works well for scalar products, so will be used for the consistency equations.
 
 The Hadamard product component of this argument is not new. It is the Hadamard Product argument of section 5.4, \cite{Bayer2014}.
 

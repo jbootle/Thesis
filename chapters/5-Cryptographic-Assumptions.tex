@@ -4,6 +4,8 @@
 
 Zero-knowledge protocols are often built based on cryptographic assumptions stating that various mathematical problems cannot be solved efficiently. In this thesis, we show that efficient zero-knowledge proofs and arguments can be built easily based on two different cryptographic assumptions: the discrete logarithm assumption, and the existence of collision resistant hash functions. Here, we formally define both of these assumptions.
 
+Note that our compilation proofs are not limited to the use of the commitment schemes in this chapter. The Pedersen commitment scheme could be replaced by any homomorphic commitment scheme over a field in our compilation in Section \ref{sec:ILCtoDLOG}. Similarly, we would like to emphasise that we have specified a commitment scheme based on collision-resistant hash-functions in this chapter purely for concreteness, and the compilation procedure in Section \ref{sec:ILCtoIOP} could be based on an arbitrary string commitment scheme.
+
 We define cryptographic assumptions relative to instance generators $\instancegen$.
 
 \section{The Discrete Logarithm Assumption}

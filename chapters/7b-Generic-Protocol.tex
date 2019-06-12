@@ -27,42 +27,59 @@ A polynomial commitment scheme enables a prover to commit to a secret vector of 
 
 We add an integer argument $id$ to both the prover and verifier algorithms. Some protocols will use the polynomial commitment scheme more than once to commit to different polynomials, and the $id$ argument will allow the verifier to request the correct polynomial evaluation as part of $\mathrm{PolyVerify}$.
 
-Let us discuss the algorithms in more detail. The public information available to both the prover and the verifier is $\crs = (\F,N)$ and $u = (m,l)$. Only the prover has access to a secret vector of polynomials $\vec{h}(X) \in \F^l[X]$ of degree $mn$. The verifier receives an evaluation point $x \in \F$ as input, and queries the \ILC\ to obtain some useful values. The verifier then outputs the evaluation $\vec{h}(x)$. The polynomial commitment scheme should be complete, knowledge-sound and special honest verifier zero-knowledge as defined below.
+Let us discuss the algorithms in more detail. Let $\KK, \Po$ and $\V$ define an ILC protocol with $\mu$ rounds. The public information available to both the prover and the verifier is $\crs = (\F,N)$ and $u = (m,l)$. Only the prover has access to a secret vector of polynomials $\vec{h}(X) \in \F^l[X]$ of degree $mn$. The verifier receives an evaluation point $x \in \F$ as input, and queries the \ILC\ to obtain some useful values. The verifier then saves the evaluation $\vec{h}(x)$ as part of their final state $\mathsf{state}^\V_\mu$.
 
-We will refer to the following relation, where ``PC" is short for polynomial commitment.
+The polynomial commitment scheme is not considered, alone, to be a zero-knowledge protocol. However, it will be a useful subroutine in other zero-knowledge protocols. As such, we need to describe some security properties of the scheme so that we can use them to prove the security properties of other protocols where polynomial commitment is used as a subroutine. For the definitions, we draw inspiration from the Oblivious Polynomial Evaluation scheme of \cite{NaorP06}. We give three security properties. These are correctness, soundness, and prover privacy. Correctness and prover privacy directly correspond to the definitions of correctness and sender security given in \cite{NaorP06}, except for small adjustments, since the scheme will be running as an \ILC\ protocol. Since we do not require the verifier's evaluation point to be hidden from the prover, we refer to the functionality of polynomial evaluation rather than oblivious polynomial evaluation. This corresponds to abandoning the notion of receiver privacy from the original scheme.
 
-$$\R_{\textnormal{PC}}=\left\{\begin{array}{c}
-(\crs,\stm,\wit)=\left( (\F,N)\ , \  (m,l) , \ \vec{h}(X) \right):\\
-\vec{h}(X) \in \F^l[X] \text{ such that } \mathrm{deg}(\vec{h}(X)) = mn, \text{ where } N = nl
-\end{array}\right\}.$$
+First, we define the functionality of polynomial evaluation for the prover and verifier. Suppose that the prover and verifier are running as part of an \ILC\ protocol over field $\F$ with vector length $\sizevect$.
 
-The definition of completeness simply guarantees that if the protocol is carried out honestly, then the verifier will return the correct polynomial evaluation $\vec{h}(x)$.
+\begin{itemize}
+\item \textbf{Prover Input:} $\vec{h}(X) \in \F^l[X]$, with $\text{deg}(\vec{h})\leq mn$.
+\item \textbf{Verifier Input:} $x \in \F$.
+\item \textbf{Prover Output:} Nothing.
+\item \textbf{Verifier Output:} $\vec{h}(x)$.
+\end{itemize}
 
-\begin{definition}[Perfect Completeness]
-The polynomial commitment scheme is \emph{perfectly complete} if for all PPT adversaries $\mathcal{A}$
-$$\Pr \left[ \begin{array}{c} \crs\gets \KK(1^\sep); ((m,l),\vec{h}(X),x) \leftarrow \mathcal{A}(\crs): \\
-(\crs,(m,l),\vec{h}(X))\notin \R_\mathrm{PC} ~\vee~ \langle \mathcal{P}(\crs,(m,l),\vec{h}(X))\overset{\ILC~}{\longleftrightarrow}\mathcal{V}(\crs,(m,l),x)\rangle= \vec{h}(x) \end{array}\right] =1.$$
+The definition of correctness simply guarantees that if the protocol is carried out honestly, then the verifier will return the correct polynomial evaluation $\vec{h}(x)$.
+
+%\begin{definition}[Correctness]
+%The polynomial commitment scheme is \emph{correct} if for all PPT adversaries $\mathcal{A}$
+%$$\Pr \left[ \begin{array}{c} \crs\gets \KK(1^\sep); ((m,l),\vec{h}(X),x) \leftarrow \mathcal{A}(\crs): \\
+% \\
+%~\vee~ \langle \mathcal{P}(\crs,(m,l),\vec{h}(X))\overset{\ILC~}{\longleftrightarrow}\mathcal{V}(\crs,(m,l),x)\rangle= \vec{h}(x) \end{array}\right] =1.$$
+%\end{definition}
+\begin{definition}[Correctness]
+The polynomial commitment scheme is \emph{correct} if for all $\vec{h}(X) \in \F^l[X]$ with $\text{deg}(\vec{h}) \leq mn$ and $x \in \F$, the verifier receives $\vec{h}(x)$, the output of the polynomial evaluation functionality.
 \end{definition}
 
-Knowledge soundness guarantees that the outputs of the protocol are in fact evaluations of the same polynomial.
+\begin{definition}[Prover Privacy]
+For every probabilistic polynomial time $\V^*$ playing the role of the verifier, there exists a probabilistic polynomial time simulator $\Sim$ that produces output identically distributed to the view of $\V^*$.
+\end{definition}
+
+The original definitions given in \cite{NaorP06} do not bind the prover to a fixed polynomial of particular degree. We saw in Section \ref{sec:combits} that it could be important to check that \ILCopen\ values were evaluations of a polynomial of a particular degree. Therefore, we provide an extra definition that ensures that the verifier's outputs must be consistent with evaluations of the same polynomial.
 
 \begin{definition}[Knowledge soundness]
 A polynomial commitment scheme has \emph{knowledge soundness} if for all DPT $\Po^*$ there exists an expected PPT extractor $\E$ such that for all PPT adversaries $\A$
-$$\Pr\left[\begin{array}{c} \crs\gets \KK(1^\sep);((m,l),s,x) \gets \mathcal{A}(\crs); \vec{h}(X) \gets \E^{\langle \Po^*(s)\overset{\ILC~}{\longleftrightarrow}\V(\crs,(m,l))\rangle}(\crs,(m,l),x):\\ \bar{\vec{h}} = \vec{h}(x) ~\wedge~ (\crs,(m,l),\vec{h}(X))\notin \R_\mathrm{PC} \end{array}\right]\approx 0.$$ 
-Here the oracle $\langle \Po^*(s)\overset{\ILC~}{\longleftrightarrow}\V(\crs,(m,l))\rangle$ runs a full protocol execution and if the proof is successful it returns a transcript of the prover's communication with the channel. The extractor $\E$ can ask the oracle to rewind the proof to any point in a previous transcript and execute the proof again from this point on with fresh public-coin challenges from the verifier. We define $\bar{\vec{h}} \in \F^l$ to be the verifier's output in the first oracle execution. We think of $s$ as the state of the prover.
+$$\Pr\left[\begin{array}{c} \crs\gets \KK(1^\sep);((m,l),s,x,x') \gets \mathcal{A}(\crs); \\
+\vec{h}(X) \gets \E^{\langle \Po^*(s)\overset{\ILC~}{\longleftrightarrow}\V(\crs,(m,l))\rangle}(\crs,(m,l),x); \\
+\langle \Po^*(s)\overset{\ILC~}{\longleftrightarrow}\V(\crs,(m,l))\rangle(\crs,(m,l),x') : \\
+\mathsf{state}^\V_\mu \neq \vec{h}(x') ~\wedge~  \vec{h}(X) \in \F^l[x] ~\wedge~ \text{deg}(\vec{h}) = mn \end{array}\right]\approx 0.$$ 
+Here the oracle $\langle \Po^*(s)\overset{\ILC~}{\longleftrightarrow}\V(\crs,(m,l))\rangle$ runs a full protocol execution and if the proof is successful it returns a transcript of the prover's communication with the channel. The extractor $\E$ can ask the oracle to rewind the proof to any point in a previous transcript and execute the proof again from this point on with fresh public-coin challenges from the verifier. We think of $s$ as the state of the prover.
 \end{definition}
-
-Perfect special honest verifier zero-knowledge means that given any evaluation point $x$ and an evaluation $\vec{h}(x)$, it is possible to simulate the verifier's view so that the simulation is distributed exactly as in a real execution of the protocol, in a way that is consistent with the evaluation $\vec{h}(x)$.
-\begin{definition}[Special Honest-Verifier Zero-Knowledge]
-The polynomial commitment scheme is \emph{special honest-verifier zero-knowledge (SHVZK)} if there exists a PPT simulator $\mathcal{S}$ such that for all stateful interactive PPT adversaries $\mathcal{A}$ that output $((m,l),\vec{h}(X))$ such that $(\crs,u,w)\in \R_\mathrm{PC}$ and randomness $\rho$ for the verifier
-\begin{eqnarray*}
-&&\Pr \left[ \begin{array}{c}\crs\gets \KK(1^\sep);((m,l), \vec{h}(X),x, \rho) \leftarrow\mathcal{A}(\crs); \\
-\viewV\leftarrow \langle \mathcal{P}(\crs,(m,l),\vec{h}(X))\overset{\ILC~}{\longleftrightarrow} \V(\crs,(m,l),x;\rho)\rangle: \A(\viewV)=1\end{array} \right]\\
-&\approx
-&\Pr \left[ \crs\gets \KK(1^\sep);((m,l), \vec{h}(X),x, \rho) \leftarrow\mathcal{A}(\crs); \viewV\leftarrow \mathcal{S}(\crs,(m,l),\vec{h}(x),x,\rho): \mathcal{A}(\viewV)=1\right].
-\end{eqnarray*}
-Note that $\vec{h}(x)$ appears as an input to the simulator.
-\end{definition}
+%
+%Perfect special honest verifier zero-knowledge means that given any evaluation point $x$ and an evaluation $\vec{h}(x)$, it is possible to simulate the verifier's view so that the simulation is distributed exactly as in a real execution of the protocol, in a way that is consistent with the evaluation $\vec{h}(x)$.
+%\begin{definition}[Special Honest-Verifier Zero-Knowledge]
+%The polynomial commitment scheme is \emph{special honest-verifier zero-knowledge (SHVZK)} if there exists a PPT simulator $\mathcal{S}$ such that for all stateful interactive PPT adversaries $\mathcal{A}$ that output randomness $\rho$ for the verifier and $m,l,\vec{h}(X)$ such that $\vec{h}(X)$ is a degree $mn$ polynomial in $\F^l[x]$, we have
+%\begin{eqnarray*}
+%&&\Pr \left[ \begin{array}{c}\crs\gets \KK(1^\sep);((m,l), \vec{h}(X),x, \rho) \leftarrow\mathcal{A}(\crs); \\
+%\viewV\leftarrow \langle \mathcal{P}(\crs,(m,l),\vec{h}(X))\overset{\ILC~}{\longleftrightarrow} \V(\crs,(m,l),x;\rho)\rangle:\\ \A(\viewV)=1\end{array} \right]\\
+%&\approx
+%&\Pr \left[ \begin{array}{c} \crs\gets \KK(1^\sep);((m,l), \vec{h}(X),x, \rho) \leftarrow\mathcal{A}(\crs); \\
+%\viewV\leftarrow \mathcal{S}(\crs,(m,l),\vec{h}(x),x,\rho):\\
+%\mathcal{A}(\viewV)=1 \end{array}\right].
+%\end{eqnarray*}
+%Note that $\vec{h}(x)$ appears as an input to the simulator.
+%\end{definition}
 
 \subsection{Idea}
 
@@ -101,6 +118,8 @@ We can therefore rewrite the polynomial as $$\vec{h}(X)=\sum_{i=0}^m\vec{h}_{i,0
 Then, in the polynomial commitment scheme, the prover can commit to each row as before, and the verifier's computation is also similar to that of the previous example. We describe the scheme below.
 
 \subsection{Protocol}
+
+In this protocol, we suppress the inputs $\crs,m,l$ and $\vec{h}(X)$ for notational simplicity.
 
 \begin{description} \label{protpolycommit}
 \item[$\textbf{P}_\mathrm{PC}(id)$:]

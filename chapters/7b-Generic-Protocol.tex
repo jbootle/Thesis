@@ -148,14 +148,14 @@ The verifier computes and returns $\vec{h}(x) = \bar{\vec{h}}_0+\sum_{j=1}^{n} \
 \subsection{Security Proof}
 
 \begin{lemma} \label{proofpolycommit}
-The polynomial commitment protocol given above has perfect completeness, knowledge-soundness, and perfect special honest verifier zero-knowledge.
+The polynomial commitment protocol given above has correctness, knowledge-soundness, and prover privacy.
 \end{lemma}
 \begin{proof}
 By inspection, it follows that when the prover is honest, the verifier always recovers $\bar{\vec{h}}=\vec{h}(x)$. 
 
-We describe an efficient simulator to prove special honest verifier zero knowledge. The simulator is given $\vec{h}(x)$, and also given $\rho$, which determines the value of $x$. The simulator first picks random $\bar{\vec{h}}_1,\ldots,\bar{\vec{h}}_n\gets \F^l$ and then computes $\bar{\vec{h}}_0=\vec{h}(x)-\sum_{j=1}^n\bar{\vec{h}}_jx^{(j-1)m+d}$. In other words, the $\vec{h}_j$ are chosen uniformly at random, conditional on giving the correct evaluation $\vec{h}(x)$.
+We describe an efficient simulator to prove that the protocol has prover privacy. The simulator is given $\vec{h}(x)$, and also given $\rho$, which determines the value of $x$. The simulator first picks random $\bar{\vec{h}}_1,\ldots,\bar{\vec{h}}_n\gets \F^l$ and then computes $\bar{\vec{h}}_0=\vec{h}(x)-\sum_{j=1}^n\bar{\vec{h}}_jx^{(j-1)m+d}$. In other words, the $\vec{h}_j$ are chosen uniformly at random, conditional on giving the correct evaluation $\vec{h}(x)$.
 
-This is a perfect SHVZK simulation. The values $\bar{\vec{h}}_1,\ldots,\bar{\vec{h}}_n$ are chosen independently and uniformly at random in real proofs due to the choices of $\vec{b}_1,\ldots,\vec{b}_n$ just as in the simulated proofs. Finally, given these random values both real and simulated proofs, the matching $\bar{\vec{h}}_0$ are uniquely determined. This means we have identical distributions of real and simulated proofs which are consistent with the evaluation $\vec{h}(x)$.
+This is a perfect simulation. The values $\bar{\vec{h}}_1,\ldots,\bar{\vec{h}}_n$ are chosen independently and uniformly at random in real proofs due to the choices of $\vec{b}_1,\ldots,\vec{b}_n$ just as in the simulated proofs. Finally, given these random values both real and simulated proofs, the matching $\bar{\vec{h}}_0$ are uniquely determined. This means we have identical distributions of real and simulated proofs which are consistent with the evaluation $\vec{h}(x)$.
 
 Finally, we prove knowledge-soundness. The knowledge extractor already has access to the vectors committed as $(\vec{h}_{i,0}||\ldots||\vec{h}_{i,n})$ for $0 \leq i \leq m$, having seen all messages sent between the prover and the \ILC. Therefore, we define the polynomial to be $$\vec{h}(X)=\sum_{i=0}^m\vec{h}_{i,0}X^i +\sum_{j=1}^{n} \left(\sum_{i=0}^m\vec{h}_{i,j}X^i \right)X^{(j-1)m+d}$$
 In the protocol, the verifier queries \ILC\ to obtain $(\bar{\vec{h}}_0,\ldots,\bar{\vec{h}}_n) = \sum_{i=0}^{m} (\vec{h}_{i,0},\ldots,\vec{h}_{i,n}) x^i$ and then computes and returns $\bar{\vec{h}} = \bar{\vec{h}}_0+\sum_{j=1}^{n} \bar{\vec{h}}_{j} x^{(j-1)m+d}$. Substituting the query values into the expression for $\bar{\vec{h}}$ shows that $\vec{h}(x) = \bar{\vec{h}}$ and completes the proof of soundness. \qed
@@ -199,6 +199,15 @@ $$C = \left(\begin{array}{lll}
 \vec{Q}(\vec{a}_{m,1},\vec{b}_{m,1}),&\vec{Q}(\vec{a}_{m,2},\vec{b}_{m,2}),& \ldots,\vec{Q}(\vec{a}_{m,n},\vec{b}_{m,n}) \\
 \end{array}\right)$$
 The protocol we design will be more efficient than repeating $t=mn$ instances of the basic protocol in parallel, as the communication complexity will depend on $\sqrt{t}$ rather than $t$.
+
+Let us explain what all of the different letters above represent, and give an example of how to instantiate the parameters to get a simple range proof, where the prover wishes to prove that a secret committed integer lies in a given interval. The range proof example is stated again more precisely later on in Section \ref{app:range}.
+
+\begin{itemize}
+\item Firstly, we have $\vec{a}$. This is a secret vector, and part of the prover's witness. For our simple range proof, $\vec{a}$ will be a vector containing the the $\sizevect$-bit binary expansion of the prover's secret integer.
+\item Secondly, we have $\vec{b}$. This is a public vector of extra inputs to the protocol. For our simple range proof, we can imagine setting $\vec{b} = (1,2,4,\ldots,2^{\sizevect-1})$. This will give a range proof for the interval $[0,2^\sizevect-1]$, but by tweaking the last entry of $\vec{b}$ to make it smaller, we could get range proofs for other intervals.
+\item Next, we have the polynomial $\vec{P}$. This represents a polynomial that the witness $\vec{a}$ should satisfy, possibly using the extra tweaks $\vec{b}$. For a range proof, $\vec{a}$ is made up of bits, so $\vec{P} = \vec{a}\circ(\vec{1}-\vec{a})$, and $\vec{P}(\vec{a}) = 0$ if and only if $\vec{a}$ consists of bits.
+\item Finally, we have the polynomial $\vec{Q}$ and the commitment $[C]$. Polynomial $\vec{Q}$ connects the witness with the contents of the commitment $[C]$. For example, for the simple range proof, we set $\vec{Q}(\vec{a},\vec{b}) = \vec{a}\cdot \vec{b}$, so that $\vec{Q}$ computes the number represented by the bits of $\vec{a}$. The commitment $[C]$ should contain the value of $\vec{Q}(\vec{a},\vec{b})$, which is the prover's secret integer in this case.
+\end{itemize}
 
 In the following we will refer to the parameters $\ell_a,\ell_b,\ell_P,d_P,\ell_Q,d_Q$ such that $\vec{a}_{i,j}\in \F^{\ell_a}$, $\vec{b}_{i,j}\in \F^{\ell_b}$, $\vec{P}$ is a vector of length $\ell_P$ with entries $(\ell_a+\ell_b)$-variate polynomials of total degree $d_P$, and $\vec{Q}$ is a vector of length $\ell_Q$ containing $(\ell_a+\ell_b)$-variate polynomials of total degree $d_Q$.
 

@@ -135,7 +135,7 @@ $$\left(\begin{array}{lllll}
 0 & \vec{h}_{m+d}-\vec{b}_2 & \cdots & \vec{h}_{(n-2)m+d}-\vec{b}_n & \vec{h}_{N}
 \end{array} \right)$$
 
-The prover sends each row of the matrix above to \ILC\ (i.e. for $1 \leq i \leq m$, the prover sends the row vector $(\vec{h}_{i,0}||\ldots||\vec{h}_{i,n})$ to \ILC).
+The prover commits to each row of the matrix above using \ILCcommit\ (i.e. for $1 \leq i \leq m$, the prover commits to the row vector $(\vec{h}_{i,0}||\ldots||\vec{h}_{i,n})$).
 
 \item[$\textbf{V}_\mathrm{PC}(x,id)$:]
 
@@ -245,7 +245,7 @@ Finally, the prover needs to convince the verifier that the committed matrix $C$
 \item[Instance:] $\lbrace \vec{b}_{i,j} \rbrace_{i \in [m], j \in [n]}, \vec{P},\vec{Q}$ polynomials, and the $[C]$ that are already stored in the \ILC.
 %
 \item[P:]
-Pick $\vec{a}_{0,1},\ldots,\vec{a}_{0,n}\gets \F^{\ell_a}$ and $\vec{c}_{0,1},\ldots,\vec{c}_{0,n}\gets \F^{\ell_Q}$. Send $(\vec{c}_{0,1}||\ldots||\vec{c}_{0,n})$ to \ILC. Also send $\left( \vec{a}_{i,1}||\ldots||\vec{a}_{i,n}\right)$ for $i\in \{0\}\cup [m]$ to \ILC.
+Pick $\vec{a}_{0,1},\ldots,\vec{a}_{0,n}\gets \F^{\ell_a}$ and $\vec{c}_{0,1},\ldots,\vec{c}_{0,n}\gets \F^{\ell_Q}$. Commit to $(\vec{c}_{0,1}||\ldots||\vec{c}_{0,n})$ and $\left( \vec{a}_{i,1}||\ldots||\vec{a}_{i,n}\right)$ for $i\in \{0\}\cup [m]$ using \ILCcommit.
 
 Define
 $$\begin{array}{lll}
@@ -264,7 +264,7 @@ The verifier runs
 \textbf{V}_\mathrm{PC}(x,id=1) \to \bar{\vec{p}}=(\bar{\vec{p}}_1,\ldots,\bar{\vec{p}}_n) &&
 \textbf{V}_\mathrm{PC}(x,id=2) \to \bar{\vec{q}}=(\bar{\vec{q}}_1,\ldots,\bar{\vec{q}}_n)
 \end{align*}
-Let $\vec{c}_i = (\vec{c}_{i,1}|| \ldots || \vec{c}_{i,n} )$ denote the rows of $C$, where $\vec{c}_{i,j} \in \F^{\ell_Q}$. The verifier makes a \ILCopen\ query for the following value.
+Let $\vec{c}_i = (\vec{c}_{i,1}|| \ldots || \vec{c}_{i,n} )$ denote the rows of $C$, where $\vec{c}_{i,j} \in \F^{\ell_Q}$. The verifier makes an \ILCopen\ query for the following value.
 \begin{align*}
 (\bar{\vec{a}}_1||\ldots||\bar{\vec{a}}_n) &= \sum_{i=0}^m ( \vec{a}_{i,1}||\ldots||\vec{a}_{i,n}) {l_i(x)}
 \end{align*}
@@ -529,13 +529,13 @@ This protocol was the main motivation for introducing the \ILCcheck\ command to 
 \item[Protocol:]
 \item[\ P:]
 
-The prover randomly selects $\vec{a}_{0},\vec{b}_{0},\vec{c}_{0}\gets \F^n$, and sends them to the \ILC. For $i \in [m]$, the prover sends $\vec{a}_{i}$, $\vec{b}_{i}$ and $\vec{c}_{i} \in \F^n$ to the \ILC. The prover computes $\vec{\DDelta}_0,\ldots,\vec{\DDelta}_m \in \F^n$ such that
+The prover randomly selects $\vec{a}_{0},\vec{b}_{0},\vec{c}_{0}\gets \F^n$, and commits to them using \ILCcommit. For $i \in [m]$, the prover commits to $\vec{a}_{i}$, $\vec{b}_{i}$ and $\vec{c}_{i} \in \F^n$ using \ILCcommit. The prover computes $\vec{\DDelta}_0,\ldots,\vec{\DDelta}_m \in \F^n$ such that
 \[
 \left( \sum_{i=0}^m \vec{a}_{i} l_i(X) \right) \circ \left( \sum_{i=0}^m \vec{b}_{i} l_i(X) \right) - \left( \sum_{i=0}^m \vec{c}_{i} l_i(X) \right) = l_0(X) \sum_{i=0}^m \vec{\DDelta}_i X^i
 \]
-Note that the sums on the left begin from $i=0$ to incorporate the blinders. For $0 \leq i \leq m$, the prover sends $\vec{\DDelta}_i$ to the \ILC.
+Note that the sums on the left begin from $i=0$ to incorporate the blinders. For $0 \leq i \leq m$, the prover commits to $\vec{\DDelta}_i$ using \ILCcommit.
 
-The prover randomly selects $\vec{e} \gets \F^n$ and sends it to \ILC. The prover computes $\vec{h}_j \in \F^Q$ such that
+The prover randomly selects $\vec{e} \gets \F^n$ and commits to it using \ILCcommit. The prover computes $\vec{h}_j \in \F^Q$ such that
 \[
 (\vec{\bar{e}}(X)\cdot \vec{w}_1(X),\ldots,\vec{\bar{e}}(X)\cdot \vec{w}_Q(X)) = (c_1,\ldots,c_Q) + \sum_{j\neq 0,j=-3m}^{3m} \vec{h}_{j} X^j
 \]
@@ -544,9 +544,9 @@ where
 \vec{\bar{e}}(X) &= \vec{e} + \sum_{i=1}^m \vec{a}_{i} X^i + X^m \sum_{i=1}^m \vec{b}_{i} X^i + X^{2m} \sum_{i=1}^m \vec{c}_{i} X^i \\
 \vec{w}_q(X) &= \sum_{i=1}^m \vec{w}_{q,a,i} X^{-i} + X^{-m} \sum_{i=1}^m \vec{w}_{q,b,i} X^{-i} + X^{-2m} \sum_{i=1}^m \vec{w}_{q,c,i} X^{-i}
 \end{align*}
-For $j\neq 0,-3m \leq j \leq 3m$, the prover sends $\vec{h}_j$ to the \ILC.
+For $j\neq 0,-3m \leq j \leq 3m$, the prover commits to $\vec{h}_j$ using \ILCcommit.
 
-\item[\ V:] The verifier randomly selects $x\gets \F^*$, and makes the following queries to \ILC.
+\item[\ V:] The verifier randomly selects $x\gets \F^*$, and makes the following \ILCopen\ queries to \ILC.
 \[
 \bar{\vec{e}} = \vec{e} + \sum_{i=1}^m \vec{a}_{i} x^i + x^m \sum_{i=1}^m \vec{b}_{i} x^i + x^{2m} \sum_{i=1}^m \vec{c}_{i} x^i
 \]
@@ -897,9 +897,9 @@ The verifier accepts the argument if both checks are satisfied.
 \item[Prover's witness:] Satisfying assignments $\wit = \{\vec{a}_i,\vec{b}_i,\vec{c}_i\}_{i \in m}$ to the wires of the circuit.
 \item[Protocol:]
 \item[\ P:]
-Choose $\vec{d} \gets \F^n$ uniformly at random, and send to \ILC. For $i \in [m]$, send $\vec{a}_{i},\vec{b}_{i},\vec{c}_{i}$ to \ILC.
+The prover chooses $\vec{d} \gets \F^n$ uniformly at random, and commits to it using \ILCcommit. For $i \in [m]$, commit to $\vec{a}_{i},\vec{b}_{i},\vec{c}_{i}$ to \ILCcommit.
 
-\item[\ V:] The verifier randomly selects $y\gets \F^*$ and sends it to \ILC.
+\item[\ V:] The verifier randomly selects $y\gets \F^*$ and sends it to the prover.
 
 As argued before, the circuit determines vectors of polynomials $\vec{w}_{a,i}(Y)$, $\vec{w}_{b,i}(Y)$, $\vec{w}_{c,i}(Y)$ and $K(Y)$ such that $C$ is satisfiable if and only if 
 $$
@@ -907,7 +907,7 @@ $$
 +
 \sum_{i=1}^m \vec{b}_i \cdot \vec{w}_{b,i}(Y)   +\sum_{i=1}^m \vec{c}_i \cdot \vec{w}_{c,i}(Y) =  K(Y)
 $$
-where $\vec{Y}'=(Y^m,\ldots,Y^{mn})$. Given $y$, both the prover and verifier can compute $K=K(y)$, $\vec{w}_{a,i}=\vec{w}_{a,i}(y)$, $\vec{w}_{b,i}=\vec{w}_{b,i}(y)$ and $\vec{w}_{c,i}=\vec{w}_{c,i}(y)$. The prover can obtain $y$ from \ILC.
+where $\vec{Y}'=(Y^m,\ldots,Y^{mn})$. Given $y$, both the prover and verifier can compute $K=K(y)$, $\vec{w}_{a,i}=\vec{w}_{a,i}(y)$, $\vec{w}_{b,i}=\vec{w}_{b,i}(y)$ and $\vec{w}_{c,i}=\vec{w}_{c,i}(y)$.
 
 \item[\ P:] The prover computes Laurent polynomials $\vec{r},\vec{s},\vec{r}'$, which have vector coefficients, and Laurent polynomial $t$, in the indeterminate $X$.
 \begin{align*}
@@ -918,14 +918,14 @@ where $\vec{Y}'=(Y^m,\ldots,Y^{mn})$. Given $y$, both the prover and verifier ca
 \end{align*}
 When the wires $\vec{a}_{i},\vec{b}_i,\vec{c}_i$ correspond to a satisfying assignment, the Laurent polynomial $t(X)$ will have constant term $t_0=0$. 
 
-The prover commits to $t(X)$ by sending each coefficient $t_k$ to the \ILC.
+The prover commits to $t(X)$ by committing to each coefficient $t_k$ using a separate \ILCcommit\ command.
 
 \item[\ V:] The verifier randomly selects $x\gets \F^*$ and makes an \ILCopen\ queries to obtain
 \begin{align*}
 \vec{r} &= \sum_{i=1}^m\vec{a}_{i}x^{i} y^i+\sum_{i=1}^m\vec{b}_{i} x^{-i}+x^m \sum_{i=1}^m\vec{c}_{i} x^{i}+\vec{d}x^{2m+1}\\ \\
 v &= \sum_{k=-3m,k \neq 0}^{4m+2}t_k x^{k}
 \end{align*}
-The verifier computes $\vec{r}'=\vec{r}\circ \vec{y}' +2\vec{s}(x)$. The verifier accepts only if the following check is satisfied.
+The verifier computes $\vec{r}'=\vec{r}\circ \vec{y}' +2\vec{s}(x)$. The verifier accepts only if the following \ILCcheck\ is satisfied.
 $$\vec{r}\cdot \vec{r}'-2K \vereq v$$
 \end{description}
 

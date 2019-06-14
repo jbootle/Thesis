@@ -83,7 +83,7 @@ Of course, in a real protocol it is important that this condition is actually ch
 
 \item[V:] The verifier samples the challenge $x \gets \Z_p$ uniformly at random.
 
-The verifier makes a \ILCopen\ query to get $f = ax+b$.
+The verifier makes an \ILCopen\ query to get $f = ax+b$.
 
 The verifier outputs $1$ to accept.
 \end{description}
@@ -190,7 +190,7 @@ This example in particular shows how the \ILC\ model can be a useful abstraction
 
 \item[V:] The verifier samples the challenge $x \gets \Z_p$ uniformly at random.
 
-The verifier makes a \ILCopen\ query to get $f = ax+b$.
+The verifier makes an \ILCopen\ query to get $f = ax+b$.
 
 The verifier computes $f(x-f)$, and makes a \ILCcheck\ query to check whether it is equal to $k_1 x + k_2$.
 
@@ -208,3 +208,24 @@ For perfect special honest verifier zero knowledge, we provide an efficient simu
 
 Finally, we prove knowledge-soundness. Firstly, note that the \ILC~ knowledge extractor already has access to all messages that the prover has committed to using \ILCcommit. As in the previous protocol, we know that $f = ax+b$ and that $f(x-f) = k_1 x + k_2$. Substituting the first expression into the second, we obtain the quadratic polynomial $a(1-a)x^2 + (b(1-2a)-k_1)x-a^2-k_2$. If $a(1-a)$ is non-zero, then this is a quadratic equation, and there are at most two values of $x$ which are roots. So the probability that the prover is able to produce a proof that the verifier will accept is at most $2/p$. Therefore, we conclude that $a(1-a) = 0$, and that $a$ is a bit. \qed
 \end{proof}
+
+\subsection{Query Matrices}\label{subsec:rankexplain}
+
+After many protocols in Chapter \ref{chapterlabel:Generic-Protocol} of this thesis, and in the security proof for the compilation procedure in Section \ref{sec:ILCtoDLOG}, we are concerned with the condition that the \ILC\ query matrices have full rank, and fewer rows than columns. With the aid of the protocols from Sections \ref{prot:combits} and \ref{prot:ILCcombits}, we explain why this is the case.
+
+Let us look at the query matrix for the protocol of Section \ref{prot:ILCcombits}. The matrix is $$\begin{pmatrix} x & 1 & 0 & 0 \\ 0 & 0 & x & 1 \end{pmatrix}.$$ The columns correspond to $A$, $B$, $K_1$ and $K_2$ from \ref{prot:combits}, and the rows correspond to the first and second verification equations. We can use this matrix to connect the randomness values sent by an honest prover to the randomness values used in the prover's commitments.
+$$\begin{pmatrix} u \\ v \end{pmatrix}  = \begin{pmatrix} x & 1 & 0 & 0 \\ 0 & 0 & x & 1 \end{pmatrix} \begin{pmatrix} r \\ s \\ t_1 \\ t_2 \end{pmatrix}.$$ This is a system of linear equations.
+
+Consider the rank-nullity theorem. Over a field $\F$, the rank-nullity theorem says when the matrix is considered to be a linear map, the dimension of the image of the map, plus the dimension of the kernel of the map, are equal to the number of columns, or the length of the vectors to which the matrix is applied. In an \ILC\ protocol, this is equal to the number of commitments that the prover has made.
+
+Imagine that this system of linear equations had a trivial kernel. In that case, given the randomness openings $u$ and $v$ from an honest prover, the verifier would be able to solve the system to recover the randomness used in the prover's commitments. In general, this seems as though it will not lead to protocols with the zero-knowledge property. This leads us to a first condition on the query matrix. If the kernel is non-trivial, this implies that \emph{the rank of the query matrix should be strictly less than the number of columns in the matrix}.
+
+Returning to the protocols for a second, we can also see that the protocol from Section \ref{prot:combits} is very easy to simulate. One picks a commitment opening $f$ at random. One also has to pick some randomness values $v$ and $u$ for the commitments in the verification equations, and these are also picked uniformly at random. Then, it is always possible to select some of the commitment group elements uniformly at random, and determine the others by rearranging the verification equations. In the \ILC\ version of this protocol in Section \ref{prot:ILCcombits}, the commitments and commitment randomness have been abstracted out of the protocol, and we only need to simulate $f$.
+
+When considering more complicated \ILC\ protocols, and how they might be converted into real protocols in the discrete logarithm setting, we could hope to use the same strategy to prove zero knowledge. Namely, we could produce a simulator for the discrete-logarithm based protocol by using the simulator for the underlying \ILC\ protocol to simulate all of the commitment openings, and then if we needed to simulate any values for commitment randomness, we could select all of those values uniformly at random. Then, one could select some of the commitment group elements uniformly at random and rearrange the verification equations to determine what the rest of the commitments should be in the simulated transcript. One could refer to this as the `simple' simulator.
+
+Now, suppose that the rank of the \ILC\ query matrix is strictly less than the number of rows in the matrix. This means that the simulated openings for the randomness values could not be chosen to be independently and uniformly at random; as they would then come from a space of higher dimension than the space of an honest prover's openings for the randomness. In such a case, we would not be able to use the simple simulator. So we have a second condition on the query matrix, namely that \emph{the rank of the query matrix should be greater than or equal to the number of rows in the matrix}.
+
+If we take the condition that the rank of the \ILC\ query matrix is at least the number of rows in the matrix, but strictly less than the number of columns in the matrix, then we must have that the number of rows is less than the number of columns. Then, the matrix must achieve maximum possible rank,  which is the number of rows in the matrix. So, motivated by some simple situations which seem like they might be problematic for the zero-knowledge property and the use of the simple simulator, we have placed some limitations on the \ILC\ query matrix.
+
+In Section \ref{sec:ILCtoDLOG}, we give a proof that these conditions on the query matrix are sufficient for honest-verifier zero-knowledge; that is, we show that the simple simulator suffices. These conditions on the query matrix apply to all of our protocols. However, we do not claim that the conditions are \emph{necessary} for zero-knowledge.

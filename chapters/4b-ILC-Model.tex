@@ -164,14 +164,14 @@ We give pseudocode descriptions of an Ideal Linear Commitment protocol in Figure
 \begin{algorithm}[H]
 \caption*{\ILCopen($Q$)}
 \begin{itemize}
-\item Output $QV$.
+\item Output $QM$.
 \end{itemize}
 \end{algorithm}
 %\vspace{-1.07cm}
 \begin{algorithm}[H]
 \caption*{\ILCcheck($Q', V'$)}
 \begin{itemize}
-\item If $Q'V = V'$ then output $\top$.
+\item If $Q'M = V'$ then output $\top$.
 \item Otherwise output $\bot$.
 \end{itemize}
 \end{algorithm}
@@ -301,9 +301,68 @@ In this case, we are able to make several simplifications. Since for $i < \mu$ t
 
 \subsection{Remarks on the Interaction Model}
 
-\paragraph{Remark.} We have presented an interaction environment using vectors of fixed length $\sizevect$. In fact, in our protocols, we will allow the prover to commit to vectors of \emph{several different fixed lengths} $\sizevect_1,\ldots,\sizevect_r$, which will be specified at the beginning of the protocol. This is easily formalised by defining a new interaction environment, giving the prover and verifier access to $r$ copies of different \ILCcommit, \ILCopen\ and \ILCcheck\ commands and oracles using vectors of lengths $\sizevect_1,\ldots,\sizevect_r$. Such a channel will be referred to as an \ILC\ channel for vectors of several fixed lengths, and will be specified simply by including multiple vector lengths in $\crs_{\ILC~}$ rather than just one.
+\paragraph{Remark.} We have presented an interaction environment using vectors of fixed length $\sizevect$. In fact, in our protocols, we will allow the prover to commit to vectors of \emph{several different fixed lengths} $\sizevect_1,\ldots,\sizevect_r$, which will be specified at the beginning of the protocol. This is easily formalised by defining a new interaction environment, giving the prover and verifier access to $r$ copies of different \ILCcommit, \ILCopen\ and \ILCcheck\ commands and oracles using vectors of lengths $\sizevect_1,\ldots,\sizevect_r$. Such a channel will be referred to as an \ILC\ channel for vectors of several fixed lengths, and will be specified simply by including multiple vector lengths in $\crs_{\ILC~}$ rather than just one. The resulting interaction environment is shown in Figure \ref{fig:ILCpseudocodemixlen}.
 
-Alternatively, we can easily incorporate vectors of different lengths into the model by padding all vectors with zeroes until they are the same length as the longest vector. This will have no impact on the asymptotic efficiency of our protocols. Some of our \ILC\ protocols require single values to be committed as well as vectors.
+Alternatively, we can easily incorporate vectors of different lengths into the model by padding all vectors with zeroes until they are the same length as the longest vector. This will have no impact on the asymptotic efficiency of our protocols. Some of our \ILC\ protocols require single values to be committed as well as vectors. 
+
+\begin{figure}[!h]
+\resizebox{\textwidth}{!}{
+\begin{minipage}[t]{13cm}
+\begin{algorithm}[H]
+\caption*{An \ILC\ Protocol on $\crs_\ILC,\rho_\Po,\rho_\V,\mathsf{state}_0^\Po, \mathsf{state}_0^\V$ }
+\begin{itemize} \item\textbf{Initialise protocol.}:
+\begin{itemize}
+\item Parse $\crs_\ILC = (\F,\sizevect_1,\ldots,\sizevect_r)$.
+\item Set $M_j = V_{0,j}$ for each $j \in [r]$.
+\end{itemize} 
+\item \textbf{For $i = 1$ to $\mu$}: 
+\item \qquad \textbf{Run prover algorithm}:
+\begin{itemize}
+\item $(V_{i,1},\ldots,V_{i,r},\mathsf{state}^\Po_i) \gets \Po_\ILC ( i, \lbrace m_j \rbrace_{j < i}, \mathsf{state}^\Po_{i-1}, \rho_\Po )$
+\item $\ILCcommit(\sizevect_j,V_{i,j})$ for each $j \in [r]$.
+\end{itemize}
+\item \qquad \textbf{Run verifier algorithm}:
+\begin{itemize}
+\item $(m_i,\mathsf{state}_i^\V) \gets \VILC^{\ILCopen(\cdot,\cdot),\ILCcheck(\cdot,\cdot,\cdot)}(i,\mathsf{state}^\V_{i-1},\rho_\V)$
+\end{itemize} 
+\item \textbf{Accept or Reject}
+\end{itemize} 
+\vspace{1.53cm}
+\end{algorithm}
+\end{minipage}
+%==============================================================
+\begin{minipage}[t]{6.5cm}
+\vspace{0cm}
+\begin{algorithm}[H]
+\caption*{\ILCcommit($\sizevect_i,V$)}
+\begin{itemize}
+\item If $M_i = \bot$ then set $M_i = V$.
+\item If $V = \bot$ then do nothing.
+\item Otherwise, update $M_i$ by vertically concatenating it with $V$, with $V$ at the bottom.
+\end{itemize}
+\end{algorithm}
+%\vspace{-1.07cm}
+\begin{algorithm}[H]
+\caption*{\ILCopen($\sizevect_i,Q$)}
+\begin{itemize}
+\item Output $QM_i$.
+\end{itemize}
+\end{algorithm}
+%\vspace{-1.07cm}
+\begin{algorithm}[H]
+\caption*{\ILCcheck($\sizevect_i,Q', V'$)}
+\begin{itemize}
+\item If $Q'M_i = V'$ then output $\top$.
+\item Otherwise output $\bot$.
+\end{itemize}
+\end{algorithm}
+%\vspace{0.1cm}
+\end{minipage}
+}
+\caption{Description of how the parties in an \ILC\ protocol with several vector lengths interact.}
+%For explanation, see Subsection~\ref{ssec:constrILCtoIOP}}
+\label{fig:ILCpseudocodemixlen}
+\end{figure}
 
 \paragraph{Remark.} It is of course easy to generalise to the case where the verifier's messages are not single field elements. We use the case of single field elements for notational simplicity and because it suffices for all of our protocols.
 

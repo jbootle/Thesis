@@ -32,7 +32,7 @@ Zero-knowledge proofs satisfy three basic requirements.
 %\red{Proof-of-knowledge}
 %\red{Honest-Verifier Zero-Knowledge}
 
-Many efficient zero-knowledge proofs are based on the discrete logarithm assumption~\cite{Schnorr91,Cramer1998a,Groth2009b,Seo2011a,BootleCCGP16,BunzBBPWM18,GrothK15,BootleCCGGP15,BayerG13,BootleG18}. Although efficiency has improved over time, it looks as though all of these protocols draw on the same small collection of techniques, some used for improbing efficiency, and some for proving security.
+Many efficient zero-knowledge proofs are based on the discrete logarithm assumption~\cite{Schnorr91,Cramer1998a,Groth2009b,Seo2011a,BootleCCGP16,BunzBBPWM18,GrothK15,BootleCCGGP15,BayerG13,BootleG18}. Although efficiency has improved over time, it looks as though all of these protocols draw on the same small collection of techniques, some used for improving efficiency, and some for proving security.
 
 For instance, all of the protocols above use commitment schemes. These allow either party to `commit' to a message, so that the message stays hidden but is fixed relative to the commitment, and can be revealed later. A party can commit to a message $m$ by applying a commitment algorithm with $m$ as input, and obtain $c$, a commitment to $m$. The commitment $c$ can then be sent to other parties. Later, the party can `open' $c$ by revealing $m$. The other parties may then check that $c$ corresponds to $m$.
 

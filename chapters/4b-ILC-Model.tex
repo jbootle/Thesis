@@ -91,7 +91,7 @@ $\Po_{\ILC~}$ &\multirow{4}{*}{ \resizebox{0.8\linewidth}{!}{\includegraphics{IL
 \end{tabular}}\caption{Description of the $\ILC~$ interaction environment. The $\vec{v}_i$ here are vectors over a field $\F$, $x$ is a value from $\F$ and $V, V'$ and $Q$ are matrices over $\F$.}\label{ILCSyntaxFigure11}
 \end{figure}
 
-As such, when using the \ILC\ channel, the prover can submit an \ILCcommit\ command to commit to
+As such, when using the \ILC\ channel, the prover can submit a \ILCcommit\ command to commit to
 vectors of field elements of some fixed length $\sizevect$, specified in $\crs_{\ILC}$. The vectors remain secretly stored, and will not be forwarded to the verifier. Instead, the verifier only learns how many vectors the prover has committed to, and their lengths.
 
 The \ILC\ could be viewed in several possible different ways, as a commitment functionality, communication channel, a trusted third party, or an oracle for the verifier. When Ideal Linear Commitment protocols are compiled into real zero-knowledge protocols, the functionality previously guaranteed by the \ILC\ will be enforced using various cryptographic tools.
@@ -108,7 +108,7 @@ We will now define general Ideal Linear Commitment protocols, and then specialis
 
 In a $\mu$-round Ideal Linear Commitment protocol, a prover $\PoILC$ and a verifier $\VILC$ will interact with each other via the \ILC, each sending $\mu$ messages. An Ideal Linear Commitment protocol is defined over a field $\F$ and will use a fixed vector length $\sizevect$. Let $(t_1,\ldots,t_\mu) \in \N^\mu$ be a tuple of message lengths. There is a setup generator $\KKILC$ which outputs $\crs_\ILC = (\F,\sizevect,(t_1,\ldots,t_\mu),\mathsf{aux})$, where $\mathsf{aux}$ consists of extra elements of $\F$ which might be useful when running the protocol.
 
-The prover and the verifier will run the protocol on given inputs. They will use random coins $\rho_\Po$ and $\rho_\V$, and they will maintain states $\mathsf{state}^\Po_i$ and $\mathsf{state}^\V_i$ that will allow them to remember information over several different rounds of the protocol. The initial state $\mathsf{state}^\Po_0$ of the prover will be equal to the prover's input. The initial state $\mathsf{state}^\V_0$ of the verifier will be equal to the prover's input. Initially, the \ILC\ will store $V_0$, which is either a matrix with $\sizevect$ columns, or equal to $\bot$. The matrix $V_0$ corresponds to any commitments that have been made before the protocol begins, that might form part of the prover or verifier's input.
+The prover and the verifier will run the protocol on given inputs. They will use random coins $\rho_\Po$ and $\rho_\V$, and they will maintain states $\mathsf{state}^\Po_i$ and $\mathsf{state}^\V_i$ that will allow them to remember information over several different rounds of the protocol. The initial state $\mathsf{state}^\Po_0$ of the prover will be equal to the prover's input. The initial state $\mathsf{state}^\V_0$ of the verifier will be equal to the prover's input. Initially, the \ILC\ will store $V_0$, which is either a matrix with $\sizevect$ columns, or equal to $\bot$. The matrix $V_0$ has $\sizevect$ columns, and corresponds to any commitments that have been made before the protocol begins, that might form part of the prover or verifier's input.
 
 In every round $\roundnum \in \{ 1,\ldots,\mu \}$:
 \begin{itemize}
@@ -185,11 +185,11 @@ The security properties of \ILC\ proof protocols, including the completeness, so
 
 \subsection{Complexity Measures}
 
-We have already mentioned $\mu$, the number of rounds of an \ILC\ protocol. This is our first useful complexity measure.
+The first useful complexity measure for an \ILC\ protocol is the vector length $\sizevect$. We have already mentioned $\mu$, the number of rounds of an \ILC\ protocol. This is another useful complexity measure.
 
 Set $t = \sum_{i=1}^\mu t_i$. This is the \emph{total number of vectors} that the prover commits to as part of the \ILC\ protocol. Later one, we will see that this can impact the communication complexity and computational complexity of real protocols based on \ILC\ protocols.
 
-We define $\qc$ to be the \ILCopen\ query complexity, i.e. the number of linear combinations that the verifier obtains using the \ILCopen\ oracle. Every time the verifier makes an \ILCopen\ query on a matrix $Q \in \F^l \times t$, we consider this to be $l$ queries for the purporse of measuring the query complexity. Then, $\qc$ is the total number of rows from all matrices $\Chal$ on which the verifier has called the \ILCopen\ oracle. Similarly, we define $\qc'$ to be the \ILCcheck\ query complexity, i.e. the number of times that the verifier queries certain linear combinations using the \ILCcheck\ oracle. 
+We define $\qc$ to be the \ILCopen\ query complexity, i.e. the number of linear combinations that the verifier obtains using the \ILCopen\ oracle. Every time the verifier makes an \ILCopen\ query on a matrix $Q \in \F^l \times t$, we consider this to be $l$ queries for the purpose of measuring the query complexity. Then, $\qc$ is the total number of rows from all matrices $\Chal$ on which the verifier has called the \ILCopen\ oracle. Similarly, we define $\qc'$ to be the \ILCcheck\ query complexity, i.e. the number of times that the verifier queries certain linear combinations using the \ILCcheck\ oracle. 
 
 %We define $\qc$ to be the \ILCopen\ query complexity, i.e., $\Chal \in \F^{\qc\times t}$, and $\qc'$ the \ILCcheck\ query complexity, i.e., $\Chal' \in \F^{\qc'\times t}$. Let $T_{\PoILC}$ be the running time of $\PoILC(\crs_{\ILC},\stm,\wit)$, $T_{\ECC\!}(\sizevect)$ be the encoding time for a vector in $\F^\sizevect$, $T_{\ComCommit}(t_\roundnum)$ be the time to commit to $t_\roundnum$ field elements, $T_{\text{Mmul}}(\qc,\totalnumvec,b)$ be the time it takes to multiply matrices in $\F^{\qc\times \totalnumvec}$ and $\F^{\totalnumvec\times b}$ and similarly for $\qc'$. Let $T_{\VILC}$ be the running time of $\VILC(\crs_{\ILC},\stm)$, and let $C_{\ILC}$ be the communication from the verifier to the prover in $\langle \PoILC \ilc \VILC\rangle$, $C_{\ComCommit}(t_\roundnum)$ be the combined size of commitment and randomness for a message consisting of $t_\roundnum$ field elements.
 %
@@ -303,6 +303,8 @@ In this case, we are able to make several simplifications. Since for $i < \mu$ t
 
 Alternatively, we can easily incorporate vectors of different lengths into the model by padding all vectors with zeroes until they are the same length as the longest vector. This will have no impact on the asymptotic efficiency of our protocols. Some of our \ILC\ protocols require single values to be committed as well as vectors. 
 
+In this case, the matrices $V_{0,j}$ each have $\sizevect_j$ columns.
+
 \begin{figure}[!h]
 \resizebox{\textwidth}{!}{
 \begin{minipage}[t]{13cm}
@@ -370,7 +372,7 @@ Alternatively, we can easily incorporate vectors of different lengths into the m
 
 \paragraph{Remark.} The verifier also produces a state in their final round, in addition to their final message $m_\mu \in \lbrace 0,1 \rbrace$ which signifies whether they want to accept or reject. This serves a useful purpose. In Section \ref{subsec:polycommit}, we define a polynomial commitment scheme in the \ILC\ model. At the end of the protocol, the verifier is able to compute the evaluation of a committed polynomial and then store it in their final state. In this way, the polynomial commitment scheme can be used as a subprotocol in other \ILC\ protocols, as the evaluation can be passed around as part of the final state.
 
-\paragraph{Remark.} We have formally defined how the prover and verifier interact as part of an \ILC\ protocol, and how the prover receives the verifier's computed outputs $m_i$, for example. Later on, when designing protocols, we will be slightly less formal, and refer, for example, to the verifier sending $m_i$ to the prover.
+\paragraph{Remark.} We have formally defined how the prover and verifier interact as part of an \ILC\ protocol, and how the prover receives the verifier's computed outputs $m_i$, for example. Later on, when designing protocols, we will be slightly less formal, and refer, for example, to the verifier sending $m_i$ to the prover. We will also suppress the vector $(t_1,\ldots,t_\mu)$ from our descriptions of $\crs_\ILC$ and protocols, and assume that both the prover and verifier know the message schedule of the protocol.
 
 \subsection{Comparison with Other Models and Types of Protocol}
 

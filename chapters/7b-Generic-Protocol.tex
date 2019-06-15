@@ -286,7 +286,7 @@ The protocol has perfect completeness, knowledge-soundness, and perfect special 
 \begin{proof}
 Perfect completeness of the protocol follows by correctness of the PolyCommit sub-protocol, which was used to commit to $\left( \vec{P}_1^*(X)||\ldots||\vec{P}_n^*(X)\right)$ and $\left( \vec{Q}_1^*(X)||\ldots||\vec{Q}_n^*(X)\right)$, and by careful inspection.
 
-For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator selects $\bar{\vec{a}}_j \gets \F^{\ell_a}$ and $\bar{\vec{q}}_j\gets \F^{\ell_Q}$ for each j. All these values are distributed exactly as in a real protocol, where they are also uniformly random. She then simulates the view of the verifier when running $\verifier_\mathrm{PC}(x,id=1)$ and $\verifier_\mathrm{PC}(x,id=2)$ using the evaluation point $x$ and evaluations $\bar{\vec{p}}$ and $\bar{\vec{q}}$, which are determined by the values already simulated, and using the simulator which comes from the prover privacy property of the PolyCommit sub-protocol. By the prover privacy of the polynomial commitment scheme, the simulated values have identical distribution to the real proofs.
+For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator selects $\bar{\vec{a}}_j \gets \F^{\ell_a}$ and $\bar{\vec{q}}_j\gets \F^{\ell_Q}$ for each j. All these values are distributed exactly as in a real protocol, where they are also uniformly random. She then simulates the view of the verifier when running $\verifier_\mathrm{PC}(x,id=1)$ and $\verifier_\mathrm{PC}(x,id=2)$ using the evaluation point $x$ and evaluations $\bar{\vec{p}}$ and $\bar{\vec{q}}$, which are determined by the values already simulated, and using the simulator which comes from the prover privacy property of the PolyCommit sub-protocol. By the prover privacy of the polynomial commitment scheme, the simulated values have identical distribution to the real proofs. Finally, the simulator sets the output of all \ILCcheck\ queries to $\top$.
 
 Finally, we prove knowledge-soundness. The \ILC~ knowledge extractor already has access to all messages sent between the prover and \ILC. It remains to show that if the committed values are not a valid witness, then there is a negligible probability that the verifier will accept.
 Recall the verification checks. The verifier runs
@@ -574,7 +574,7 @@ The argument of subsection \ref{prot:3ac} for satisfiability of an arithmetic ci
 
 \begin{proof} Perfect completeness follows by careful inspection.
 
-For SHVZK, we describe a simulator. Given a challenge $x$ such that $l_0(x) \neq 0$, the simulator randomly selects $\vec{\bar{a}}$ and $\vec{\bar{b}}$ uniformly at random from $\F^n$ and $\bar{\vec{e}}$ uniformly at random from $\F^Q$. These are distributed exactly as in a real argument. Therefore the simulated argument is indistinguishable from a real argument and we have SHVZK.
+For SHVZK, we describe a simulator. Given a challenge $x$ such that $l_0(x) \neq 0$, the simulator randomly selects $\vec{\bar{a}}$ and $\vec{\bar{b}}$ uniformly at random from $\F^n$ and $\bar{\vec{e}}$ uniformly at random from $\F^Q$. Finally, the simulator sets the output of all \ILCcheck\ queries to $\top$. These are distributed exactly as in a real argument. Therefore the simulated argument is indistinguishable from a real argument and we have SHVZK.
 
 Finally, we prove knowledge-soundness. The \ILC~ knowledge extractor already has access to all messages sent between the prover and \ILC. It remains to show that if the committed values are not a valid witness, then there is a negligible probability that the verifier will accept.
 Recall that the verifier makes \ILCopen \ queries in order to obtain the following values.
@@ -941,7 +941,7 @@ The argument of subsection \ref{prot:5ac} for satisfiability of an arithmetic ci
 \begin{proof}\label{ap:proofAC}
 Perfect completeness follows by inspection and using the fact that the polynomial commitment protocol  and inner product argument also have perfect completeness.
 
-For perfect special honest verifier zero-knowledge we are given $y,x\in \F^*$, which allows us to compute $\vec{w}_{a,i},\vec{w}_{b,i},\vec{w}_{c,i}$ and $K$ from the circuit. The simulator picks $\vec{r}\gets \F^n$. To see that the simulated components have the same distribution as a real argument observe $\vec{r}$ is uniformly random.
+For perfect special honest verifier zero-knowledge we are given $y,x\in \F^*$, which allows us to compute $\vec{w}_{a,i},\vec{w}_{b,i},\vec{w}_{c,i}$ and $K$ from the circuit. The simulator picks $\vec{r}\gets \F^n$. To see that the simulated components have the same distribution as a real argument observe $\vec{r}$ is uniformly random. Finally, the simulator sets the output of all \ILCcheck\ queries to $\top$.
 
 It remains to show that we have knowledge soundness. The \ILC\ knowledge extractor already has access to all messages sent between the prover and \ILC. It remains to show that if the committed values are not a valid witness, then there is a negligible probability that the verifier will accept.
 Recall that the verifier makes an \ILCopen\ query in order to obtain the following value

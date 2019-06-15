@@ -10,7 +10,11 @@
 \label{sec:IPCPgencon}\label{sec:ILCtoIOP}
 In this section, we show how to compile a proof of knowledge with straight-line extraction for relation $\R$ over the communication channel $\ILC$ into a proof of knowledge without straight-line extraction for the same relation over the standard channel, based on the existence of collision-resistant hash functions.
 
-The idea behind the compilation of an \ILC\ proof is that instead of committing to vectors $\vect_\rownr$ using the channel \ILC, the prover encodes each vector $\vect_\rownr$ as $\preECC(\vect_\rownr)$ using a linear error-correcting code $\preECC$. In any given round, we can think of the codewords as rows $\preECC(\vect_\rownr)$ in a matrix $\preECC(V)$. However, instead of committing to the rows of the matrix, the prover commits to the columns of the matrix. When the verifier wants to make an \ILCopen\ query for a linear combination of the original vectors, he sends the coefficients $\vec{q}=(q_1,\ldots,q_t)$ of the linear combination to the prover, and the prover responds with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$. 
+The compilation proof given in this section comes from joint work in \cite{BootleCGGHJ17} with Andrea Cerulli, Essam Ghadafi, Jens Groth, Mohammad Hajiabadi and Sune K. Jakobsen. In particular, Sune K Jakobsen is responsible for the technical lemmas in the compilation proof, but the proof and compilation have been adapted for use with our modified \ILC\ model and optimisations to the compilation method.
+
+The resulting protocols have the potential to be extremely efficient in practice. Ligero \cite{CCS:AHIV17}, a similar protocol which is also based on hashes and error-correcting codes with an additional special property, has been implemented in C++ and provides evidence for the deployability of interactive protocols based on hash functions and error-correcting codes.
+
+The idea behind the compilation of an \ILC\ proof is that instead of committing to vectors $\vect_\rownr$ using \ILCcommit, the prover encodes each vector $\vect_\rownr$ as $\preECC(\vect_\rownr)$ using a linear error-correcting code $\preECC$. In any given round, we can think of the codewords as rows $\preECC(\vect_\rownr)$ in a matrix $\preECC(V)$. However, instead of committing to the rows of the matrix, the prover commits to the columns of the matrix. When the verifier wants to make an \ILCopen\ query for a linear combination of the original vectors, he sends the coefficients $\vec{q}=(q_1,\ldots,q_t)$ of the linear combination to the prover, and the prover responds with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$. 
 Notice that we will use the notation $\vect_{(\vec{q})}$, and later on $\vect_{(\vec{\gamma})}$, to denote vectors that depend on $\vec{q}$ and $\vec{\gamma}$: the $\vec{q}$ and $\vec{\gamma}$ are not indices. 
 Now, to spot check that the prover is not giving a wrong $\vect_{(\vec{q})}$, the verifier may request the $j$th element of each committed codeword $\ecc_\rownr$. This corresponds to revealing the $j$th column of error-corrected matrix $\preECC(V)$. Since the code $\preECC$ is linear, the revealed elements should satisfy $\preECC(\vect_{(\vec{q})})_j=\sum_{\rownr=1}^tq_\rownr \preECC(\vec{v}_\rownr)_{j}=\vec{q} (\preECC(V)|_{j})$. The verifier will spot check on multiple columns, so that if the code has sufficiently large minimum distance and the prover gives a wrong $\vect_{(\vec{q})}$, then with overwhelming probability, the verifier will  open at least one column $j$ where the above equality does not hold.
 
@@ -198,8 +202,8 @@ All the commitment openings are correct, so they will be accepted by the verifie
       \begin{theorem}[Knowledge Soundness]\label{thm:sound}
     If $(\KKILC,\PoILC,\VILC)$ is statistically knowledge sound with a straight-line extractor for relation $\R$ over $\ILC$ and $(\ComSetup,\ComCommit)$ is computationally (statistically) binding, then $(\KK,\Po,\V)$ as constructed above is computationally (statistically) knowledge sound for relation $\R$.
     \end{theorem}   
-    \begin{proof}
 
+    \begin{proof}
 We prove the computational case. The statistical case is similar.%, but slightly simpler. %(Check that that is true!)
 
 
@@ -236,7 +240,7 @@ We will now argue that for each of these three cases, the probability that they 
 
 \paragraph{Second Case} To do so, define the event $\event$ that $E^*$ is such that for some $\chaloptx\in \F^{\totalnumvec}$ we have $\hamdist(\tilde{\codeset}, {\chaloptx} E^*)\geq \maxdist$. Here $\tilde{\codeset}$ denotes the image of $\ECC$, i.e. $\tilde{\codeset}=\{(c+r,r):c\in \codeset, r\in \F^n\}$. Clearly, if $\PoILCMal$ returns an error because no $\vect_i,\eccrand_i$ with $\hamdist(\ECC(\vect_i,\eccrand_i),\eccmal_i)< \maxdist$ exist then we have $\event$. 
 
-\begin{lemma}%Remember a copy of the claim is in appendix. If you change this, change appendix
+\begin{lemma}\label{lem:proximity}
 Let $\eccmal_0,\ldots, \eccmal_{\totalnumvec}\in \F^{2n}$. If $\event$ occurs, then for uniformly chosen $\chalx\in \F^\totalnumvec$, there is probability at most $\frac{1}{|\F |}$ that $\hamdist(\tilde\codeset,\xce)<\frac{\minhamdist}{6}$.
 \end{lemma}
 
@@ -267,7 +271,7 @@ In this case, for all $\chaloptx\in \F^{\totalnumvec}$, we have $\hamdist(\tilde
 
 For two matrices $A$ and $B$ of the same dimensions, we define their Hamming distance $\hamdist_2(A,B)$ to be the number of $j$'s such that the $j$th column of $A$ and $j$th column of $B$ are different. This agrees with the standard definition of Hamming distance, if we consider each matrix to be a string of column vectors.
 
-\begin{lemma}
+\begin{lemma}\label{lem:goodlinearcombo}
 Assume $\neg \event$ and let $V$ and $R$ be defined as above. 
 Then for any $\vec{q}\in \F^{\totalnumvec}$ there exists an $\vec{r}_{(\vec{q})}$ with $\hamdist(\ECC(\vec{q} V, \vec{r}_{(\vec{q})}), \vec{q} E^*)< \maxdist$. 
 
@@ -308,7 +312,7 @@ This means that if $\neg \event$ occurs and $\PoMal$ attempts to open a $V_{(Q)}
 \[ \hamdist_2\left(\ECC\left(V_{(Q)}^*,R_{(Q)}^*\right), QE^*\right)\geq 2\maxdist.\]
 As argued above, if the distance between two strings of length $\sizeecc$ is at least $\maxdist$, the probability that $\chalJ$ will not contain a $\chalj$ such that the two strings differ in position $\chalj$ is negligible. Hence, the probability that $\ECC\left(V_{(Q)}^*,R_{(Q)}^*\right)|_J= QE^*|_J$ is negligible. Thus, the probability that $\neg \event$ and $\V$ accepts while $\VILC$ does not is negligible. This proves (\ref{zkip:ineq:pilcstar}).
 
-Next, we want to define a \emph{transcript extractor} $\Extrans$ that given rewindable access to ${\langle \Po^*(s)\std\V(\crs,\stm)\rangle}$ outputs $\viewpilcsim$, which we would like to correspond to all messages sent between $\PoILCMal$ and the channel in $ \langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_\ILC,\stm;\rho_{\ILC})\rangle $. Here $\rho_{\ILC}$ is the randomness used by the $\VILC$ inside $\V$ in the first execution of $\Extrans$'s oracle ${\langle \Po^*(s)\std\V(\crs,\stm)\rangle}$. However, we allow $\Extrans$ to fail if $\V$ does not accept in this first transcript and further to fail with negligible probability. Formally, we want $\Extrans$ to run in expected PPT such that for all PPT $\A$: 
+Next, we want to define a \emph{transcript extractor} $\Extrans$ that given rewindable access to ${\langle \Po^*(s)\std\V(\crs,\stm)\rangle}$ outputs $\viewpilcsim$, which we would like to correspond to all messages committed by $\PoILCMal$ using \ILCcommit\ in $ \langle \PoILCMal(s,\crs,\stm)\ilc\VILC(\crs_\ILC,\stm;\rho_{\ILC})\rangle $. Here $\rho_{\ILC}$ is the randomness used by the $\VILC$ inside $\V$ in the first execution of $\Extrans$'s oracle ${\langle \Po^*(s)\std\V(\crs,\stm)\rangle}$. However, we allow $\Extrans$ to fail if $\V$ does not accept in this first transcript and further to fail with negligible probability. Formally, we want $\Extrans$ to run in expected PPT such that for all PPT $\A$: 
 
 \begin{align}\Pr&\left[\begin{array}{c} \crs\gets \KK(1^\sep);(\crs_\ILC,\cdot)=\crs;(\stm,s) \gets \A(\crs);\\
 %\langle \PoMal(s)\std\V(\crs,u;(\rho_{\ILC},\rho))\rangle = b ; \\
@@ -464,7 +468,7 @@ As before, we will use the notation $\vect_{(\vec{q})}$ to denote vectors that d
 
 Now, to check that the prover is not giving a wrong $\vect_{(\vec{q})}$, the verifier will compute a commitment to $\vect_{(\vec{q})}$ using the real homomorphic commitment scheme, and check that this commitment is the correct linear combination of the commitments to $\vect_\rownr$. This works because the commitment scheme is homomorphic.
 
-Of course, to prevent real commitments from leaking information about committed vectors, randomnes is necessary. Each vector $\vect_\rownr$ will have the randomness $\vec{s}_\rownr$ used to commit to it concatenated to it, and then the prover will respond with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$ as before, plus $\vec{s}_{(\vec{q})}=\vec{q}\vec{s}$. Then SHVZK for the compiled proof is inherited from the underlying \ILC\ proof. Unlike the previous compilation technique which reveals some entries of committed codewords, almost all of the verifier's calculations are done on hiding commitments, along with a few openings that do not reveal any information due to the SHVZK property of the underlying \ILC\ proof. Therefore, it is not necessary to use any additional linear combinations in the proof.
+Of course, to prevent real commitments from leaking information about committed vectors, randomness is necessary. Each vector $\vect_\rownr$ will have the randomness $\vec{s}_\rownr$ used to commit to it concatenated to it, and then the prover will respond with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$ as before, plus $\vec{s}_{(\vec{q})}=\vec{q}\vec{s}$. Then SHVZK for the compiled proof is inherited from the underlying \ILC\ proof. Unlike the previous compilation technique which reveals some entries of committed codewords, almost all of the verifier's calculations are done on hiding commitments, along with a few openings that do not reveal any information due to the SHVZK property of the underlying \ILC\ proof. Therefore, it is not necessary to use any additional linear combinations in the proof.
 
 As before, we must discuss how to treat \ILCcheck\ queries. The verifier makes \ILCcheck\ queries $\vec{q}'=(q'_1,\ldots,q'_t)$ of linear combinations of committed vectors. Now, \ILCcheck\ queries handle the case where the verifier can compute what $\vect'_{(\vec{q})}\gets \vec{q}' V$ should be by themselves, using the results of other \ILCopen\ queries. Therefore, the prover need not send $\vect'_{(\vec{q})}$ to the verifier. The prover, given $\vec{q}'$, must still reveal $\vec{s}'_{(\vec{q})}=\vec{q}'\vec{s}$. To check that the prover is not giving a wrong $\vect'_{(\vec{q})}$, the verifier will compute a commitment to $\vect'_{(\vec{q})}$ using the real homomorphic commitment scheme with randomness $\vec{s}'_{(\vec{q})}$, and check that this commitment is the correct linear combination of the commitments to $\vect_\rownr$.
 %---------

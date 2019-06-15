@@ -1,0 +1,231 @@
+% !TEX root = ..\Main.tex
+\chapter{Simple Protocols through the ILC Lens}
+\label{chapterlabel:Baby-Protocols}
+
+In this chapter, to motivate the \ILC\ model and to help the reader warm up before they read about more complicated matters in later chapters, we present some very simple zero-knowledge protocols in the discrete logarithm setting, and rewrite them as \ILC\ protocols.
+
+In the process, we explain the rationale and design process for protocols in the Ideal Linear Commitment model with reference to two simple, concrete examples of a zero-knowledge protocol based on the discrete logarithm assumption. We also explain why in later chapters we prove properties about the rank and dimension of the query matrices.
+
+\section{Basic Proof-of-Knowledge}\label{sec:schnorr}
+
+In this section, we present one of the simplest possible useful examples of a discrete-logarithm-based protocol, and show how it can be rewritten as an \ILC\ protocol.
+
+Let $\G$ be a group of prime order $p$ in which the discrete logarithm problem is hard to solve. Let $g$ and $h$ be elements of $\G$. We will use the Pedersen commitment scheme. A commitment $A$ to message $m$ with randomness $\alpha$ shall be computed as $A = g^m \cdot h^\alpha$.
+
+The relation corresponding to the proof is
+\[
+\R =\left\{\begin{array}{c}
+\crs = (\G,p,g,h), 
+\stm = C,
+\wit = \lbrace a,r \rbrace \ : \
+C = g^a \cdot h^r
+\end{array}\right\}
+\]
+
+Now we present the protocol.
+
+\begin{description}\label{prot:schnorr}
+\item[Common input:] Setup information $\crs = (\G,p,g,h)$.
+\item [Instance:] Group element $\stm = C \in \G$.
+\item[Prover's witness:] A field element. $\wit = (a,r) \in \Z^2_p$ such that $C = g^a \cdot h^r$.
+\item[Protocol:]
+\item[\ P:] The prover randomly selects $b,s \gets \Z_p$. The prover computes $B = g^b \cdot h^s$ and sends $B$ to the verifier.
+
+\item[\ V:] The verifier randomly selects $x\gets \Z_p$, and sends $x$ to the prover.
+
+\item[\ P:] The prover computes $f = ax + b$, and $u = rx + t$, and sends $f$ and $u$ to the verifier.
+
+\item[\ V:] The verifier checks the equation $g^f \cdot h^u \vereq C^x \cdot B$.
+\end{description}
+
+\begin{thm}
+The Schnorr protocol \ref{prot:schnorr} has perfect completeness, knowledge-soundness and special honest verifier zero-knowledge.
+\end{thm}
+%
+%\paragraph{Remark.} Usually, security proofs for the Schnorr protocol prove special soundness and quote other results to show that the protocol has knowledge soundness according to the usual definition. We go into more detail here as it will help the reader to understand how our compilation of \ILC\ protocols into discrete-logarithm based protocols works later on.
+%
+%\red{Remove all this stuff, probably unnecessary. Put discussion about Markov inequality next to knowledge soundness definition}
+%
+%\paragraph{Remark.} The definition of knowledge-soundness uses an expected polynomial time extractor. Later in our arguments, our knowledge extraction algorithms, running in expected polynomial time, will either succeed in extracting a witness or will succeed in breaking an instance of a mathematical problem that is believed to be hard, such as the discrete logarithm problem. The astute reader might observe that this seems to reduce the security of the protocol to the problem of solving a hard problem in \emph{expected} polynomial time, which is not part of standard security assumptions. We show how to deal with this in the proof below, using the Markov inequality to limit the knowledge extractor's running time to strict polynomial time, and explain how to draw conclusions about the conrete security of the protocol. This provides a hint of how the same thing could be done in the actual discrete-logarithm-based compilation proof later on. \red{add section references}
+%
+\begin{proof} Perfect completeness follows by careful inspection.
+
+For SHVZK, we describe a simulator. Given a challenge $x$, the simulator selects $f$ and $u$ uniformly at random from $\Z_p$ so that they are distributed exactly as in a real argument. Now, $B$ is uniquely determined by the verification equation, and can be efficiently computed by rearranging the equation to see that $B = g^{-f} \cdot h^{-u} \cdot C^{-x}$. All values are distributed exactly as they would be in a real argument. Therefore the simulated argument is indistinguishable from a real argument and we have SHVZK.
+
+Finally, we prove knowledge-soundness. To do this, we show that the protocol has \emph{special soundness}. That is, given two proofs with the same first message and distinct challenges $x$ and $x'$, we show that it is possible to extract a valid witness $w$. This is the same as 2-tree special soundness from Definition \ref{def:treespecsound}.
+
+Given $B \in \G$, distinct $x,x' \in \Z_p$ and $f,f',u,u' \in \Z_p$ such that $g^f \cdot h^u = C^x \cdot B$, and $g^{f'} \cdot h^{u'} = C^{x'} \cdot B$, we can divide the two copies of the verification equation to eliminate $B$. We obtain $g^{f-f'}  \cdot h^{u-u'}= C^{x-x'}$. Since $x$ and $x'$ are distinct, $x-x'$ is invertible in $\Z_p$. Setting $a = \frac{f-f'}{x-x'}$ and $r = \frac{u-u'}{x-x'}$, we see that $g^a \cdot h^r = C$.
+
+To see that the protocol has knowledge soundness, apply Lemma \ref{lem:fork}, which shows that the protocol has witness extended emulation. Then, as mentioned previously,  \cite{dissertation} shows that witness extended emulation implies knowledge soundness.\qed
+%Now, we define a knowledge extractor to prove knowledge soundness. Suppose that the prover has success probability $\epsilon > 1/p$. The idea is that having fixed the prover's random coins, if $\epsilon > 1/p$, then there are two accepting transcripts, then a knowledge extractor running in expected polynomial time should be able to find them and use the special-soundness argument to compute a witness. If, however, $\epsilon \leq 1/p$, then if $p$ is large, the prover's success probability is already very poor indeed, so we need not worry about whether they know a witness or not.
+%
+%Assume that $\epsilon > 1/p$. The extractor executes the Schnorr protocol with the prover and verifier once, hoping to obtain a valid proof. If the proof is not accepted by the verifier, the extractor aborts. If the proof is accepted by the verifier, then the extractor rewinds the prover and verifier until just after the prover sends $w$ to the verifier, and replays the protocol over and over again until they obtain another accepting transcript with a different challenge $x$. In each run, this happens with probability $\epsilon - 1/p$, so we expect the extractor to replay the protocol $\frac{1}{\epsilon - 1/p}$ times. At this point, the extractor can compute the witness $s$ using the special-soundness procedure.
+%
+%Overall, the expected running time of the knowledge extractor is at most $T_1 + \frac{\epsilon T_1}{\epsilon - 1/p} + T_2$ where $T_1$ is the time taken to run the protocol once and obtain a transcript, and $T_2$ is the time taken to compute a witness from the two accepting transcripts.
+\end{proof}
+
+Next, we give the \ILC\ version of this protocol. The idea behind the basic proof-of-knowledge protocol is that the prover gives the verifier a linear combination of their secret value $a$ and a random blinding value $b$ used to hide $a$. Thus, we can reimagine Schnorr's protocol as an \ILC\ protocol.
+
+Notice that the verifier always accepts! This is not a mistake. \ILC\ protocols model zero-knowledge protocols where the verifier wants to check relations between different linear combinations of committed values. In the real proof-of-knowledge protocol, the prover sends the values $B = g^b \cdot h^s$, $f$, and $u$ to the verifier. We know that $C = g^a \cdot h^r$. Then, the verification equation checks that $z = sx+t$ in the exponent of the group element $g$. If the check is satisfied, then we know that $z = sx+t$.
+
+In the \ILC\ version of the protocol, the verifier is already sure that $f$ is of the correct form, having used the \ILCopen\ oracle to get it. The point of the \ILC\ abstraction is to remove the need to think about a concrete commitment scheme, assume that all linear combinations that were previously checked using the homomorphic commitments are of the correct form, and focus on the how the prover and verifier compute on and check relations between the values in the finite field. We also remove the randomness used in the commitment scheme. This means that in the \ILC\ version of the basic proof-of-knowledge protocol, the verifier simply needs to see the value of $f$, and nothing more.
+
+Of course, in a real protocol it is important that this condition is actually checked. To see how the \ILC\ version of the basic proof-of-knowledge protocol is converted into the actual basic proof-of-knowledge protocol, first, replace the prover's uses of the \ILCcommit\ command with real commitments, and send the commitments to the verifier as they are made. Next, notice that the verifier's \ILCopen\ query is split into two parts in the real protocol. The prover sends $f$ and the randomness $u$ corresponding to it, and the verifier checks the verification equation.
+
+\begin{description} \label{prot:ILCschnorr}
+\item[Common Reference String:] $\crs=(\Z_p,1,\mathsf{aux}=\bot)$.
+%t
+\item[Instance:] The committed field element $[a]$, which is already committed or stored in the \ILC.
+%
+\item[Prover's witness:] The field element $a$.
+%
+\item[\ P:] The prover randomly selects $b \gets \Z_p$. The prover commits to $b$ using \ILCcommit.
+
+\item[V:] The verifier samples the challenge $x \gets \Z_p$ uniformly at random.
+
+The verifier makes an \ILCopen\ query to get $f = ax+b$.
+
+The verifier outputs $1$ to accept.
+\end{description}
+
+\begin{lemma} \label{proof:ILCschnorr}
+The protocol has perfect completeness, knowledge-soundness, and perfect special honest verifier zero-knowledge.
+\end{lemma}
+
+\begin{proof}
+Perfect completeness of the protocol follows by careful inspection.
+
+For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator simulates the view of the verifier by picking $f$ uniformly at random from $\Z_p$.
+
+Finally, we prove knowledge-soundness. This is trivial as the \ILC~ knowledge extractor already has access to all messages that the prover has committed to using \ILCcommit. \qed
+\end{proof}
+
+\section{Proof-of-Knowledge of a Committed Bit}\label{sec:combits}
+
+Next, we give an example of a more complicated zero-knowledge protocol based on the discrete logarithm assumption. In this protocol, the prover proves to the verifier that they know how to open a given commitment to either $0$ or $1$.
+
+This protocol will illustrate, for this basic case, some of the techniques used to design \ILC\ protocols for particular statements.
+
+The relation corresponding to the proof is
+\[
+\R =\left\{\begin{array}{c}
+\crs = (\G,p,g,h), 
+\stm = C,
+\wit = \lbrace a \in \lbrace 0,1 \rbrace, r \in \Z_p \rbrace \ : \
+B = g^a \cdot h^r
+\end{array}\right\}
+\]
+
+In the basic proof-of-knowledge protocol, the prover sent a linear combination $f = ax+b$ to the verifier, and this linear combination contained the secret, but looked random to the verifier. In this protocol, we want to check that $a$ is a bit. One way to do this would be to find a way to use $f$ to compute a useful function of $a$. Since $a$ is a bit, it satisfies $a(1-a)$. So we can design a protocol around this fact.
+
+We can use $f$ to compute $a(1-a)$, although there will be some extra terms too, since $f = ax+b$. Observe that $f(x-f) = a(1-a) x^2 + b(1-2a) x - a^2$. The leading coefficient is $a(1-a)$. This means that if the prover is honest and $a$ is really a bit, then $f(x-f)$ will be a polynomial of degree $1$, instead of a polynomial of degree $2$ as we might expect. So if the verifier can check this condition using commitments, then they will be satisfied that $a$ really is a bit.
+
+To check this, in the protocol, the prover will act as in the previous example, but will compute extra commitments $K_1$ and $K_2$ to $k_1 := b(1-2a)$ and $k_2 := -a^2$. Then the verifier will be able to commit to $f(x-f)$ later on and check that it is a linear polynomial. Note that the verifier doesn't need to worry about what the values inside $K_1$ and $k_2$ are. They simply serve to prove that $f(x-f)$ has the correct degree.
+
+This example demonstrates a useful strategy for designing protocols. The prover commits to their witness, and extra random blinding values which will be used to hide the witness. They send the prover a masked version of the witness, and the verifier uses this to compute a polynomial which has a useful expression involving the witness in one of the coefficients. If the prover really knows a witness, that coefficient of the polynomial will be equal to zero, or some other known value. The prover commits to the other coefficients of the polynomial in advance to convince the verifier that the polynomial really is of this special form.
+
+Now we present the protocol.
+
+\begin{description}\label{prot:combits}
+\item[Common input:] Setup information $\crs = (\G,p,g,h)$.
+\item [Instance:] Group element $u = C \in \G$.
+\item[Prover's witness:] $\wit = \lbrace a \in \lbrace 0,1 \rbrace, r \in \Z_p$ such that $C = g^a \cdot h^r$
+\item[Protocol:]
+\item[\ P:] The prover randomly selects $b,s,t_1,t_2 \gets \Z_p$.
+
+The prover computes $B = g^b \cdot h^s$, $K_1 = g^{b(1-2a)} \cdot h^{t_1}$ and $K_2 = g^{-a^2} \cdot h^{t_2}$.
+
+The prover sends $B$, $K_1$ and $K_2$ to the verifier.
+
+\item[\ V:] The verifier randomly selects $x\gets \Z_p$, and sends $x$ to the prover.
+
+\item[\ P:] The prover computes $f = ax + b$, $u = rx+s$, and $v = t_1 x + t_2$, and sends $f$, $u$ and $v$ to the verifier.
+
+\item[\ V:] The verifier checks the equations $g^f \cdot h^u \vereq C^x \cdot B$ and $g^{f(x-f)} \cdot h^v \vereq K_1^x \cdot K_2$.
+\end{description}
+
+\begin{thm}
+The Schnorr protocol \ref{prot:combits} has perfect completeness, knowledge-soundness and special honest verifier zero-knowledge.
+\end{thm}
+%
+%\paragraph{Remark.} Usually, security proofs for the Schnorr protocol prove special soundness and quote other results to show that the protocol has knowledge soundness according to the usual definition. We go into more detail here as it will help the reader to understand how our compilation of \ILC\ protocols into discrete-logarithm based protocols works later on.
+%
+%\red{Remove all this stuff, probably unnecessary. Put discussion about Markov inequality next to knowledge soundness definition}
+%
+%\paragraph{Remark.} The definition of knowledge-soundness uses an expected polynomial time extractor. Later in our arguments, our knowledge extraction algorithms, running in expected polynomial time, will either succeed in extracting a witness or will succeed in breaking an instance of a mathematical problem that is believed to be hard, such as the discrete logarithm problem. The astute reader might observe that this seems to reduce the security of the protocol to the problem of solving a hard problem in \emph{expected} polynomial time, which is not part of standard security assumptions. We show how to deal with this in the proof below, using the Markov inequality to limit the knowledge extractor's running time to strict polynomial time, and explain how to draw conclusions about the conrete security of the protocol. This provides a hint of how the same thing could be done in the actual discrete-logarithm-based compilation proof later on. \red{add section references}
+%
+\begin{proof} Perfect completeness follows by careful inspection.
+
+For SHVZK, we describe a simulator. Given a challenge $x$, the simulator selects $f$, $u$ and $v$ uniformly at random from $\Z_p$ so that they distributed exactly as in a real argument. Choose $K_2$ uniformly at random from $\G$. Now, $B$ and $K_1$ are uniquely determined by the verification equation, and can be efficiently computed by rearranging the equations. All values are distributed exactly as they would be in a real argument. Therefore the simulated argument is indistinguishable from a real argument and we have SHVZK.
+
+Finally, we prove knowledge-soundness. To do this, as before, we show that the protocol has special soundness. That is, given two proofs with the same first message and distinct challenges $x$ and $x'$, we show that it is possible to extract a valid witness $a$. This is the same as 2-tree special soundness from Definition \ref{def:treespecsound}.
+
+Suppose that we are given $B,K_1,K_2 \in \G$, distinct $x,x' \in \Z_p$ and $f$, $f'$, $u$, $u'$, $v$, $v'
+ \in \Z_p$ such that $g^f \cdot h^u = C^x \cdot B$, $g^{f(x-f)} \cdot h^v \vereq K_1^x \cdot K_2$ and similarly equalities hold for the other copies of the verification equations in $x'$. 
+
+We can divide the two copies of the first verification equation to eliminate $B$. We obtain $g^{f-f'}  \cdot h^{u-u'}= C^{x-x'}$. Since $x$ and $x'$ are distinct, $x-x'$ is invertible in $\Z_p$. Setting $a = \frac{f-f'}{x-x'}$ and $r = \frac{u-u'}{x-x'}$, we see that $g^a \cdot h^r = C$. By substituting this value for $C$ into a copy of the first verification equation, we can also compute $b$ and $s$ such that $B = g^b \cdot h^s$. In a similar way, we can use the two copies of the second verification equation to find openings $k_1,\kappa_1$ of $K_1$ and $k_2,\kappa_2$ of $K_2$.
+
+Now, by the binding property of the commitment scheme, we know that $f = ax+b$ and that $f(x-f) = k_1 x + k_2$. Substituting the first expression into the second, we obtain the quadratic polynomial $a(1-a)x^2 + (b(1-2a)-k_1)x-a^2-k_2$. If the leading coefficient, $a(1-a)$, is non-zero, then this is a linear or quadratic equation, and there are at most two values of $x$ which are roots. So the probability that the prover is able to produce a proof that the verifier will accept is at most $2/p$. Therefore, we conclude that $a(1-a) = 0$, and that $a$ is a bit.
+
+To see that the protocol has knowledge soundness, apply Lemma \ref{lem:fork}, which shows that the protocol has witness extended emulation. Then, as mentioned previously,  \cite{dissertation} shows that witness extended emulation implies knowledge soundness. \qed
+%Now, we define a knowledge extractor to prove knowledge soundness. Suppose that the prover has success probability $\epsilon > 1/p$. The idea is that having fixed the prover's random coins, if $\epsilon > 1/p$, then there are two accepting transcripts, then a knowledge extractor running in expected polynomial time should be able to find them and use the special-soundness argument to compute a witness. If, however, $\epsilon \leq 1/p$, then if $p$ is large, the prover's success probability is already very poor indeed, so we need not worry about whether they know a witness or not.
+%
+%Assume that $\epsilon > 1/p$. The extractor executes the Schnorr protocol with the prover and verifier once, hoping to obtain a valid proof. If the proof is not accepted by the verifier, the extractor aborts. If the proof is accepted by the verifier, then the extractor rewinds the prover and verifier until just after the prover sends $w$ to the verifier, and replays the protocol over and over again until they obtain another accepting transcript with a different challenge $x$. In each run, this happens with probability $\epsilon - 1/p$, so we expect the extractor to replay the protocol $\frac{1}{\epsilon - 1/p}$ times. At this point, the extractor can compute the witness $s$ using the special-soundness procedure.
+%
+%Overall, the expected running time of the knowledge extractor is at most $T_1 + \frac{\epsilon T_1}{\epsilon - 1/p} + T_2$ where $T_1$ is the time taken to run the protocol once and obtain a transcript, and $T_2$ is the time taken to compute a witness from the two accepting transcripts.
+\end{proof}
+
+Now we present the \ILC\ version of the protocol. In this case, the verifier is already sure that $f$ is of the correct form $ax+b$, having used the \ILCopen\ oracle to get it. The prover commits to $k_1$ and $k_2$ in advance. Since the verifier has $f = ax+b$, they can compute $f(x-f)$ for themselves and then use an \ILCcheck\ command to check that it is equal to $k_1 x+ k_2$. Remember that it does not matter exactly what the values of $k_1$ and $k_2$ are, so long as they exist and $f(x-f)$ is a linear and not a quadratic polynomial.
+
+This example in particular shows how the \ILC\ model can be a useful abstraction. The details of the commitment scheme used, and the randomness in the commitments, are removed. One can focus on the polynomial arithmetic that actually makes the protocol work.
+
+\begin{description} \label{prot:ILCcombits}
+\item[Common Reference String:] $\crs=(\Z_p,1,\mathsf{aux}=\bot)$.
+%t
+\item[Instance:] The committed element $[a]$, which is already committed or stored in the \ILC.
+%
+\item[Prover's witness:] The bit $a \in \lbrace 0,1 \rbrace$.
+%
+\item[\ P:] The prover randomly selects $b \gets \Z_p$. The prover computes $k_1 = b(1-2a)$ and $k_2 = -a^2$. The prover commits to $b, k_1$ and $k_2$ using \ILCcommit.
+
+\item[V:] The verifier samples the challenge $x \gets \Z_p$ uniformly at random.
+
+The verifier makes an \ILCopen\ query to get $f = ax+b$.
+
+The verifier computes $f(x-f)$, and makes a \ILCcheck\ query to check whether it is equal to $k_1 x + k_2$.
+
+The verifier outputs $1$ if the \ILCcheck\ query passed, and $0$ otherwise.
+\end{description}
+
+\begin{lemma} \label{proof:ILCcombits}
+The protocol has perfect completeness, knowledge-soundness, and perfect special honest verifier zero-knowledge.
+\end{lemma}
+
+\begin{proof}
+Perfect completeness of the protocol follows by careful inspection.
+
+For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator simulates the view of the verifier by picking $f$ uniformly at random from $\Z_p$, and setting the output of the \ILCcheck\ query to $\top$.
+
+Finally, we prove knowledge-soundness. Firstly, note that the \ILC~ knowledge extractor already has access to all messages that the prover has committed to using \ILCcommit. As in the previous protocol, we know that $f = ax+b$ and that $f(x-f) = k_1 x + k_2$. Substituting the first expression into the second, we obtain the quadratic polynomial $a(1-a)x^2 + (b(1-2a)-k_1)x-a^2-k_2$. If $a(1-a)$ is non-zero, then this is a quadratic equation, and there are at most two values of $x$ which are roots. So the probability that the prover is able to produce a proof that the verifier will accept is at most $2/p$. Therefore, we conclude that $a(1-a) = 0$, and that $a$ is a bit. \qed
+\end{proof}
+
+\subsection{Query Matrices}\label{subsec:rankexplain}
+
+After many protocols in Chapter \ref{chapterlabel:Generic-Protocol} of this thesis, and in the security proof for the compilation procedure in Section \ref{sec:ILCtoDLOG}, we are concerned with the condition that the \ILC\ query matrices have full rank, and fewer rows than columns. With the aid of the protocols from Sections \ref{prot:combits} and \ref{prot:ILCcombits}, we explain why this is the case.
+
+Let us look at the query matrix for the protocol of Section \ref{prot:ILCcombits}. The matrix is $$\begin{pmatrix} x & 1 & 0 & 0 \\ 0 & 0 & x & 1 \end{pmatrix}.$$ The columns correspond to $A$, $B$, $K_1$ and $K_2$ from \ref{prot:combits}, and the rows correspond to the first and second verification equations. We can use this matrix to connect the randomness values sent by an honest prover to the randomness values used in the prover's commitments.
+$$\begin{pmatrix} u \\ v \end{pmatrix}  = \begin{pmatrix} x & 1 & 0 & 0 \\ 0 & 0 & x & 1 \end{pmatrix} \begin{pmatrix} r \\ s \\ t_1 \\ t_2 \end{pmatrix}.$$ This is a system of linear equations.
+
+Consider the rank-nullity theorem. Over a field $\F$, the rank-nullity theorem says when the matrix is considered to be a linear map, the dimension of the image of the map, plus the dimension of the kernel of the map, are equal to the number of columns, or the length of the vectors to which the matrix is applied. In an \ILC\ protocol, this is equal to the number of commitments that the prover has made.
+
+Imagine that this system of linear equations had a trivial kernel. In that case, given the randomness openings $u$ and $v$ from an honest prover, the verifier would be able to solve the system to recover the randomness used in the prover's commitments. In general, this seems as though it will not lead to protocols with the zero-knowledge property. This leads us to a first condition on the query matrix. If the kernel is non-trivial, this implies that \emph{the rank of the query matrix should be strictly less than the number of columns in the matrix}.
+
+Returning to the protocols for a second, we can also see that the protocol from Section \ref{prot:combits} is very easy to simulate. One picks a commitment opening $f$ at random. One also has to pick some randomness values $v$ and $u$ for the commitments in the verification equations, and these are also picked uniformly at random. Then, it is always possible to select some of the commitment group elements uniformly at random, and determine the others by rearranging the verification equations. In the \ILC\ version of this protocol in Section \ref{prot:ILCcombits}, the commitments and commitment randomness have been abstracted out of the protocol, and we only need to simulate $f$.
+
+When considering more complicated \ILC\ protocols, and how they might be converted into real protocols in the discrete logarithm setting, we could hope to use the same strategy to prove zero knowledge. Namely, we could produce a simulator for the discrete-logarithm based protocol by using the simulator for the underlying \ILC\ protocol to simulate all of the commitment openings, and then if we needed to simulate any values for commitment randomness, we could select all of those values uniformly at random. Then, one could select some of the commitment group elements uniformly at random and rearrange the verification equations to determine what the rest of the commitments should be in the simulated transcript. One could refer to this as the `simple' simulator.
+
+Now, suppose that the rank of the \ILC\ query matrix is strictly less than the number of rows in the matrix. This means that the simulated openings for the randomness values could not be chosen to be independently and uniformly at random; as they would then come from a space of higher dimension than the space of an honest prover's openings for the randomness. In such a case, we would not be able to use the simple simulator. So we have a second condition on the query matrix, namely that \emph{the rank of the query matrix should be greater than or equal to the number of rows in the matrix}.
+
+If we take the condition that the rank of the \ILC\ query matrix is at least the number of rows in the matrix, but strictly less than the number of columns in the matrix, then we must have that the number of rows is less than the number of columns. Then, the matrix must achieve maximum possible rank,  which is the number of rows in the matrix. So, motivated by some simple situations which seem like they might be problematic for the zero-knowledge property and the use of the simple simulator, we have placed some limitations on the \ILC\ query matrix.
+
+In Section \ref{sec:ILCtoDLOG}, we give a proof that these conditions on the query matrix are sufficient for honest-verifier zero-knowledge; that is, we show that the simple simulator suffices. These conditions on the query matrix apply to all of our protocols. However, we do not claim that the conditions are \emph{necessary} for zero-knowledge.

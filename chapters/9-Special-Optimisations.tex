@@ -175,7 +175,7 @@ At each iteration, the main cost for the prover is computing the $A_k$ and $B_k$
 
 At the end of the argument of Section \ref{subsec:5rndsqrt}, once compiled using Pedersen commitments, the verification equations verify exactly the statement of the recursive argument above. This means that rather than the prover sending the vector $\vec{r}$ to the verifier in that argument, along with some commitment randomness which appears in the compiled argument, the prover and verifier can conduct an inner product argument like the one above to prove that the prover knows values which satisfy the verification equations. To get a logarithmic communication complexity, one can use the original 5-move arithmetic circuit argument with extremely long vectors, of length $O(N)$, where $N$ is the number of multiplication gates in the arithmetic circuit. Then the prover and verifier run the recursive argument with $m_i = 2$ for all $i$.
 
-The argument is presented in stand-alone form in Appendix \ref{appendix:logprot}.
+The argument is presented in stand-alone form in Appendix \ref{appendix:logprot}. This argument has been implemented in Python. It is closely related to the Bulletproofs protocol given in \cite{BunzBBPWM18}, which has been implemented in various different languages including Java, C and Rust, and deployed as part of the Monero cryptocurrency.
 %Then, in the verification equations of that protocol, the verifier checks that vectors sent by the prover correspond to certain Pedersen commitments, and that the vectors have a given scalar product.
 \subsection{Generalisations}
 

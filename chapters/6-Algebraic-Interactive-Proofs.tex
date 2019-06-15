@@ -2,7 +2,15 @@
 \chapter{Lemmata for Security Proofs}
 \label{chapterlabel:AlgIntProofs}
 
+In this chapter, we present a variety of useful lemmata which will be used to prove that the \ILC\ protocols in Chapter \ref{chapterlabel:Generic-Protocol} are secure, and to prove that those protocols have a few useful additional properties for the purpose of compiling them into discrete-logarithm-based protocols in Chapter \ref{chapterlabel:Compilation-Proof}.
+
+These results are presented here together because they are technical in nature. They are useful for proving the security of the protocols but unnecessary for understanding the flow of any of the protocols. In particular, Lemma \ref{lem:matinv} and Lemma \ref{lem:linextract} prevent a good deal of repetition in the proofs of the properties given after each \ILC\ protocol.
+
 \section{Variant of the Schwarz-Zippel Lemma}
+
+This lemma is a non-standard variant of the Schwarz-Zippel Lemma, and was proved for the first time by the author of this thesis in \cite{BootleCGGHJ17}. The role of this lemma is to help prove the soundness of the \ILC\ protocol in Section \ref{subsec:5rndsqrt}, which uses two random challenges $x$ and $y$. When $d' = 0$, we also recover the original Schwarz-Zippel lemma which is useful for proving the soundness of the other protocols in Chapter \ref{chapterlabel:Generic-Protocol}.
+
+Intuitively, in protocols with two random challenges represented by $X$ and $Y$, where $Y$ was produced after $X$, the coefficients of $Q(X)$ correspond to values that the prover committed before having seen $X$ or $Y$, and the functions $R_j(X)$ correspond to values that the prover committed to after having seen $X$, but before having seen $Y$. This is why the $R_j(X)$ are allowed to be arbitrary functions of $X$. As in the example in Section \ref{sec:combits}, the coefficients of $P(X,Y)$ will all be zero if the prover has behaved honestly, and the verifier checks an equality of polynomials evaluated at random points. If $P(X,Y)$ is not identically zero, then we would like to know the probability that the prover succeeds if $P(X,Y$ nevertheless evaluates to zero. The lemma provides an upper bound on the probability that a cheating prover will fail to be caught out during this process.
 
 A Laurent polynomial is a polynomial which also has terms with negative powers in some variable. For example, a Laurent polynomial in one formal variable $X$ with coefficients in the field $\F$ is an expression of the form $\sum_{i \in I} a_i X^i$ where $I$ is a finite set of integers (some of which may be negative) and $a_i$ is an element of $\F$ for each $i \in I$.
 
@@ -39,13 +47,16 @@ The first probability is bounded by the fact that $Q(X)$ is a polynomial of degr
 \end{proof}
 
 \section{A general forking lemma.}
+
+In this section, we prove a general forking lemma which connects two security notions for interactive protocols. One type of notion includes properties such as \emph{special soundness}, where one can use a collection of accepting protocol transcripts in the correct format to compute a witness for the protocol. The other includes notions such as knowledge soundness and witness-extended emulation, where a knowledge extractor with rewindable black-box access to the prover and verifier must compute a witness. This forking lemma connects the two by showing that the knowledge extractor can efficiently sample the collection of transcripts required to compute a witness. This lemma was first proved in \cite{BootleCCGP16}.
+
 Suppose that we have a $(2\mu+1)$-move public-coin argument with $\mu$ challenges, $x_1,\ldots,x_\mu$ in sequence. Let $n_i\geq 1$ for $1\leq i \leq \mu$.  Consider $\prod_{i=1}^\mu n_i$ accepting transcripts with challenges in the following tree format. The tree has depth $\mu$ and $\prod_{i=1}^\mu n_i$ leaves. The root of the tree is labelled with the statement. Each node of depth $i<\mu$ has exactly $n_i$ children, each labelled with a distinct value for the $i$th challenge $x_i$. This can be referred to as an $(n_1,\ldots,n_\mu)$-tree of accepting transcripts. 
 
-\begin{definition}[$(n_1,\ldots,n_\mu)$-tree special soundness]
+\begin{definition}[$(n_1,\ldots,n_\mu)$-tree special soundness]\label{def:treespecsound}
 Let $(\crsgen,\prover,\verifier)$ be an interactive argument. Let $n_1(\sep),\ldots,n_\mu(\sep) \in \N$ such that $\prod_{i=1}^\mu n_i$ is bounded above by a polynomial in the security parameter $\sep$. Suppose that there exists a DPT algorithm $\chi$ such that given $\viewV$ for each transcript of an $(n_1,\ldots,n_\mu)$-tree of accepting transcripts as input, $\chi$ outputs a valid witness $w$ for the statement at the root of the tree. Then we say that $(\crsgen,\prover,\verifier)$ has $(n_1,\ldots,n_\mu)$-tree special soundness.
 \end{definition}
 
-All of our arguments allow a witness to be extracted efficiently from an appropriate tree of accepting transcripts. This is a natural generalisation of special-soundness for Sigma-protocols, where $\mu=1$ and $n=2$.  For simplicity in the following lemma, we assume that the challenges are chosen uniformly from a field $\F$ where $\left| \F \right| = 2^\sep$, but any sufficiently large challenge space would suffice.
+All of our arguments allow a witness to be extracted efficiently from an appropriate tree of accepting transcripts. This lemma therefore shows that they all have knowledge soundness. This is a natural generalisation of special-soundness for Sigma-protocols, where $\mu=1$ and $n=2$.  For simplicity in the following lemma, we assume that the challenges are chosen uniformly from a field $\F$ where $\left| \F \right| = 2^\sep$, but any sufficiently large challenge space would suffice.
 
 \begin{lemma}[Forking Lemma]\label{lem:fork}
 Let $(\mathcal{P},\mathcal{V})$ be a $(2\mu+1)$-move, public coin interactive protocol with $(n_1,\ldots,n_\mu)$-tree soundness. Then $(\mathcal{P},\mathcal{V})$ has witness-extended emulation. 
@@ -117,7 +128,9 @@ When $\mathcal{E}$ runs in time at most $T$, then at most $T$ uniformly random p
 Now, we choose $T = \sqrt[3]{p}$. The probability that $\mathsf{tree}$ fails to be an $(n_1,\ldots,n_\mu)$-tree is at most $\frac{t}{T} + \frac{T^2}{p}$ which is now equal to $\frac{t}{\sqrt[3]{p}} + \frac{1}{\sqrt[3]{p}}$. This is negligible. Therefore, there is negligible probability of the tree-finding algorithms succeeding, yet $\mathcal{E}$ failing to extract a witness. This proves the argument has statistical witness-extended emulation. \qed
 \end{proof}
 
-\section{Extractable Algebraic Queries}
+\section{Extractable Algebraic Queries}\label{sec:extalgq}
+
+The following lemma shows that matrices from a certain family are always invertible. This fact is used to prove a further lemma which will be useful for arguing about the security of \ILC\ protocols that have been compiled into discrete logarithm protocols.
 
 \begin{lemma}\label{lem:matinv}
 Let $\vec{p} = (p_1(X),\ldots,p_k(X))$ be linearly independent (Laurent) polynomials over $\F[X]$ of degree at most $k-1$. Let $\vec{x} = (x_1,\ldots,x_k)$ be distinct points in $\F^*$. Then the following matrix is invertible.
@@ -137,6 +150,10 @@ p_k(x_1) & p_k(x_2) & \cdots & & p_k(x_k)
 \begin{proof}
 The matrix $M(\vec{p},\vec{x})$ is square. In order to prove that the matrix is invertible, it suffices to prove that the rows are linearly independent. Suppose for contradiction that there was a linear relation between the rows of $M(\vec{p},\vec{x})$. Since all of the polynomials have degree at most $k-1$, the coefficients of each polynomial are completely determined by their evaluations at the points of $\vec{x}$, by applying a linear map. Therefore, any linear relation over the rows implies a linear relation over the polynomials, contradicting linear independence. \qed
 \end{proof}
+
+Using the invertibility of matrices from the previous lemma, the next lemma shows that for certain types polynomials in multiple variables, where one has a lot of polynomial evaluations at a structured set of points, one can solve a linear system to recover the coefficients of the polynomials.
+
+Intuitively, in real protocols in the discrete logarithm setting, the verifier often receives an opening of a linear combination of many commitments. The coefficients of the linear combination come from the polynomials given below. Given a large number of openings at different points $x$ and $y$, one can solve the linear system and recover openings to all of the commitments. This lemma is new but not general, with each type of polynomial corresponding to one of the \ILC\ protocols in Chapter Chapter \ref{chapterlabel:Generic-Protocol}.
 
 \begin{lemma}\label{lem:linextract}
 Consider an \ILC\ protocol with random verifier challenges $x$ and $y$. Consider \ILC\ queries of the following polynomial forms, where $\vec{p}_i$ are constant vectors, and $\vec{q}_j(y)$ are vectors which were committed after the prover saw $y$. We prove the result for each type of polynomial. Suppose that we have an $(n_1,n_2)$-tree of query results, written as a vector $\vec{q}$. There exist $n_1$ and $n_2$ such that given the result of the query for $n_1$ different values of $x$, and for each value of $x$, for $n_2$ different values of $y$, there exists a linear map $L$ such that $L \vec{q}$ is the concatenation of all of the $\vec{p}_i$ values, and the values of $\vec{q}_j(y)$ for each query $y$. In other words, \ILC\ protocols that use queries of this form have $(n_1,n_2)$-tree special soundness for some $n_1$ and $n_2$.

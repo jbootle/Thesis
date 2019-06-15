@@ -8,13 +8,16 @@
 
 \section{Compiling into Hash-Based Proofs}
 \label{sec:IPCPgencon}\label{sec:ILCtoIOP}
-In this section, we show how to compile a proof of knowledge with straight-line extraction for relation $\R$ over the communication channel $\ILC$ into a proof of knowledge without straight-line extraction for the same relation over the standard channel, based on the existence of collision-resistant hash functions.
+In this section, we show how to compile a proof of knowledge with straight-line extraction for relation $\R$ over the communication channel $\ILC$ into a proof of knowledge for the same relation over the standard channel, based on the existence of collision-resistant hash functions.
 
 The compilation proof given in this section comes from joint work in \cite{BootleCGGHJ17} with Andrea Cerulli, Essam Ghadafi, Jens Groth, Mohammad Hajiabadi and Sune K. Jakobsen. In particular, Sune K Jakobsen is responsible for the technical lemmas in the compilation proof, but the proof and compilation have been adapted for use with our modified \ILC\ model and optimisations to the compilation method.
 
 As well as the fact that we can instantiate protocols designed for homomorphic commitment schemes without any homomorphic commitments, and showing that the \ILC\ model really is very useful and general, the resulting protocols have the potential to be extremely efficient in practice. Ligero \cite{CCS:AHIV17}, a similar protocol which is also based on hashes and error-correcting codes with an additional special property, has been implemented in C++ and provides evidence for the deployability of interactive protocols based on hash functions and error-correcting codes.
 
 The idea behind the compilation of an \ILC\ proof is that instead of committing to vectors $\vect_\rownr$ using \ILCcommit, the prover encodes each vector $\vect_\rownr$ as $\preECC(\vect_\rownr)$ using a linear error-correcting code $\preECC$. In any given round, we can think of the codewords as rows $\preECC(\vect_\rownr)$ in a matrix $\preECC(V)$. However, instead of committing to the rows of the matrix, the prover commits to the columns of the matrix. When the verifier wants to make an \ILCopen\ query for a linear combination of the original vectors, he sends the coefficients $\vec{q}=(q_1,\ldots,q_t)$ of the linear combination to the prover, and the prover responds with the linear combination $\vect_{(\vec{q})}\gets \vec{q} V$. 
+
+We also add a check, where the verifier sends an extra random linear combination $\chalx\in \F^\totalnumvec$ to ensure that if a malicious prover commits to values of $\ecc_\rownr$ that are far from being codewords, the verifier will most likely reject. The reason the challenges $\vec{q}$ and $\vec{q}'$ from the $\ILC$ proof are not enough to ensure this is that they are not chosen uniformly at random. One could, for instance, imagine that there was a vector $\vect_\rownr$ that was never queried in a non-trivial way, and hence the prover could choose it to be far from a codeword. To make sure this extra challenge $\chalx$ does not reveal information to the verifier, the prover picks a random blinding vector $\vect_0$, which is added as the first row of $V$ and will be added to the linear combination of the challenge $\chalx$.
+
 Notice that we will use the notation $\vect_{(\vec{q})}$, and later on $\vect_{(\vec{\gamma})}$, to denote vectors that depend on $\vec{q}$ and $\vec{\gamma}$: the $\vec{q}$ and $\vec{\gamma}$ are not indices. 
 Now, to spot check that the prover is not giving a wrong $\vect_{(\vec{q})}$, the verifier may request the $j$th element of each committed codeword $\ecc_\rownr$. This corresponds to revealing the $j$th column of error-corrected matrix $\preECC(V)$. Since the code $\preECC$ is linear, the revealed elements should satisfy $\preECC(\vect_{(\vec{q})})_j=\sum_{\rownr=1}^tq_\rownr \preECC(\vec{v}_\rownr)_{j}=\vec{q} (\preECC(V)|_{j})$. The verifier will spot check on multiple columns, so that if the code has sufficiently large minimum distance and the prover gives a wrong $\vect_{(\vec{q})}$, then with overwhelming probability, the verifier will  open at least one column $j$ where the above equality does not hold.
 
@@ -23,7 +26,9 @@ Revealing entries in a codeword may leak information about the encoded vector. T
 The original compilation given in \cite{BootleCGGHJ17} handled an earlier version of the \ILC\ model without \ILCcheck\ queries. We must discuss how to treat these queries. The verifier makes \ILCcheck\ queries $\vec{q}'=(q'_1,\ldots,q'_t)$ of linear combinations of committed vectors. Now, \ILCcheck\ queries handle the case where the verifier can compute what $\vect'_{(\vec{q})}\gets \vec{q}' V$ should be by themselves, using the results of other \ILCopen\ queries. Therefore, the prover need not send $\vect'_{(\vec{q})}$ to the verifier. The prover, given $\vec{q}'$, must still reveal $\vec{r}'_{(\vec{q})}=\vec{q}'R$. The verifier now asks for openings of $2\lambda$ columns $J=\{j_1,\dots,j_{2\lambda}\}$ in $E$ and verifies for these columns that $\vec{q}'E|_J=\ECC(\vect'_{(\vec{q})};\vec{r}'_{(\vec{q})})|_J$, using the value of $\vect'_{(\vec{q})}$ that they have computed using other openings. To avoid revealing any information about $\preECC(V)$, we must ensure that $\forall j\in [n]: j\in J\Rightarrow j+n\notin J$. If the spot checks pass, the verifier believes that $\vect'_{(\vec{q})}=\vec{q}'V$.
 %\red{When using RS codes, much less randomness is required, actually just $2\sep$ entries, and the proof will go through. Also, for long vectors, Merkle trees should be used, otherwise the prover will send a lot of hash values.}
 
-\begin{figure}[!h]
+\newpage
+
+\begin{figure}[t]
 \centering
 \begin{minipage}[t]{15cm}
 $$\begin{array}{ccc} 
@@ -39,8 +44,6 @@ $$\begin{array}{ccc}
 \end{minipage}
 \caption{Vectors $\vect_\rownr$ organized in matrix $V$ are encoded row-wise as matrix $E=\ECC(V;R)$. The vertical line in the right matrix and vector denotes concatenation of matrices respectively vectors. The prover commits to each column of $E$. When the prover, given $\vec{q}$ and $\vec{q}'$, wants to reveal the linear combination $\vect_{(\vec{q})}=\vec{q}V$ she also reveals $\vec{r}_{(\vec{q})}=\vec{q}R$ and $\vec{r}'_{(\vec{q})}=\vec{q}'R$. The verifier now asks for openings of $2\lambda$ columns $J=\{j_1,\dots,j_{2\lambda}\}$ in $E$ and verifies for these columns that $\vec{q}E|_J=\ECC(\vect_{(\vec{q})};\vec{r}_{(\vec{q})})|_J$ and $\vec{q}'E|_J=\ECC(\vect'_{(\vec{q})};\vec{r}'_{(\vec{q})})|_J$, where the verifier computed $\vect'_{(\vec{q})}$ by themselves. To avoid revealing any information about $\preECC(V)$, we must ensure that $\forall j\in [n]: j\in J\Rightarrow j+n\notin J$. If the spot checks pass, the verifier believes that $\vect_{(\vec{q})}=\vec{q}V$ and $\vect'_{(\vec{q})}=\vec{q}'V$.}\label{fig:spotcheck}
 \end{figure}
-
-We also add a check, where the verifier sends an extra random linear combination $\chalx\in \F^\totalnumvec$ to ensure that if a malicious prover commits to values of $\ecc_\rownr$ that are far from being codewords, the verifier will most likely reject. The reason the challenges $\vec{q}$ and $\vec{q}'$ from the $\ILC$ proof are not enough to ensure this is that they are not chosen uniformly at random. One could, for instance, imagine that there was a vector $\vect_\rownr$ that was never queried in a non-trivial way, and hence the prover could choose it to be far from a codeword. To make sure this extra challenge $\chalx$ does not reveal information to the verifier, the prover picks a random blinding vector $\vect_0$, which is added as the first row of $V$ and will be added to the linear combination of the challenge $\chalx$.
 
 \subsection{Reed-Solomon Codes}
 
@@ -62,13 +65,6 @@ Let $(\KKILC,\PoILC,\VILC)$ be a {\em non-adaptive} $\numround$-round SHVZK proo
 We now define a proof of knowledge $(\KK,\Po,\V)$ in Fig. \ref{fig:defILCtoIOP}, where we use the following notation:
 given matrices $V_1,\dots, V_\mu$, $R_1,\ldots,R_\mu$ and $E_1,\ldots,E_\mu$ we define $$V=\left(\begin{matrix}V_1\\ \vdots \\ V_\mu\end{matrix}\right) \qquad R=\left(\begin{matrix}R_1\\ \vdots \\ R_\mu\end{matrix}\right) \qquad E=\left(\begin{matrix}E_1\\ \vdots \\ E_\mu\end{matrix}\right).$$ 
 The matrices $V_1,\ldots,V_\mu$ are formed by the row vectors $\PoILC$ commits to, and we let $t_1,\ldots,t_\mu$ be the numbers of vectors in each round, i.e., for all $\roundnum$ we have $V_\roundnum\in \F^{t_\roundnum \times \sizevect}$.  
-
-We say that a set $J\subset [2n]$ is \emph{allowed} if $|J\cap [n]|=\chals$ and $|J\setminus [n]|=\chals$ and there is no $j\in J$ such that $j+n\in J$. In the following we will always assume codewords have length $n\geq 2\sep$.
-We use $\ECC(V;R)$ to denote the function that applies $\ECC$ \emph{row-wise} to $V$ and $R$.
-In the protocol for $\V$, we are using that $\ECC(\vec{v};\vec{r})|_J$ can be computed from just $\vec{v}$ and $\vec{r}|_{\{j\in [n]:j\in J \vee j+n\in J\}}$. We use $\ComCommit(E;\vec{s})$ to denote the function that applies $\ComCommit$ \emph{column-wise} on $E$ and returns a vector $\vec{c}$ of $2n$ commitments. 
-We group all $\VILC$'s queries in two matrices $\Chal \in \F^{\qc\times \totalnumvec}$ and $\Chal' \in \F^{\qc' \times \totalnumvec}$, where $\totalnumvec$ is the total number of vectors committed to by $\Po$, $\qc$ is the \ILCopen\ query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}$ that $\VILC$ requests to be opened, and $\qc'$ is the \ILCcheck query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}'$ that $\VILC$ requests to be checked.
-
-\paragraph{Remark}\label{welldef} For the protocol to be well-defined, we need $n\geq 2\sep$ so we have sufficiently many columns. Otherwise no allowed $J$ exists. If the output of $\preECC$ is shorter than $2\sep$, $\KKIOP$ will extend $\preECC$ by a factor $\left\lceil \frac{2\sep}{n}\right\rceil$ to ensure that output length $n$ satisfies $n\geq 2\sep$. Here the extension of $\preECC$ is given by $\{(e,\dots,e): e\in\preECC\}$, where the number of $e$'s is the factor of the extension. In particular, extending by a factor $1$ leaves everything unchanged. Extending by a larger factor keeps the input length constant while extending the output length. Notice that we are interested in efficiency when $\ell$ is large compared to $\sep$, in which case no extension is needed.
 
 \begin{figure}[!h]
 \resizebox{\textwidth}{!}{\begin{minipage}[t]{13cm}
@@ -186,6 +182,13 @@ to $\V$
 %For explanation, see Subsection~\ref{ssec:constrILCtoIOP}}
 \label{fig:defILCtoIOP}
 \end{figure}
+
+We say that a set $J\subset [2n]$ is \emph{allowed} if $|J\cap [n]|=\chals$ and $|J\setminus [n]|=\chals$ and there is no $j\in J$ such that $j+n\in J$. In the following we will always assume codewords have length $n\geq 2\sep$.
+We use $\ECC(V;R)$ to denote the function that applies $\ECC$ \emph{row-wise} to $V$ and $R$.
+In the protocol for $\V$, we are using that $\ECC(\vec{v};\vec{r})|_J$ can be computed from just $\vec{v}$ and $\vec{r}|_{\{j\in [n]:j\in J \vee j+n\in J\}}$. We use $\ComCommit(E;\vec{s})$ to denote the function that applies $\ComCommit$ \emph{column-wise} on $E$ and returns a vector $\vec{c}$ of $2n$ commitments. 
+We group all $\VILC$'s queries in two matrices $\Chal \in \F^{\qc\times \totalnumvec}$ and $\Chal' \in \F^{\qc' \times \totalnumvec}$, where $\totalnumvec$ is the total number of vectors committed to by $\Po$, $\qc$ is the \ILCopen\ query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}$ that $\VILC$ requests to be opened, and $\qc'$ is the \ILCcheck query complexity of $\VILC$, i.e., the total number of linear combinations $\vec{q}'$ that $\VILC$ requests to be checked.
+
+\paragraph{Remark}\label{welldef} For the protocol to be well-defined, we need $n\geq 2\sep$ so we have sufficiently many columns. Otherwise no allowed $J$ exists. If the output of $\preECC$ is shorter than $2\sep$, $\KKIOP$ will extend $\preECC$ by a factor $\left\lceil \frac{2\sep}{n}\right\rceil$ to ensure that output length $n$ satisfies $n\geq 2\sep$. Here the extension of $\preECC$ is given by $\{(e,\dots,e): e\in\preECC\}$, where the number of $e$'s is the factor of the extension. In particular, extending by a factor $1$ leaves everything unchanged. Extending by a larger factor keeps the input length constant while extending the output length. Notice that we are interested in efficiency when $\ell$ is large compared to $\sep$, in which case no extension is needed.
 
 \subsection{Security Analysis}
 \label{sec:IPCPsec}

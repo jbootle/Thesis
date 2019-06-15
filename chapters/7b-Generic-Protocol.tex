@@ -286,7 +286,7 @@ The protocol has perfect completeness, knowledge-soundness, and perfect special 
 \begin{proof}
 Perfect completeness of the protocol follows by correctness of the PolyCommit sub-protocol, which was used to commit to $\left( \vec{P}_1^*(X)||\ldots||\vec{P}_n^*(X)\right)$ and $\left( \vec{Q}_1^*(X)||\ldots||\vec{Q}_n^*(X)\right)$, and by careful inspection.
 
-For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator selects $\bar{\vec{a}}_j \gets \F^{\ell_a}$ and $\bar{\vec{q}}_j\gets \F^{\ell_Q}$ for each j. All these values are distributed exactly as in a real protocol, where they are also uniformly random. She then simulates the view of the verifier when running $\verifier_\mathrm{PC}(x,id=1)$ and $\verifier_\mathrm{PC}(x,id=2)$ using the evaluation point $x$ and evaluations $\bar{\vec{p}}$ and $\bar{\vec{q}}$, which are determined by the values already simulated. By the prover privacy of the polynomial commitment scheme, the simulated values have identical distribution to the real proofs.
+For perfect special honest verifier zero knowledge, we provide an efficient simulator for the protocol. The simulator selects $\bar{\vec{a}}_j \gets \F^{\ell_a}$ and $\bar{\vec{q}}_j\gets \F^{\ell_Q}$ for each j. All these values are distributed exactly as in a real protocol, where they are also uniformly random. She then simulates the view of the verifier when running $\verifier_\mathrm{PC}(x,id=1)$ and $\verifier_\mathrm{PC}(x,id=2)$ using the evaluation point $x$ and evaluations $\bar{\vec{p}}$ and $\bar{\vec{q}}$, which are determined by the values already simulated, and using the simulator which comes from the prover privacy property of the PolyCommit sub-protocol. By the prover privacy of the polynomial commitment scheme, the simulated values have identical distribution to the real proofs.
 
 Finally, we prove knowledge-soundness. The \ILC~ knowledge extractor already has access to all messages sent between the prover and \ILC. It remains to show that if the committed values are not a valid witness, then there is a negligible probability that the verifier will accept.
 Recall the verification checks. The verifier runs
@@ -494,7 +494,9 @@ u = \left( \{\vec{w}_{q,{a,i}},\vec{w}_{q,{b,i}},\vec{w}_{q,{c,i}}\}_{q \in [Q],
 
 The prover will begin by commiting to each $\vec{a}_{i}$, $\vec{b}_i$ and $\vec{c}_i$ for each $i$.
 
-Given distinct points $z_1,\ldots,z_m$, let $l_i(X)$ be the Lagrange polynomials, and $l_0(X)$ be defined as before. The Hadamard product holds if and only if there exists a polynomial $\vec{d}(X)$ of degree $m-2$ such that the following polynomial equation holds:
+Given distinct points $z_1,\ldots,z_m$, let $l_i(X)$ be the Lagrange polynomials using distinct interpolation points $z_1,\ldots,z_m \in \F$. Explicitly, $$l_i(X) = \prod_{j \neq i} \frac{X-z_j}{z_i - z_j}$$ Recall that $l_i(z_j)=\delta_{i,j}$. Set $l_0(X) = \prod_{i=1}^m (X-z_i)$. 
+
+The Hadamard product holds if and only if there exists a polynomial $\vec{d}(X)$ of degree $m-2$ such that the following polynomial equation holds:
 \begin{align*}
 \left( \sum_{i=1}^m \vec{a}_i l_i(X) \right) \circ \left( \sum_{i=1}^m \vec{b}_i l_i(X) \right) - \left( \sum_{i=1}^m \vec{c}_{i} l_i(X) \right) = \vec{\DDelta}(X) l_0(X)
 \end{align*}

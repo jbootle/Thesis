@@ -78,7 +78,7 @@ Figure \ref{alg:com:hash} gives a commitment scheme with message space $\{0,1\}^
 \label{alg:com:hash}
 \fbox{\centerline{\small\begin{minipage}[b]{\textwidth}
     \begin{algorithmic}[1]
-	\State $\ckgen{1^\sep}{\mlen}$:
+	\State $\ckgen{1^\sep}{m}$:
 	\State Set $L = 6\sep+4$.
 	\State $s \gets \crsgen(1^\lambda)$.
 	\State \Return $(\HashFunction,s,L)$
@@ -89,7 +89,7 @@ Figure \ref{alg:com:hash} gives a commitment scheme with message space $\{0,1\}^
 	\State Parse $\vec{m}$ as a bitstring.
 	\State Parse $\vec{r} \in \{0,1\}^L$.
 	\State Compute $\vec{m}' = \HashFunction^s(\vec{m})$.
-	\State Select $A \gets T_n$.
+	\State Select $A \gets T_{l,L}$.
 	\State Compute $\vec{b} = \vec{m}'-A\vec{r}$.
 	\State Compute $y = \HashFunction^s(\vec{r})$.
 	\State \Return $(A,\vec{b},y)$

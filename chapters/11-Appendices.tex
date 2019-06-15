@@ -70,7 +70,7 @@ To do this, for all $j$ such that $j\in J$ or $j+n\in J$, the simulator computes
 Finally, $\Sim$ defines $E_{01}|_{\bar{J}},\ldots,E_{\mu}|_{\bar{J}}$ to be $0$ matrices. It then picks $\vec{s}_1,\ldots,\vec{s}_\mu$ at random and makes the commitments $\vec{c}_1,\ldots,\vec{c}_\mu$ as in the protocol. For $j\in J$ we see that all the $\vec{c}_i|_j$ commitments are computed as in the real execution from values that have the same distribution as in a real proof. Hence, they will have the correct distribution. The $\vec{c}_i|_j$s for $j\notin J$ are commitments to different values than in a real proof. However, by the computational (statistical) hiding property of the commitment scheme, they have a distribution that is computationally (statistically) indistinguishable from the correct distribution. \qed
 \end{proof}
 
-\chapter{Stand-alone Argument for Arithmetic Circuit Satisfiability with Logarithm Communication Complexity}
+\chapter{Stand-alone Argument for Arithmetic Circuit Satisfiability with Logarithmic Communication Complexity}
 \label{appendix:logprot}
 
 We now give the formal description of a stand-alone argument of knowledge for the satisfiability of an arithmetic circuit, which combines the compiled version of the \ILC\ protocol from Section \ref{subsec:5rndsqrt}, and the recursive protocol for inner products from Section \ref{se:innerproduct}. Both prover and verifier take the move parameter $\mu$ as common input. For square root communication complexity, the inner product argument is not used and we set $\mu=0$. For $\mu > 0$, the common input includes the values $(m_\mu,\ldots,m_1)$ used in the inner product argument.

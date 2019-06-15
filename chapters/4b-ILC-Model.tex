@@ -79,7 +79,9 @@ We say the proof is \emph{statistically SHVZK} if the definition holds also agai
 \section{Introduction to the Ideal Linear Commitment Model}
 \label{formalILCmodel}
 
-In this section, we will precisely define Ideal Linear Commitment protocols. We will then compare and contrast this interaction model with other models. Ideal Linear Commitment protocols were first described in \cite{BootleCGGHJ17}, but never completely formally defined. The definitions given in this section are new, and an important contribution of this thesis. Though the definitions are new, they draw inspiration from the definitions of similar models for information-theoretic proof systems, such as Interactive Oracle Proof protocols \cite{Ben-SassonCS16}.
+In this section, we will precisely define Ideal Linear Commitment protocols. We will then compare and contrast this interaction model with other models. Later, in Section \ref{chapterlabel:Baby-Protocols}, we give some simple examples of discrete-logarithm-based protocols and their equivalent protocols in the \ILC\ model. 
+
+Ideal Linear Commitment protocols were first described in \cite{BootleCGGHJ17}, but never completely formally defined. The definitions given in this section are new, and an important contribution of this thesis. Though the definitions are new, they draw inspiration from the definitions of similar models for information-theoretic proof systems, such as Interactive Oracle Proof protocols \cite{Ben-SassonCS16}.
 
 In contrast to standard interactions between a prover and a verifier in IP protocols, we will consider interactions in an \emph{ideal linear commitment} interaction environment, \ILC. Figure~\ref{ILCSyntaxFigure11} provides some graphical insight into how parties in an \ILC\ proof protocol interact. Our motivation for introducing this new interaction environment was to model zero-knowledge proof protocols using compressing and homomorphic cryptographic commitment schemes.
 
@@ -108,7 +110,7 @@ We will now define general Ideal Linear Commitment protocols, and then specialis
 
 In a $\mu$-round Ideal Linear Commitment protocol, a prover $\PoILC$ and a verifier $\VILC$ will interact with each other via the \ILC, each sending $\mu$ messages. An Ideal Linear Commitment protocol is defined over a field $\F$ and will use a fixed vector length $\sizevect$. Let $(t_1,\ldots,t_\mu) \in \N^\mu$ be a tuple of message lengths. There is a setup generator $\KKILC$ which outputs $\crs_\ILC = (\F,\sizevect,(t_1,\ldots,t_\mu),\mathsf{aux})$, where $\mathsf{aux}$ consists of extra elements of $\F$ which might be useful when running the protocol.
 
-The prover and the verifier will run the protocol on given inputs. They will use random coins $\rho_\Po$ and $\rho_\V$, and they will maintain states $\mathsf{state}^\Po_i$ and $\mathsf{state}^\V_i$ that will allow them to remember information over several different rounds of the protocol. The initial state $\mathsf{state}^\Po_0$ of the prover will be equal to the prover's input. The initial state $\mathsf{state}^\V_0$ of the verifier will be equal to the prover's input. Initially, the \ILC\ will store $V_0$, which is either a matrix with $\sizevect$ columns, or equal to $\bot$. The matrix $V_0$ has $\sizevect$ columns, and corresponds to any commitments that have been made before the protocol begins, that might form part of the prover or verifier's input.
+The prover and the verifier will run the protocol on given inputs. They will use random coins $\rho_\Po$ and $\rho_\V$, and they will maintain states $\mathsf{state}^\Po_i$ and $\mathsf{state}^\V_i$ that will allow them to remember information over several different rounds of the protocol. The initial state $\mathsf{state}^\Po_0$ of the prover will be equal to the prover's input. The initial state $\mathsf{state}^\V_0$ of the verifier will be equal to the prover's input. Initially, the \ILC\ will store $V_0$, which is either a matrix with $\sizevect$ columns, or equal to $\bot$. The matrix $V_0$ corresponds to any commitments that have been made before the protocol begins, that might form part of the prover or verifier's input.
 
 In every round $\roundnum \in \{ 1,\ldots,\mu \}$:
 \begin{itemize}
@@ -162,6 +164,7 @@ We give pseudocode descriptions of an Ideal Linear Commitment protocol in Figure
 \begin{algorithm}[H]
 \caption*{\ILCopen($Q$)}
 \begin{itemize}
+\item If $M = \bot$ then output $\bot$.
 \item Output $QM$.
 \end{itemize}
 \end{algorithm}
@@ -169,6 +172,7 @@ We give pseudocode descriptions of an Ideal Linear Commitment protocol in Figure
 \begin{algorithm}[H]
 \caption*{\ILCcheck($Q', V'$)}
 \begin{itemize}
+\item If $M = \bot$ then output $\bot$.
 \item If $Q'M = V'$ then output $\top$.
 \item Otherwise output $\bot$.
 \end{itemize}
@@ -303,7 +307,7 @@ In this case, we are able to make several simplifications. Since for $i < \mu$ t
 
 Alternatively, we can easily incorporate vectors of different lengths into the model by padding all vectors with zeroes until they are the same length as the longest vector. This will have no impact on the asymptotic efficiency of our protocols. Some of our \ILC\ protocols require single values to be committed as well as vectors. 
 
-In this case, the matrices $V_{0,j}$ each have $\sizevect_j$ columns.
+In this case, the matrices $V_{0,j}$, which correspond to commitments to data made before the protocol begins, each have $\sizevect_j$ columns, or maybe be equal to $\bot$.
 
 \begin{figure}[!h]
 \resizebox{\textwidth}{!}{
@@ -345,6 +349,7 @@ In this case, the matrices $V_{0,j}$ each have $\sizevect_j$ columns.
 \begin{algorithm}[H]
 \caption*{\ILCopen($\sizevect_i,Q$)}
 \begin{itemize}
+\item If $M_i = \bot$ then output $\bot$.
 \item Output $QM_i$.
 \end{itemize}
 \end{algorithm}
@@ -352,6 +357,7 @@ In this case, the matrices $V_{0,j}$ each have $\sizevect_j$ columns.
 \begin{algorithm}[H]
 \caption*{\ILCcheck($\sizevect_i,Q', V'$)}
 \begin{itemize}
+\item If $M_i = \bot$ then output $\bot$.
 \item If $Q'M_i = V'$ then output $\top$.
 \item Otherwise output $\bot$.
 \end{itemize}
@@ -366,7 +372,7 @@ In this case, the matrices $V_{0,j}$ each have $\sizevect_j$ columns.
 
 \paragraph{Remark.} It is of course easy to generalise to the case where the verifier's messages are not single field elements. We use the case of single field elements for notational simplicity and because it suffices for all of our protocols.
 
-\paragraph{Remark.} We will assume that all parties output messages which parse correctly. In other words, no party or functionality will ever deviate from the protocol using messages which are from the wrong domain, or of incorrect length. This will not be a problem for security. Indeed, provided that checking the format of a message can be done efficiently, it would be simple, but tedious, to add such checks at the beginning of every algorithm, and instruct all algorithms to abort if the checks are failed. We assume that this is the case in all of our compiled protocols.
+\paragraph{Remark.} We will assume that all parties output messages which parse correctly. In other words, no party or functionality will ever deviate from the protocol using messages which are from the wrong domain, or of incorrect length. This includes the verifier making \ILCopen\ and \ILCcheck\ queries $Q$ such that matrices $Q$ and $M$ cannot be multipled together, or such that $Q'V$ and $V'$ are of different dimensions. This will not be a problem for security. Indeed, provided that checking the format of a message can be done efficiently, it would be simple, but tedious, to add such checks at the beginning of every algorithm, and instruct all algorithms to abort if the checks are failed. We assume that this is the case in all of our compiled protocols.
 
 \paragraph{Remark.} If we had followed the original model of \cite{BootleCGGHJ17}, we might have allowed sequences of \ILCcommit, \ILCsend\ and \ILCopen\ and \ILCcheck\ queries to be performed in an arbitrary order. Our definition does not incur a loss in generality by having the prover and verifier alternate in the protocol, as valid protocols in the original model could be recovered by having rounds in which either the prover does nothing or the verifier does not use certain oracles. Rather, our definition corresponds to a sensible reordering of such protocols. For example, the verifier gains no power by being able to make an \ILCopen\ query directly after sending a message to the prover, but before the prover has committed to any new vectors. The verifier might just as well compute their message without sending it, make their query, and then send the message.
 

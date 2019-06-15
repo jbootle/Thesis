@@ -96,9 +96,7 @@ vectors of field elements of some fixed length $\sizevect$, specified in $\crs_{
 
 The \ILC\ could be viewed in several possible different ways, as a commitment functionality, communication channel, a trusted third party, or an oracle for the verifier. When Ideal Linear Commitment protocols are compiled into real zero-knowledge protocols, the functionality previously guaranteed by the \ILC\ will be enforced using various cryptographic tools.
 
-The verifier can send single field elements to the prover. The original model in \cite{BootleCGGHJ17} described an \ILCsend\ command for this purpose. We removed this command, as we found no need for it when moving to a more precise description of the \ILC\ interaction environment.
-
-The verifier can also submit queries to an \ILCopen\ oracle for obtaining the opening of any linear combinations of the vectors \emph{of the same length} sent by the prover. We stress that the verifier can request several linear combinations within a single \ILCopen\ query, as depicted in Figure~\ref{ILCSyntaxFigure11}.
+The verifier can send single field elements to the prover. The verifier can also submit queries to an \ILCopen\ oracle for obtaining the opening of any linear combinations of the vectors \emph{of the same length} sent by the prover. We stress that the verifier can request several linear combinations within a single \ILCopen\ query, as depicted in Figure~\ref{ILCSyntaxFigure11}.
 
 In addition to the \ILC\ commands and oracles used in the original model \cite{BootleCGGHJ17}, we introduce a new \ILCcheck\ oracle. Inside the \ILC \ model, this command behaves in a very similar way to the \ILCopen\ oracle. However, the two commands will be treated slightly differently when \ILC\ protocols are compiled into real protocols. The reason for making the distinction is that in some of our protocols, the verifier needs to check whether a large vector, that they have computed themselves, is the correct linear combination of vectors committed by the prover. This could be solved by having the verifier make an \ILCsend\ query for the correct linear combination and checking whether the result is equal to the large vector, which incurs a communication cost for the large vector in the \ILC\ protocol. However, in a real protocol, where the verifier's queries will actually be computed and sent by the prover, the verifier can re-commit to the vector that they have computed, and check this against the prover's commitments. In other words, since the verifier has already computed the vector for themself, there is no need for them to receive it again. Therefore, the \ILCcheck\ oracle is used to distinguish this case, which should not be counted as part of the communication costs of a proof. This issue will be discussed further in later chapters.
 
@@ -189,23 +187,23 @@ The security properties of \ILC\ proof protocols, including the completeness, so
 
 We have already mentioned $\mu$, the number of rounds of an \ILC\ protocol. This is our first useful complexity measure.
 
-W also consider is $t = \sum_{i=1}^\mu t_i$. This is the \emph{total number of vectors} that the prover commits to as part of the \ILC\ protocol. Later one, we will see that this can impact the communication complexity and computational complexity of real protocols based on \ILC\ protocols.
+Set $t = \sum_{i=1}^\mu t_i$. This is the \emph{total number of vectors} that the prover commits to as part of the \ILC\ protocol. Later one, we will see that this can impact the communication complexity and computational complexity of real protocols based on \ILC\ protocols.
 
-We define $\qc$ to be the \ILCopen\ query complexity, i.e. the number of times that the verifier uses the \ILCopen\ oracle. Similarly, we define $\qc'$ to be the \ILCcheck\ query complexity, i.e. the number of times that the verifier uses the \ILCcheck\ oracle. 
+We define $\qc$ to be the \ILCopen\ query complexity, i.e. the number of linear combinations that the verifier obtains using the \ILCopen\ oracle. Every time the verifier makes an \ILCopen\ query on a matrix $Q \in \F^l \times t$, we consider this to be $l$ queries for the purporse of measuring the query complexity. Then, $\qc$ is the total number of rows from all matrices $\Chal$ on which the verifier has called the \ILCopen\ oracle. Similarly, we define $\qc'$ to be the \ILCcheck\ query complexity, i.e. the number of times that the verifier queries certain linear combinations using the \ILCcheck\ oracle. 
 
 %We define $\qc$ to be the \ILCopen\ query complexity, i.e., $\Chal \in \F^{\qc\times t}$, and $\qc'$ the \ILCcheck\ query complexity, i.e., $\Chal' \in \F^{\qc'\times t}$. Let $T_{\PoILC}$ be the running time of $\PoILC(\crs_{\ILC},\stm,\wit)$, $T_{\ECC\!}(\sizevect)$ be the encoding time for a vector in $\F^\sizevect$, $T_{\ComCommit}(t_\roundnum)$ be the time to commit to $t_\roundnum$ field elements, $T_{\text{Mmul}}(\qc,\totalnumvec,b)$ be the time it takes to multiply matrices in $\F^{\qc\times \totalnumvec}$ and $\F^{\totalnumvec\times b}$ and similarly for $\qc'$. Let $T_{\VILC}$ be the running time of $\VILC(\crs_{\ILC},\stm)$, and let $C_{\ILC}$ be the communication from the verifier to the prover in $\langle \PoILC \ilc \VILC\rangle$, $C_{\ComCommit}(t_\roundnum)$ be the combined size of commitment and randomness for a message consisting of $t_\roundnum$ field elements.
-
-Following \cite{BonehBCGI19}, we define the \emph{degree} of an \ILC\ verifier.
-
-\begin{definition}[Degree of \ILC\ Verifier]
-We say that an \ILC\ protocol has a degree $d$ verifier if the following hold.
-\begin{itemize}
-\item The verifier's output state $\mathsf{state}_i^\V$ is a vector in $\F^{w_i}$.
-\item There exists a check polynomial $T \ : \ \F^{\sum_{i=1}^\mu w_i + \qc \cdot \sizevect} \to \F^{qc' \times \sizevect}$ of degree $d$ that takes as input the verifier's state at each round of the protocol and the verifier's \ILCopen\ queries, and outputs the matrices $V'$ for the verifier's \ILCcheck\ queries.
-\item The verifier accepts if and only if the result of the check query is $\top$.
-\end{itemize}
-\end{definition}
-
+%
+%Following \cite{BonehBCGI19}, we define the \emph{degree} of an \ILC\ verifier.
+%
+%\begin{definition}[Degree of \ILC\ Verifier]
+%We say that an \ILC\ protocol has a degree $d$ verifier if the following hold.
+%\begin{itemize}
+%\item The verifier's output state $\mathsf{state}_i^\V$ is a vector in $\F^{w_i}$.
+%\item There exists a check polynomial $T \ : \ \F^{\sum_{i=1}^\mu w_i + \qc \cdot \sizevect} \to \F^{qc' \times \sizevect}$ of degree $d$ that takes as input the verifier's state at each round of the protocol and the verifier's \ILCopen\ queries, and outputs the matrices $V'$ for the verifier's \ILCcheck\ queries.
+%\item The verifier accepts if and only if the result of the check query is $\top$.
+%\end{itemize}
+%\end{definition}
+%
 \subsection{Public Coin Protocols}
 
 As with zero-knowledge protocols, we say that an Ideal Linear Commitment protocol is \emph{public coin} if the following conditions hold.
@@ -359,7 +357,7 @@ Alternatively, we can easily incorporate vectors of different lengths into the m
 %\vspace{0.1cm}
 \end{minipage}
 }
-\caption{Description of how the parties in an \ILC\ protocol with several vector lengths interact.}
+\caption{Description of how the parties interact in an \ILC\ protocol with several vector lengths.}
 %For explanation, see Subsection~\ref{ssec:constrILCtoIOP}}
 \label{fig:ILCpseudocodemixlen}
 \end{figure}
